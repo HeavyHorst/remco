@@ -28,6 +28,8 @@ type fileConfig struct {
 	templateRes *template.TemplateResource
 }
 
+var config = fileConfig{}
+
 // Cmd represents the file command
 var Cmd = &cobra.Command{
 	Use:   "file",
@@ -49,8 +51,6 @@ var Cmd = &cobra.Command{
 		config.templateRes = t
 	},
 }
-
-var config = fileConfig{}
 
 func init() {
 	Cmd.PersistentFlags().StringVar(&config.filepath, "filepath", "", "The filepath of the yaml/json file")

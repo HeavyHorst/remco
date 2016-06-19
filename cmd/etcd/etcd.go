@@ -25,14 +25,13 @@ import (
 )
 
 type etcdConfig struct {
-	nodes     []string
-	cert      string
-	key       string
-	caCert    string
-	basicAuth bool
-	username  string
-	password  string
-	//client    backends.StoreClient
+	nodes       []string
+	cert        string
+	key         string
+	caCert      string
+	basicAuth   bool
+	username    string
+	password    string
 	templateRes *template.TemplateResource
 }
 
