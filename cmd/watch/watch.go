@@ -12,21 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package etcdv3
+package watch
 
 import "github.com/spf13/cobra"
 
-// pollCmd represents the watch command
-var pollCmd = &cobra.Command{
-	Use:   "poll",
+// watchCmd represents the watch command
+var Cmd = &cobra.Command{
+	Use:   "watch",
 	Short: "A brief description of your command",
-
-	Run: func(cmd *cobra.Command, args []string) {
-		interval, _ := cmd.Flags().GetInt("interval")
-		config.templateRes.Interval(interval)
-	},
-}
-
-func init() {
-	Cmd.AddCommand(pollCmd)
 }

@@ -12,21 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package etcd
+package poll
 
 import "github.com/spf13/cobra"
 
-// watchCmd represents the watch command
-var watchCmd = &cobra.Command{
-	Use:   "watch",
+// pollCmd represents the watch command
+var Cmd = &cobra.Command{
+	Use:   "poll",
 	Short: "A brief description of your command",
-
-	Run: func(cmd *cobra.Command, args []string) {
-		config.templateRes.Monitor()
-	},
 }
-
-func init() {
-	Cmd.AddCommand(watchCmd)
-}
-

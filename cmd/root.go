@@ -21,9 +21,8 @@ import (
 	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
 
-	"github.com/HeavyHorst/remco/cmd/etcd"
-	"github.com/HeavyHorst/remco/cmd/etcdv3"
-	"github.com/HeavyHorst/remco/cmd/file"
+	"github.com/HeavyHorst/remco/cmd/poll"
+	"github.com/HeavyHorst/remco/cmd/watch"
 )
 
 // This represents the base command when called without any subcommands
@@ -52,9 +51,11 @@ func init() {
 	RootCmd.PersistentFlags().IntP("interval", "i", 60, "The backend polling interval in seconds")
 	RootCmd.PersistentFlags().String("log-level", "INFO", "The log Level (DEBUG, INFO, ERROR, ...)")
 
-	RootCmd.AddCommand(etcd.Cmd)
-	RootCmd.AddCommand(etcdv3.Cmd)
-	RootCmd.AddCommand(file.Cmd)
+	//RootCmd.AddCommand(etcd.Cmd)
+	//RootCmd.AddCommand(etcdv3.Cmd)
+	//RootCmd.AddCommand(file.Cmd)
+	RootCmd.AddCommand(watch.Cmd)
+	RootCmd.AddCommand(poll.Cmd)
 
 	cobra.OnInitialize(func() {
 		l, _ := RootCmd.Flags().GetString("log-level")

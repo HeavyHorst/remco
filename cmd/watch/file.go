@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package file
+package watch
 
 import (
 	"os"
@@ -24,20 +24,19 @@ import (
 )
 
 type fileConfig struct {
-	filepath    string
-	templateRes *template.TemplateResource
+	filepath string
 }
 
-var config = fileConfig{}
+var fc = fileConfig{}
 
 // Cmd represents the file command
-var Cmd = &cobra.Command{
+var watchFileCmd = &cobra.Command{
 	Use:   "file",
 	Short: "A brief description of your command",
 
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		log.Info("Filepath set to " + config.filepath)
-		client, err := file.NewFileClient(config.filepath)
+	Run: func(cmd *cobra.Command, args []string) {
+		log.Info("Filepath set to " + fc.filepath)
+		client, err := file.NewFileClient(fc.filepath)
 		if err != nil {
 			log.Error(err)
 		}
@@ -48,10 +47,12 @@ var Cmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		config.templateRes = t
+		t.Monitor()
 	},
 }
 
 func init() {
-	Cmd.PersistentFlags().StringVar(&config.filepath, "filepath", "", "The filepath of the yaml/json file")
+	watchFileCmd.PersistentFlags().StringVar(&fc.filepath, "filepath", "", "The filepath of the yaml/json file")
+
+	Cmd.AddCommand(watchFileCmd)
 }

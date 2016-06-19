@@ -12,21 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package file
+package poll
 
-import "github.com/spf13/cobra"
+import (
+	"os"
 
-// pollCmd represents the watch command
-var pollCmd = &cobra.Command{
-	Use:   "poll",
+	"github.com/HeavyHorst/remco/backends/file"
+	"github.com/HeavyHorst/remco/template"
+	"github.com/cloudflare/cfssl/log"
+	"github.com/spf13/cobra"
+)
+
+type fileConfig struct {
+	filepath string
+}
+
+var fc = fileConfig{}
+
+// Cmd represents the file command
+var watchFileCmd = &cobra.Command{
+	Use:   "file",
 	Short: "A brief description of your command",
 
 	Run: func(cmd *cobra.Command, args []string) {
+		log.Info("Filepath set to " + fc.filepath)
+		client, err := file.NewFileClient(fc.filepath)
+		if err != nil {
+			log.Error(err)
+		}
+
+		t, err := template.NewTemplateResource(client, "/", cmd.Flags())
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+
 		interval, _ := cmd.Flags().GetInt("interval")
-		config.templateRes.Interval(interval)
+		t.Interval(interval)
 	},
 }
 
 func init() {
-	Cmd.AddCommand(pollCmd)
+	watchFileCmd.PersistentFlags().StringVar(&fc.filepath, "filepath", "", "The filepath of the yaml/json file")
+
+	Cmd.AddCommand(watchFileCmd)
 }
