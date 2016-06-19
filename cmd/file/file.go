@@ -15,15 +15,17 @@
 package file
 
 import (
-	"github.com/HeavyHorst/remco/backends"
+	"os"
+
 	"github.com/HeavyHorst/remco/backends/file"
+	"github.com/HeavyHorst/remco/template"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
 )
 
 type fileConfig struct {
-	filepath string
-	client   backends.StoreClient
+	filepath    string
+	templateRes *template.TemplateResource
 }
 
 // Cmd represents the file command
@@ -37,7 +39,14 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			log.Error(err)
 		}
-		config.client = client
+
+		t, err := template.NewTemplateResource(client, "/", cmd.Flags())
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+
+		config.templateRes = t
 	},
 }
 

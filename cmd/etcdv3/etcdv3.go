@@ -15,23 +15,24 @@
 package etcdv3
 
 import (
+	"os"
 	"strings"
 
-	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/backends/etcdv3"
+	"github.com/HeavyHorst/remco/template"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
 )
 
 type etcdConfig struct {
-	nodes     []string
-	cert      string
-	key       string
-	caCert    string
-	basicAuth bool
-	username  string
-	password  string
-	client    backends.StoreClient
+	nodes       []string
+	cert        string
+	key         string
+	caCert      string
+	basicAuth   bool
+	username    string
+	password    string
+	templateRes *template.TemplateResource
 }
 
 var Cmd = &cobra.Command{
@@ -44,7 +45,14 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			log.Error(err)
 		}
-		config.client = client
+
+		t, err := template.NewTemplateResource(client, "/", cmd.Flags())
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+
+		config.templateRes = t
 	},
 }
 

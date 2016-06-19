@@ -14,13 +14,7 @@
 
 package file
 
-import (
-	"os"
-
-	"github.com/HeavyHorst/remco/template"
-	"github.com/cloudflare/cfssl/log"
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 // watchCmd represents the watch command
 var watchCmd = &cobra.Command{
@@ -28,13 +22,7 @@ var watchCmd = &cobra.Command{
 	Short: "A brief description of your command",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		t, err := template.NewTemplateResource(config.client, "/", cmd.Flags())
-		if err != nil {
-			log.Error(err)
-			os.Exit(1)
-		}
-
-		t.Monitor()
+		config.templateRes.Monitor()
 	},
 }
 

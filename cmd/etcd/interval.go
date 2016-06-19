@@ -14,13 +14,7 @@
 
 package etcd
 
-import (
-	"os"
-
-	"github.com/HeavyHorst/remco/template"
-	"github.com/cloudflare/cfssl/log"
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 // pollCmd represents the watch command
 var pollCmd = &cobra.Command{
@@ -28,14 +22,8 @@ var pollCmd = &cobra.Command{
 	Short: "A brief description of your command",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		t, err := template.NewTemplateResource(config.client, "/", cmd.Flags())
-		if err != nil {
-			log.Error(err)
-			os.Exit(1)
-		}
-
 		interval, _ := cmd.Flags().GetInt("interval")
-		t.Interval(interval)
+		config.templateRes.Interval(interval)
 	},
 }
 
