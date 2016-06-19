@@ -18,6 +18,7 @@ import (
 
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/cloudflare/cfssl/log"
+	"github.com/flosch/pongo2"
 	"github.com/kelseyhightower/memkv"
 	flag "github.com/spf13/pflag"
 )
@@ -82,7 +83,31 @@ func NewTemplateResource(storeClient backends.StoreClient, path string, flags *f
 		syncOnly:    syncOnly,
 	}
 
-	addFuncs(tr.funcMap, tr.store.FuncMap)
+	//Wrap the Memkv functions, so that they work with pongo2
+	get := func(key string) memkv.KVPair {
+		val, _ := tr.store.Get(key)
+		return val
+	}
+	gets := func(pattern string) memkv.KVPairs {
+		val, _ := tr.store.GetAll(pattern)
+		return val
+	}
+	getv := func(key string, v ...string) string {
+		val, _ := tr.store.GetValue(key, v...)
+		return val
+	}
+	getvs := func(pattern string) []string {
+		val, _ := tr.store.GetAllValues(pattern)
+		return val
+	}
+
+	tr.funcMap["exists"] = tr.store.Exists
+	tr.funcMap["ls"] = tr.store.List
+	tr.funcMap["lsdir"] = tr.store.ListDir
+	tr.funcMap["get"] = get
+	tr.funcMap["gets"] = gets
+	tr.funcMap["getv"] = getv
+	tr.funcMap["getvs"] = getvs
 
 	return tr, nil
 }
@@ -118,11 +143,18 @@ func (t *TemplateResource) createStageFile() error {
 		return errors.New("Missing template: " + t.Src)
 	}
 
-	log.Debug("Compiling source template " + t.Src)
-	tmpl, err := template.New(path.Base(t.Src)).Funcs(t.funcMap).ParseFiles(t.Src)
+	log.Debug("Compiling source template(pongo2) " + t.Src)
+	tmpl, err := pongo2.FromFile(t.Src)
 	if err != nil {
 		return fmt.Errorf("Unable to process template %s, %s", t.Src, err)
 	}
+
+	/*
+		log.Debug("Compiling source template " + t.Src)
+		tmpl, err := template.New(path.Base(t.Src)).Funcs(t.funcMap).ParseFiles(t.Src)
+		if err != nil {
+			return fmt.Errorf("Unable to process template %s, %s", t.Src, err)
+		}*/
 
 	// create TempFile in Dest directory to avoid cross-filesystem issues
 	temp, err := ioutil.TempFile(filepath.Dir(t.Dest), "."+filepath.Base(t.Dest))
@@ -130,11 +162,17 @@ func (t *TemplateResource) createStageFile() error {
 		return err
 	}
 
-	if err = tmpl.Execute(temp, nil); err != nil {
+	if err = tmpl.ExecuteWriter(t.funcMap, temp); err != nil {
 		temp.Close()
 		os.Remove(temp.Name())
 		return err
 	}
+
+	/*if err = tmpl.Execute(temp, nil); err != nil {
+		temp.Close()
+		os.Remove(temp.Name())
+		return err
+	}*/
 	defer temp.Close()
 
 	// Set the owner, group, and mode on the stage file now to make it easier to
