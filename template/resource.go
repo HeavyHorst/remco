@@ -149,13 +149,6 @@ func (t *TemplateResource) createStageFile() error {
 		return fmt.Errorf("Unable to process template %s, %s", t.Src, err)
 	}
 
-	/*
-		log.Debug("Compiling source template " + t.Src)
-		tmpl, err := template.New(path.Base(t.Src)).Funcs(t.funcMap).ParseFiles(t.Src)
-		if err != nil {
-			return fmt.Errorf("Unable to process template %s, %s", t.Src, err)
-		}*/
-
 	// create TempFile in Dest directory to avoid cross-filesystem issues
 	temp, err := ioutil.TempFile(filepath.Dir(t.Dest), "."+filepath.Base(t.Dest))
 	if err != nil {
@@ -168,11 +161,6 @@ func (t *TemplateResource) createStageFile() error {
 		return err
 	}
 
-	/*if err = tmpl.Execute(temp, nil); err != nil {
-		temp.Close()
-		os.Remove(temp.Name())
-		return err
-	}*/
 	defer temp.Close()
 
 	// Set the owner, group, and mode on the stage file now to make it easier to

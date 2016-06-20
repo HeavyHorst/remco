@@ -2,46 +2,50 @@ package template
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"os"
 	"path"
 	"sort"
 	"strings"
-	"time"
 
+	"github.com/flosch/pongo2"
 	"github.com/kelseyhightower/memkv"
 )
 
 func newFuncMap() map[string]interface{} {
-	m := make(map[string]interface{})
-	m["base"] = path.Base
-	m["split"] = strings.Split
-	m["json"] = UnmarshalJsonObject
-	m["jsonArray"] = UnmarshalJsonArray
-	m["dir"] = path.Dir
-	m["map"] = CreateMap
-	m["getenv"] = Getenv
-	m["join"] = strings.Join
-	m["datetime"] = time.Now
-	m["toUpper"] = strings.ToUpper
-	m["toLower"] = strings.ToLower
-	m["contains"] = strings.Contains
-	m["replace"] = strings.Replace
-	m["lookupIP"] = LookupIP
-	m["lookupSRV"] = LookupSRV
-	m["fileExists"] = isFileExist
-	m["reverse"] = Reverse
-	m["sortByLength"] = SortByLength
-	m["sortKVByLength"] = SortKVByLength
+	m := map[string]interface{}{
+		"json":       UnmarshalJsonObject,
+		"jsonArray":  UnmarshalJsonArray,
+		"dir":        path.Dir,
+		"base":       path.Base,
+		"getenv":     Getenv,
+		"contains":   strings.Contains,
+		"replace":    strings.Replace,
+		"lookupIP":   LookupIP,
+		"lookupSRV":  LookupSRV,
+		"fileExists": isFileExist,
+		"printf":     fmt.Sprintf,
+	}
+
+	//already available in pongo2 ?
+	//  m["join"] = strings.Join -- {{ value|join:" // " }}
+	// 	m["toUpper"] = strings.ToUpper -- {{ value|upper }}
+	//  m["toLower"] = strings.ToLower -- {{ value|lower }}
+	//  m["datetime"] = time.Now  -- {% now "jS F Y H:i" %}
+
+	pongo2.RegisterFilter("reverse", filterReverse)
+	pongo2.RegisterFilter("sortByLength", filterSortByLength)
+	pongo2.RegisterFilter("split", filterSplit)
+
 	return m
 }
 
-func addFuncs(out, in map[string]interface{}) {
-	for name, fn := range in {
-		out[name] = fn
+func filterSplit(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.IsString() || !param.IsString() {
+		return in, nil
 	}
+	return pongo2.AsValue(strings.Split(in.String(), param.String())), nil
 }
 
 type byLengthKV []memkv.KVPair
@@ -58,11 +62,6 @@ func (s byLengthKV) Less(i, j int) bool {
 	return len(s[i].Key) < len(s[j].Key)
 }
 
-func SortKVByLength(values []memkv.KVPair) []memkv.KVPair {
-	sort.Sort(byLengthKV(values))
-	return values
-}
-
 type byLength []string
 
 func (s byLength) Len() int {
@@ -75,14 +74,34 @@ func (s byLength) Less(i, j int) bool {
 	return len(s[i]) < len(s[j])
 }
 
-func SortByLength(values []string) []string {
-	sort.Sort(byLength(values))
-	return values
+func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.CanSlice() {
+		return in, nil
+	}
+
+	values := in.Interface()
+	switch values.(type) {
+	case []string:
+		v := values.([]string)
+		sort.Sort(byLength(v))
+		return pongo2.AsValue(v), nil
+	case []memkv.KVPair:
+		v := values.([]memkv.KVPair)
+		sort.Sort(byLengthKV(v))
+		return pongo2.AsValue(v), nil
+	}
+
+	return in, nil
 }
 
 //Reverse returns the array in reversed order
 //works with []string and []KVPair
-func Reverse(values interface{}) interface{} {
+func filterReverse(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.CanSlice() {
+		return in, nil
+	}
+
+	values := in.Interface()
 	switch values.(type) {
 	case []string:
 		v := values.([]string)
@@ -95,7 +114,8 @@ func Reverse(values interface{}) interface{} {
 			v[left], v[right] = v[right], v[left]
 		}
 	}
-	return values
+
+	return pongo2.AsValue(values), nil
 }
 
 // Getenv retrieves the value of the environment variable named by the key.
@@ -114,33 +134,16 @@ func Getenv(key string, v ...string) string {
 	return value
 }
 
-// CreateMap creates a key-value map of string -> interface{}
-// The i'th is the key and the i+1 is the value
-func CreateMap(values ...interface{}) (map[string]interface{}, error) {
-	if len(values)%2 != 0 {
-		return nil, errors.New("invalid map call")
-	}
-	dict := make(map[string]interface{}, len(values)/2)
-	for i := 0; i < len(values); i += 2 {
-		key, ok := values[i].(string)
-		if !ok {
-			return nil, errors.New("map keys must be strings")
-		}
-		dict[key] = values[i+1]
-	}
-	return dict, nil
-}
-
-func UnmarshalJsonObject(data string) (map[string]interface{}, error) {
+func UnmarshalJsonObject(data string) map[string]interface{} {
 	var ret map[string]interface{}
-	err := json.Unmarshal([]byte(data), &ret)
-	return ret, err
+	json.Unmarshal([]byte(data), &ret)
+	return ret
 }
 
-func UnmarshalJsonArray(data string) ([]interface{}, error) {
+func UnmarshalJsonArray(data string) []interface{} {
 	var ret []interface{}
-	err := json.Unmarshal([]byte(data), &ret)
-	return ret, err
+	json.Unmarshal([]byte(data), &ret)
+	return ret
 }
 
 func LookupIP(data string) []string {
