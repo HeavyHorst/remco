@@ -89,19 +89,31 @@ func NewTemplateResource(storeClient backends.StoreClient, path string, flags *f
 
 	//Wrap the Memkv functions, so that they work with pongo2
 	get := func(key string) memkv.KVPair {
-		val, _ := tr.store.Get(key)
+		val, err := tr.store.Get(key)
+		if err != nil {
+			log.Warning(err)
+		}
 		return val
 	}
 	gets := func(pattern string) memkv.KVPairs {
-		val, _ := tr.store.GetAll(pattern)
+		val, err := tr.store.GetAll(pattern)
+		if err != nil {
+			log.Warning(err)
+		}
 		return val
 	}
 	getv := func(key string, v ...string) string {
-		val, _ := tr.store.GetValue(key, v...)
+		val, err := tr.store.GetValue(key, v...)
+		if err != nil {
+			log.Warning(err)
+		}
 		return val
 	}
 	getvs := func(pattern string) []string {
-		val, _ := tr.store.GetAllValues(pattern)
+		val, err := tr.store.GetAllValues(pattern)
+		if err != nil {
+			log.Warning(err)
+		}
 		return val
 	}
 
