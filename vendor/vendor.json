@@ -75,6 +75,12 @@
 			"revisionTime": "2016-06-17T22:33:18Z"
 		},
 		{
+			"checksumSHA1": "rbJzKkkLXx3KmAo3e+cODbJw4B8=",
+			"path": "github.com/flosch/pongo2",
+			"revision": "7f5515449ea9bbeb00256d9cbb654c556e7d0146",
+			"revisionTime": "2016-03-15T18:30:58Z"
+		},
+		{
 			"checksumSHA1": "LtBBfn+Uw7/gaB2tVsrLRBTprdo=",
 			"path": "github.com/fsnotify/fsnotify",
 			"revision": "30411dbcefb7a1da7e84f75530ad3abe4011b4f8",
