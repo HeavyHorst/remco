@@ -128,11 +128,23 @@ Alias for the [strings.Split](https://golang.org/pkg/strings/#Split) function.
 {% endfor %}
 ```
 
-### json
+### parseJson
 Returns an map[string]interface{} of the json value.
 
-### jsonArray
+### parseJsonArray
 Returns a []interface{} from a json array.
+
+### toJson
+Converts data, for example the result of gets or lsdir, into an JSON object.
+```
+{{ gets("/myapp/database/*") | toJson}}
+```
+
+### toPrettyJson
+Converts data, for example the result of gets or lsdir, into an pretty-printed JSON object, indented by four spaces.
+```
+{{ gets("/myapp/database/*") | toPrettyJson}}
+```
 
 ### sortByLength
 Returns the sorted array. 

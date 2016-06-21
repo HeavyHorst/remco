@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cloudflare/cfssl/log"
 	"github.com/flosch/pongo2"
 	"github.com/kelseyhightower/memkv"
 )
@@ -15,8 +16,10 @@ func initFilters() {
 	pongo2.RegisterFilter("reverse", filterReverse)
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
 	pongo2.RegisterFilter("split", filterSplit)
-	pongo2.RegisterFilter("json", filterUnmarshalJSONObject)
-	pongo2.RegisterFilter("jsonArray", filterUnmarshalJSONArray)
+	pongo2.RegisterFilter("parseJson", filterUnmarshalJSONObject)
+	pongo2.RegisterFilter("parseJsonArray", filterUnmarshalJSONArray)
+	pongo2.RegisterFilter("toJson", filterToJson)
+	pongo2.RegisterFilter("toPrettyJson", filterToPrettyJson)
 	pongo2.RegisterFilter("dir", filterDir)
 	pongo2.RegisterFilter("base", filterBase)
 	pongo2.RegisterFilter("base64", filterBase64)
@@ -49,6 +52,24 @@ func filterSplit(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.
 		return in, nil
 	}
 	return pongo2.AsValue(strings.Split(in.String(), param.String())), nil
+}
+
+func filterToPrettyJson(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	b, err := json.MarshalIndent(in.Interface(), "", "    ")
+	if err != nil {
+		log.Warning(err)
+		return in, nil
+	}
+	return pongo2.AsSafeValue(string(b)), nil
+}
+
+func filterToJson(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	b, err := json.Marshal(in.Interface())
+	if err != nil {
+		log.Warning(err)
+		return in, nil
+	}
+	return pongo2.AsSafeValue(string(b)), nil
 }
 
 func filterUnmarshalJSONObject(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
