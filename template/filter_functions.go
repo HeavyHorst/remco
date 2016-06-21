@@ -1,6 +1,7 @@
 package template
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"path"
 	"sort"
@@ -18,6 +19,15 @@ func initFilters() {
 	pongo2.RegisterFilter("jsonArray", filterUnmarshalJSONArray)
 	pongo2.RegisterFilter("dir", filterDir)
 	pongo2.RegisterFilter("base", filterBase)
+	pongo2.RegisterFilter("base64", filterBase64)
+}
+
+func filterBase64(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.IsString() {
+		return in, nil
+	}
+	sEnc := base64.StdEncoding.EncodeToString([]byte(in.String()))
+	return pongo2.AsValue(sEnc), nil
 }
 
 func filterBase(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

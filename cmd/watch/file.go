@@ -32,7 +32,7 @@ var fc = fileConfig{}
 // Cmd represents the file command
 var watchFileCmd = &cobra.Command{
 	Use:   "file",
-	Short: "A brief description of your command",
+	Short: "use a simple json/yaml file as the backend source",
 
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Info("Filepath set to " + fc.filepath)

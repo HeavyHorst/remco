@@ -19,5 +19,9 @@ import "github.com/spf13/cobra"
 // pollCmd represents the watch command
 var Cmd = &cobra.Command{
 	Use:   "poll",
-	Short: "A brief description of your command",
+	Short: "poll a backend for changes and render the template accordingly",
+}
+
+func init() {
+	Cmd.PersistentFlags().Bool("onetime", false, "run once and exit")
 }

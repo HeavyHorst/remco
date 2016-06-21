@@ -41,7 +41,7 @@ var config = etcdConfig{}
 
 var watchEtcdCmd = &cobra.Command{
 	Use:   "etcd",
-	Short: "A brief description of your command",
+	Short: "use etcd2/3 as the backend source",
 
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Info("Backend nodes set to " + strings.Join(config.nodes, ", "))

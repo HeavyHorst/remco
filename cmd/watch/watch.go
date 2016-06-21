@@ -19,5 +19,5 @@ import "github.com/spf13/cobra"
 // watchCmd represents the watch command
 var Cmd = &cobra.Command{
 	Use:   "watch",
-	Short: "A brief description of your command",
+	Short: "watch a backend for changes and render the template accordingly",
 }

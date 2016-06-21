@@ -27,8 +27,7 @@ import (
 
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "remco",
-	Short: "A brief description of your application",
+	Use: "remco",
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -44,16 +43,14 @@ func init() {
 	RootCmd.PersistentFlags().StringP("src", "s", "/etc/konfigurator/default.template", "The absolute path of a configuration template")
 	RootCmd.PersistentFlags().StringP("dst", "d", "", "The target file")
 	RootCmd.PersistentFlags().StringSliceP("keys", "k", []string{"/"}, "An array of keys")
-	RootCmd.PersistentFlags().StringP("fileMode", "m", "0644", "The permission mode of the file")
+	RootCmd.PersistentFlags().StringP("fileMode", "m", "0644", "The permission mode of the target file")
 	RootCmd.PersistentFlags().StringP("prefix", "p", "/", "The string to prefix to keys")
 	RootCmd.PersistentFlags().StringP("reload_cmd", "r", "", "The command to reload the config")
 	RootCmd.PersistentFlags().StringP("check_cmd", "c", "", "The command to check the config")
 	RootCmd.PersistentFlags().IntP("interval", "i", 60, "The backend polling interval in seconds")
 	RootCmd.PersistentFlags().String("log-level", "INFO", "The log Level (DEBUG, INFO, ERROR, ...)")
+	RootCmd.PersistentFlags().Bool("onetime", false, "run once and exit")
 
-	//RootCmd.AddCommand(etcd.Cmd)
-	//RootCmd.AddCommand(etcdv3.Cmd)
-	//RootCmd.AddCommand(file.Cmd)
 	RootCmd.AddCommand(watch.Cmd)
 	RootCmd.AddCommand(poll.Cmd)
 

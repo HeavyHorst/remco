@@ -1,6 +1,6 @@
 // +build !windows
 
-package template
+package fileutil
 
 import (
 	"crypto/md5"
@@ -11,9 +11,9 @@ import (
 	"syscall"
 )
 
-// fileStat return a fileInfo describing the named file.
-func fileStat(name string) (fi fileInfo, err error) {
-	if isFileExist(name) {
+// Stat return a fileInfo describing the named file.
+func Stat(name string) (fi fileInfo, err error) {
+	if IsFileExist(name) {
 		f, err := os.Open(name)
 		if err != nil {
 			return fi, err

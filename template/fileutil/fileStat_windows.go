@@ -1,4 +1,4 @@
-package template
+package fileutil
 
 import (
 	"crypto/md5"
@@ -8,9 +8,9 @@ import (
 	"os"
 )
 
-// fileStat return a fileInfo describing the named file.
-func fileStat(name string) (fi fileInfo, err error) {
-	if isFileExist(name) {
+// Stat return a fileInfo describing the named file.
+func Stat(name string) (fi fileInfo, err error) {
+	if IsFileExist(name) {
 		f, err := os.Open(name)
 		defer f.Close()
 		if err != nil {

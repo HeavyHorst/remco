@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/HeavyHorst/remco/backends"
+	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/flosch/pongo2"
 	"github.com/kelseyhightower/memkv"
@@ -40,6 +41,7 @@ type TemplateResource struct {
 	store       memkv.Store
 	storeClient backends.StoreClient
 	syncOnly    bool
+	onetime     bool
 }
 
 var ErrEmptySrc = errors.New("empty src template")
@@ -57,6 +59,7 @@ func NewTemplateResource(storeClient backends.StoreClient, path string, flags *f
 	prefix, _ := flags.GetString("prefix")
 	reloadCmd, _ := flags.GetString("reload_cmd")
 	checkCmd, _ := flags.GetString("check_cmd")
+	onetime, _ := flags.GetBool("onetime")
 
 	if src == "" {
 		return nil, ErrEmptySrc
@@ -81,6 +84,7 @@ func NewTemplateResource(storeClient backends.StoreClient, path string, flags *f
 		Uid:         uid,
 		Gid:         gid,
 		syncOnly:    syncOnly,
+		onetime:     onetime,
 	}
 
 	//Wrap the Memkv functions, so that they work with pongo2
@@ -139,7 +143,7 @@ func (t *TemplateResource) setVars() error {
 func (t *TemplateResource) createStageFile() error {
 	log.Debug("Using source template " + t.Src)
 
-	if !isFileExist(t.Src) {
+	if !fileutil.IsFileExist(t.Src) {
 		return errors.New("Missing template: " + t.Src)
 	}
 
@@ -293,7 +297,7 @@ func (t *TemplateResource) process() error {
 // setFileMode sets the FileMode.
 func (t *TemplateResource) setFileMode() error {
 	if t.Mode == "" {
-		if !isFileExist(t.Dest) {
+		if !fileutil.IsFileExist(t.Dest) {
 			t.FileMode = 0644
 		} else {
 			fi, err := os.Stat(t.Dest)
@@ -350,6 +354,9 @@ func (t *TemplateResource) Interval(interval int) error {
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	for {
 		err := t.process()
+		if t.onetime {
+			os.Exit(0)
+		}
 		select {
 		case <-time.After(time.Duration(interval) * time.Second):
 			if err != nil {

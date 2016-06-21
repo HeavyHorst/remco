@@ -6,28 +6,29 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/HeavyHorst/remco/template/fileutil"
 )
 
 func newFuncMap() map[string]interface{} {
 	m := map[string]interface{}{
-		"getenv":     Getenv,
+		"getenv":     getenv,
 		"contains":   strings.Contains,
 		"replace":    strings.Replace,
-		"lookupIP":   LookupIP,
-		"lookupSRV":  LookupSRV,
-		"fileExists": isFileExist,
+		"lookupIP":   lookupIP,
+		"lookupSRV":  lookupSRV,
+		"fileExists": fileutil.IsFileExist,
 		"printf":     fmt.Sprintf,
 	}
 
 	initFilters()
-
 	return m
 }
 
 // Getenv retrieves the value of the environment variable named by the key.
 // It returns the value, which will the default value if the variable is not present.
 // If no default value was given - returns "".
-func Getenv(key string, v ...string) string {
+func getenv(key string, v ...string) string {
 	defaultValue := ""
 	if len(v) > 0 {
 		defaultValue = v[0]
@@ -40,7 +41,7 @@ func Getenv(key string, v ...string) string {
 	return value
 }
 
-func LookupIP(data string) []string {
+func lookupIP(data string) []string {
 	ips, err := net.LookupIP(data)
 	if err != nil {
 		return nil
@@ -55,7 +56,7 @@ func LookupIP(data string) []string {
 	return ipStrings
 }
 
-func LookupSRV(service, proto, name string) []*net.SRV {
+func lookupSRV(service, proto, name string) []*net.SRV {
 	_, addrs, err := net.LookupSRV(service, proto, name)
 	if err != nil {
 		return []*net.SRV{}
