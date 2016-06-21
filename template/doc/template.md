@@ -1,8 +1,39 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Templates](#templates)
+  - [Template Functions](#template-functions)
+    - [exists](#exists)
+    - [get](#get)
+    - [gets](#gets)
+    - [getv](#getv)
+      - [With a default value](#with-a-default-value)
+    - [getvs](#getvs)
+    - [getenv](#getenv)
+      - [With a default value](#with-a-default-value-1)
+    - [ls](#ls)
+    - [lsdir](#lsdir)
+    - [replace](#replace)
+    - [contains](#contains)
+    - [printf](#printf)
+  - [Template Filters](#template-filters)
+    - [base64](#base64)
+    - [base](#base)
+    - [dir](#dir)
+    - [split](#split)
+    - [json](#json)
+    - [jsonArray](#jsonarray)
+    - [sortByLength](#sortbylength)
+    - [reverse](#reverse)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Templates
 
 Templates are written in flosch's [`pongo2`](https://github.com/flosch/pongo2) template engine.
 
-> For a documentation on how the templating language works you can [head over to the Django documentation](https://docs.djangoproject.com/en/dev/topics/templates/). pongo2 aims to be compatible with it.
+> For a documentation on how the templating language works you can head over to the Django documentation. pongo2 aims to be compatible with it.
 
 ## Template Functions
 ### exists

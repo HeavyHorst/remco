@@ -49,7 +49,6 @@ func init() {
 	RootCmd.PersistentFlags().StringP("check_cmd", "c", "", "The command to check the config")
 	RootCmd.PersistentFlags().IntP("interval", "i", 60, "The backend polling interval in seconds")
 	RootCmd.PersistentFlags().String("log-level", "INFO", "The log Level (DEBUG, INFO, ERROR, ...)")
-	RootCmd.PersistentFlags().Bool("onetime", false, "run once and exit")
 
 	RootCmd.AddCommand(watch.Cmd)
 	RootCmd.AddCommand(poll.Cmd)
