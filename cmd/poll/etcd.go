@@ -18,9 +18,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/HeavyHorst/backends/etcdv3"
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/backends/etcd"
+	"github.com/HeavyHorst/remco/backends/etcdv3"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
