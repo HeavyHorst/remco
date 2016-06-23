@@ -197,7 +197,7 @@ func (t *TemplateResource) sync() error {
 	defer os.Remove(staged)
 
 	log.Debug("Comparing candidate config to " + t.Dest)
-	ok, err := sameConfig(staged, t.Dest)
+	ok, err := fileutil.SameFile(staged, t.Dest)
 	if err != nil {
 		log.Error(err.Error())
 	}

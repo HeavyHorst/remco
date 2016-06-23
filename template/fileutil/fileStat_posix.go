@@ -3,7 +3,7 @@
 package fileutil
 
 import (
-	"crypto/md5"
+	hash "crypto/sha1"
 	"errors"
 	"fmt"
 	"io"
@@ -23,9 +23,9 @@ func Stat(name string) (fi fileInfo, err error) {
 		fi.Uid = stats.Sys().(*syscall.Stat_t).Uid
 		fi.Gid = stats.Sys().(*syscall.Stat_t).Gid
 		fi.Mode = stats.Mode()
-		h := md5.New()
+		h := hash.New()
 		io.Copy(h, f)
-		fi.Md5 = fmt.Sprintf("%x", h.Sum(nil))
+		fi.Hash = fmt.Sprintf("%x", h.Sum(nil))
 		return fi, nil
 	}
 	return fi, errors.New("File not found")
