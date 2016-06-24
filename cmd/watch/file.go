@@ -51,8 +51,33 @@ var watchFileCmd = &cobra.Command{
 	},
 }
 
+// Cmd represents the file command
+var pollFileCmd = &cobra.Command{
+	Use:   "file",
+	Short: "use a simple json/yaml file as the backend source",
+
+	Run: func(cmd *cobra.Command, args []string) {
+		log.Info("Filepath set to " + fc.filepath)
+		client, err := file.NewFileClient(fc.filepath)
+		if err != nil {
+			log.Error(err)
+		}
+
+		t, err := template.NewTemplateResource(client, "/", cmd.Flags())
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+
+		interval, _ := cmd.Flags().GetInt("interval")
+		t.Interval(interval)
+	},
+}
+
 func init() {
 	watchFileCmd.PersistentFlags().StringVar(&fc.filepath, "filepath", "", "The filepath of the yaml/json file")
+	pollFileCmd.PersistentFlags().StringVar(&fc.filepath, "filepath", "", "The filepath of the yaml/json file")
 
-	Cmd.AddCommand(watchFileCmd)
+	WatchCmd.AddCommand(watchFileCmd)
+	PollCmd.AddCommand(pollFileCmd)
 }

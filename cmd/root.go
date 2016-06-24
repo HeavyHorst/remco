@@ -21,7 +21,6 @@ import (
 	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
 
-	"github.com/HeavyHorst/remco/cmd/poll"
 	"github.com/HeavyHorst/remco/cmd/watch"
 )
 
@@ -40,18 +39,16 @@ func Execute() {
 }
 
 func init() {
-	RootCmd.PersistentFlags().StringP("src", "s", "/etc/konfigurator/default.template", "The absolute path of a configuration template")
+	RootCmd.PersistentFlags().StringP("src", "s", "/etc/remco/default.template", "The absolute path of a configuration template")
 	RootCmd.PersistentFlags().StringP("dst", "d", "", "The target file")
 	RootCmd.PersistentFlags().StringSliceP("keys", "k", []string{"/"}, "An array of keys")
 	RootCmd.PersistentFlags().StringP("fileMode", "m", "0644", "The permission mode of the target file")
 	RootCmd.PersistentFlags().StringP("prefix", "p", "/", "The string to prefix to keys")
 	RootCmd.PersistentFlags().StringP("reload_cmd", "r", "", "The command to reload the config")
 	RootCmd.PersistentFlags().StringP("check_cmd", "c", "", "The command to check the config")
-	RootCmd.PersistentFlags().IntP("interval", "i", 60, "The backend polling interval in seconds")
 	RootCmd.PersistentFlags().String("log-level", "INFO", "The log Level (DEBUG, INFO, ERROR, ...)")
 
-	RootCmd.AddCommand(watch.Cmd)
-	RootCmd.AddCommand(poll.Cmd)
+	RootCmd.AddCommand(watch.WatchCmd, watch.PollCmd)
 
 	cobra.OnInitialize(func() {
 		l, _ := RootCmd.Flags().GetString("log-level")
