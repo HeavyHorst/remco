@@ -21,10 +21,21 @@ import (
 	"github.com/HeavyHorst/remco/template"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 type fileConfig struct {
 	filepath string
+}
+
+func (f *fileConfig) newTemplateRes(flags *pflag.FlagSet) (*template.TemplateResource, error) {
+	log.Info("Filepath set to " + f.filepath)
+	client, err := file.NewFileClient(f.filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	return template.NewTemplateResource(client, flags)
 }
 
 var fc = fileConfig{}
@@ -33,20 +44,12 @@ var fc = fileConfig{}
 var watchFileCmd = &cobra.Command{
 	Use:   "file",
 	Short: "use a simple json/yaml file as the backend source",
-
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Info("Filepath set to " + fc.filepath)
-		client, err := file.NewFileClient(fc.filepath)
-		if err != nil {
-			log.Error(err)
-		}
-
-		t, err := template.NewTemplateResource(client, "/", cmd.Flags())
+		t, err := fc.newTemplateRes(cmd.Flags())
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
-
 		t.Monitor()
 	},
 }
@@ -55,28 +58,20 @@ var watchFileCmd = &cobra.Command{
 var pollFileCmd = &cobra.Command{
 	Use:   "file",
 	Short: "use a simple json/yaml file as the backend source",
-
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Info("Filepath set to " + fc.filepath)
-		client, err := file.NewFileClient(fc.filepath)
-		if err != nil {
-			log.Error(err)
-		}
-
-		t, err := template.NewTemplateResource(client, "/", cmd.Flags())
+		t, err := fc.newTemplateRes(cmd.Flags())
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
-
 		interval, _ := cmd.Flags().GetInt("interval")
 		t.Interval(interval)
 	},
 }
 
 func init() {
-	watchFileCmd.PersistentFlags().StringVar(&fc.filepath, "filepath", "", "The filepath of the yaml/json file")
-	pollFileCmd.PersistentFlags().StringVar(&fc.filepath, "filepath", "", "The filepath of the yaml/json file")
+	watchFileCmd.Flags().StringVar(&fc.filepath, "filepath", "", "The filepath of the yaml/json file")
+	pollFileCmd.Flags().StringVar(&fc.filepath, "filepath", "", "The filepath of the yaml/json file")
 
 	WatchCmd.AddCommand(watchFileCmd)
 	PollCmd.AddCommand(pollFileCmd)

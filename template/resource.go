@@ -47,7 +47,7 @@ type TemplateResource struct {
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewTemplateResource creates a TemplateResource.
-func NewTemplateResource(storeClient backends.StoreClient, path string, flags *flag.FlagSet) (*TemplateResource, error) {
+func NewTemplateResource(storeClient backends.StoreClient, flags *flag.FlagSet) (*TemplateResource, error) {
 	if storeClient == nil {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
