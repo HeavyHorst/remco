@@ -14,7 +14,14 @@
 
 package watch
 
-import "github.com/spf13/cobra"
+import (
+	"os"
+
+	"github.com/HeavyHorst/remco/backends"
+	"github.com/HeavyHorst/remco/template"
+	"github.com/cloudflare/cfssl/log"
+	"github.com/spf13/cobra"
+)
 
 // WatchCmd represents the watch command
 var WatchCmd = &cobra.Command{
@@ -31,4 +38,35 @@ var PollCmd = &cobra.Command{
 func init() {
 	PollCmd.PersistentFlags().IntP("interval", "i", 60, "The backend polling interval in seconds")
 	PollCmd.PersistentFlags().Bool("onetime", false, "run once and exit")
+}
+
+func watch(bc backends.BackendConfig, cmd *cobra.Command) {
+	client, err := bc.NewClient()
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+
+	t, err := template.NewTemplateResource(client, cmd.Flags())
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+	t.Monitor()
+}
+
+func poll(bc backends.BackendConfig, cmd *cobra.Command) {
+	client, err := bc.NewClient()
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+
+	t, err := template.NewTemplateResource(client, cmd.Flags())
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+	interval, _ := cmd.Flags().GetInt("interval")
+	t.Interval(interval)
 }
