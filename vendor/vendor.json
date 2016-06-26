@@ -129,6 +129,12 @@
 			"revisionTime": "2016-06-14T22:31:40Z"
 		},
 		{
+			"checksumSHA1": "SBu6v9PlA4CCVOt8nGmgIXyi+5g=",
+			"path": "github.com/kelseyhightower/confd/backends/consul",
+			"revision": "4c9c4335bd35fad095053bba4363b8e8d8487bbf",
+			"revisionTime": "2016-04-19T14:53:44Z"
+		},
+		{
 			"checksumSHA1": "D2QFYrg/6CTA+mBh/2e00ErY7Zw=",
 			"path": "github.com/kelseyhightower/memkv",
 			"revision": "71620c547230ad53777a00e2ebd3bbab8353370e",
