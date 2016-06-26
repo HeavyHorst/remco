@@ -141,6 +141,12 @@
 			"revisionTime": "2016-02-24T08:34:39Z"
 		},
 		{
+			"checksumSHA1": "MUYxtCY95dt/b/5cmzP0x1b9d/E=",
+			"path": "github.com/naoina/toml",
+			"revision": "751171607256bb66e64c9f0220c00662420c38e9",
+			"revisionTime": "2015-07-27T12:48:37Z"
+		},
+		{
 			"checksumSHA1": "58DHZSuvG0+mKl+Ijks8uF60+fw=",
 			"path": "github.com/spf13/cobra",
 			"revision": "bc81c21bd0d8be5ba2d6630a505d79d4467566e7",

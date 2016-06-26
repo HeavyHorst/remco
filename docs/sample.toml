@@ -18,7 +18,24 @@
       nodes = ["http://127.0.0.1:4001"]
       version = 2
 
-      
 
+[[config]]
+  fileMode = "0777"
+  
+  [config.cmd]
+    check = "test"
+    reload = "test"
+
+  [config.template]
+    src = "/etc/remco/default.template"
+    dst = "/etc/haproxy/haproxy.conf"
+
+  [config.backend]
+    name = "file"
+    prefix = "/"
+    interval = 1
+    keys = ["/config", "/services"]
+    [config.backend.fileconfig]
+      filepath = "/etc/haproxy/haproxy.yml"
     
       

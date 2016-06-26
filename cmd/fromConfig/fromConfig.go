@@ -15,17 +15,71 @@
 package fromConfig
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 
+	"github.com/HeavyHorst/remco/backends/consul"
+	"github.com/HeavyHorst/remco/backends/etcd"
+	"github.com/HeavyHorst/remco/backends/file"
+	"github.com/cloudflare/cfssl/log"
+	"github.com/naoina/toml"
 	"github.com/spf13/cobra"
 )
+
+type tomlConf struct {
+	Config []struct {
+		FileMode string
+		Cmd      struct {
+			Check  string
+			Reload string
+		}
+		Template struct {
+			Src string
+			Dst string
+		}
+		Backend struct {
+			Name         string
+			Prefix       string
+			Interval     int
+			Keys         []string
+			Etcdconfig   etcd.Config
+			Fileconfig   file.Config
+			Consulconfig consul.Config
+		}
+	}
+}
 
 // Cmd represents the fromConfig command
 var Cmd = &cobra.Command{
 	Use:   "fromConfig",
 	Short: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Ich habe leider noch keine Funktion")
+		cfg, _ := cmd.Flags().GetString("config")
+
+		f, err := os.Open(cfg)
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+		defer f.Close()
+		buf, err := ioutil.ReadAll(f)
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+		var c tomlConf
+		if err := toml.Unmarshal(buf, &c); err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+
+		for _, v := range c.Config {
+			data, _ := json.MarshalIndent(v, "", "  ")
+			fmt.Println(string(data))
+		}
+
 	},
 }
 
