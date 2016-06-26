@@ -1,0 +1,24 @@
+[[config]]
+  fileMode = "0644"
+  
+  [config.cmd]
+    check = ""
+    reload = ""
+
+  [config.template]
+    src = "/etc/remco/default.template"
+    dst = "/etc/haproxy/haproxy.conf"
+
+  [config.backend]
+    name = "etcd"
+    prefix = "/"
+    interval = 1
+    keys = ["/config", "/services"]
+    [config.backend.etcdconfig]
+      nodes = ["http://127.0.0.1:4001"]
+      version = 2
+
+      
+
+    
+      

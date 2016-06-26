@@ -21,6 +21,7 @@ import (
 	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
 
+	"github.com/HeavyHorst/remco/cmd/fromConfig"
 	"github.com/HeavyHorst/remco/cmd/watch"
 )
 
@@ -48,7 +49,7 @@ func init() {
 	RootCmd.PersistentFlags().StringP("check_cmd", "c", "", "The command to check the config")
 	RootCmd.PersistentFlags().String("log-level", "INFO", "The log Level (DEBUG, INFO, ERROR, ...)")
 
-	RootCmd.AddCommand(watch.WatchCmd, watch.PollCmd)
+	RootCmd.AddCommand(watch.WatchCmd, watch.PollCmd, fromConfig.Cmd)
 
 	cobra.OnInitialize(func() {
 		l, _ := RootCmd.Flags().GetString("log-level")
