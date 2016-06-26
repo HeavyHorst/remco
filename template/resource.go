@@ -328,7 +328,7 @@ func (t *TemplateResource) setFileMode() error {
 	return nil
 }
 
-func (t *TemplateResource) Monitor() error {
+func (t *TemplateResource) Monitor() {
 	var lastIndex uint64
 	stopChan := make(chan bool)
 	signalChan := make(chan os.Signal, 1)
@@ -356,18 +356,21 @@ func (t *TemplateResource) Monitor() error {
 		select {
 		case s := <-signalChan:
 			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			os.Exit(0)
+			return
 		}
 	}
 }
 
-func (t *TemplateResource) Interval(interval int) error {
+func (t *TemplateResource) Interval(interval int) {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	for {
 		err := t.process()
 		if t.onetime {
-			os.Exit(0)
+			if err != nil {
+				log.Error(err)
+			}
+			return
 		}
 		select {
 		case <-time.After(time.Duration(interval) * time.Second):
@@ -376,7 +379,7 @@ func (t *TemplateResource) Interval(interval int) error {
 			}
 		case s := <-signalChan:
 			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			os.Exit(0)
+			return
 		}
 	}
 }

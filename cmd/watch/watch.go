@@ -15,11 +15,8 @@
 package watch
 
 import (
-	"os"
-
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/template"
-	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
 )
 
@@ -40,33 +37,33 @@ func init() {
 	PollCmd.PersistentFlags().Bool("onetime", false, "run once and exit")
 }
 
-func watch(bc backends.BackendConfig, cmd *cobra.Command) {
+func watch(bc backends.BackendConfig, cmd *cobra.Command) error {
 	client, err := bc.NewClient()
 	if err != nil {
-		log.Error(err)
-		os.Exit(1)
+		return err
 	}
 
 	t, err := template.NewTemplateResource(client, cmd.Flags())
 	if err != nil {
-		log.Error(err)
-		os.Exit(1)
+		return err
 	}
 	t.Monitor()
+
+	return nil
 }
 
-func poll(bc backends.BackendConfig, cmd *cobra.Command) {
+func poll(bc backends.BackendConfig, cmd *cobra.Command) error {
 	client, err := bc.NewClient()
 	if err != nil {
-		log.Error(err)
-		os.Exit(1)
+		return err
 	}
 
 	t, err := template.NewTemplateResource(client, cmd.Flags())
 	if err != nil {
-		log.Error(err)
-		os.Exit(1)
+		return err
 	}
 	interval, _ := cmd.Flags().GetInt("interval")
 	t.Interval(interval)
+
+	return nil
 }

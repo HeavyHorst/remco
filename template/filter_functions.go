@@ -12,7 +12,7 @@ import (
 	"github.com/kelseyhightower/memkv"
 )
 
-func initFilters() {
+func init() {
 	pongo2.RegisterFilter("reverse", filterReverse)
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
 	pongo2.RegisterFilter("split", filterSplit)

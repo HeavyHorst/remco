@@ -16,6 +16,7 @@ package watch
 
 import (
 	"github.com/HeavyHorst/remco/backends/etcd"
+	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +26,10 @@ var watchEtcdCmd = &cobra.Command{
 	Use:   "etcd",
 	Short: "use etcd2/3 as the backend source",
 	Run: func(cmd *cobra.Command, args []string) {
-		watch(config, cmd)
+		err := watch(config, cmd)
+		if err != nil {
+			log.Error(err)
+		}
 	},
 }
 
@@ -33,7 +37,10 @@ var pollEtcdCmd = &cobra.Command{
 	Use:   "etcd",
 	Short: "use etcd2/3 as the backend source",
 	Run: func(cmd *cobra.Command, args []string) {
-		poll(config, cmd)
+		err := poll(config, cmd)
+		if err != nil {
+			log.Error(err)
+		}
 	},
 }
 

@@ -75,6 +75,7 @@ var Cmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		//wait := &sync.WaitGroup{}
 		for _, v := range c.Config {
 			data, _ := json.MarshalIndent(v, "", "  ")
 			fmt.Println(string(data))

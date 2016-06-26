@@ -21,7 +21,7 @@ func newFuncMap() map[string]interface{} {
 		"printf":     fmt.Sprintf,
 	}
 
-	initFilters()
+	//initFilters()
 	return m
 }
 

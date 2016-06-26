@@ -16,6 +16,7 @@ package watch
 
 import (
 	"github.com/HeavyHorst/remco/backends/consul"
+	"github.com/cloudflare/cfssl/log"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +26,10 @@ var watchConsulCmd = &cobra.Command{
 	Use:   "consul",
 	Short: "use consul k/v as the backend source",
 	Run: func(cmd *cobra.Command, args []string) {
-		watch(consulConfig, cmd)
+		err := watch(consulConfig, cmd)
+		if err != nil {
+			log.Error(err)
+		}
 	},
 }
 
@@ -33,7 +37,10 @@ var pollConsulCmd = &cobra.Command{
 	Use:   "consul",
 	Short: "use consul k/v as the backend source",
 	Run: func(cmd *cobra.Command, args []string) {
-		poll(consulConfig, cmd)
+		err := poll(consulConfig, cmd)
+		if err != nil {
+			log.Error(err)
+		}
 	},
 }
 
