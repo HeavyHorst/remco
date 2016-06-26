@@ -15,14 +15,15 @@
 package fromConfig
 
 import (
-	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
+	"sync"
 
+	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/backends/consul"
 	"github.com/HeavyHorst/remco/backends/etcd"
 	"github.com/HeavyHorst/remco/backends/file"
+	"github.com/HeavyHorst/remco/template"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/naoina/toml"
 	"github.com/spf13/cobra"
@@ -36,8 +37,9 @@ type tomlConf struct {
 			Reload string
 		}
 		Template struct {
-			Src string
-			Dst string
+			Onetime bool
+			Src     string
+			Dst     string
 		}
 		Backend struct {
 			Name         string
@@ -75,12 +77,38 @@ var Cmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		//wait := &sync.WaitGroup{}
+		wait := &sync.WaitGroup{}
 		for _, v := range c.Config {
-			data, _ := json.MarshalIndent(v, "", "  ")
-			fmt.Println(string(data))
-		}
+			var client backends.StoreClient
+			var err error
 
+			switch v.Backend.Name {
+			case "etcd":
+				client, err = v.Backend.Etcdconfig.NewClient()
+			case "file":
+				client, err = v.Backend.Fileconfig.NewClient()
+			case "consul":
+				client, err = v.Backend.Consulconfig.NewClient()
+			}
+
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+
+			t, err := template.NewTemplateResource(client, v.Template.Src, v.Template.Dst, v.Backend.Keys, v.FileMode, v.Backend.Prefix, v.Cmd.Reload, v.Cmd.Check, v.Template.Onetime)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+
+			wait.Add(1)
+			go func() {
+				defer wait.Done()
+				t.Monitor()
+			}()
+		}
+		wait.Wait()
 	},
 }
 

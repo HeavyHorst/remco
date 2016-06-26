@@ -47,19 +47,10 @@ type TemplateResource struct {
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewTemplateResource creates a TemplateResource.
-func NewTemplateResource(storeClient backends.StoreClient, flags *flag.FlagSet) (*TemplateResource, error) {
+func NewTemplateResource(storeClient backends.StoreClient, src, dst string, keys []string, fileMode, prefix, reloadCmd, checkCmd string, onetime bool) (*TemplateResource, error) {
 	if storeClient == nil {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
-
-	src, _ := flags.GetString("src")
-	dst, _ := flags.GetString("dst")
-	keys, _ := flags.GetStringSlice("keys")
-	fileMode, _ := flags.GetString("fileMode")
-	prefix, _ := flags.GetString("prefix")
-	reloadCmd, _ := flags.GetString("reload_cmd")
-	checkCmd, _ := flags.GetString("check_cmd")
-	onetime, _ := flags.GetBool("onetime")
 
 	if src == "" {
 		return nil, ErrEmptySrc
@@ -126,6 +117,20 @@ func NewTemplateResource(storeClient backends.StoreClient, flags *flag.FlagSet) 
 	tr.funcMap["getvs"] = getvs
 
 	return tr, nil
+}
+
+// NewTemplateResourceFromFlags creates a TemplateResource from the provided commandline flags.
+func NewTemplateResourceFromFlags(storeClient backends.StoreClient, flags *flag.FlagSet) (*TemplateResource, error) {
+	src, _ := flags.GetString("src")
+	dst, _ := flags.GetString("dst")
+	keys, _ := flags.GetStringSlice("keys")
+	fileMode, _ := flags.GetString("fileMode")
+	prefix, _ := flags.GetString("prefix")
+	reloadCmd, _ := flags.GetString("reload_cmd")
+	checkCmd, _ := flags.GetString("check_cmd")
+	onetime, _ := flags.GetBool("onetime")
+
+	return NewTemplateResource(storeClient, src, dst, keys, fileMode, prefix, reloadCmd, checkCmd, onetime)
 }
 
 // setVars sets the Vars for template resource.

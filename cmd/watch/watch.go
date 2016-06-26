@@ -43,7 +43,7 @@ func watch(bc backends.BackendConfig, cmd *cobra.Command) error {
 		return err
 	}
 
-	t, err := template.NewTemplateResource(client, cmd.Flags())
+	t, err := template.NewTemplateResourceFromFlags(client, cmd.Flags())
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func poll(bc backends.BackendConfig, cmd *cobra.Command) error {
 		return err
 	}
 
-	t, err := template.NewTemplateResource(client, cmd.Flags())
+	t, err := template.NewTemplateResourceFromFlags(client, cmd.Flags())
 	if err != nil {
 		return err
 	}
