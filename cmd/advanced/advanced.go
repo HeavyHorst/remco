@@ -31,17 +31,13 @@ import (
 
 type tomlConf struct {
 	Config []struct {
-		FileMode string
-		Cmd      struct {
+		Cmd struct {
 			Check  string
 			Reload string
 		}
-		Template struct {
-			Onetime bool
-			Src     string
-			Dst     string
-		}
-		Backend struct {
+		Template []*template.SrcDst
+		Backend  struct {
+			Onetime      bool
 			Watch        bool
 			Name         string
 			Prefix       string
@@ -102,7 +98,7 @@ var Cmd = &cobra.Command{
 				continue
 			}
 
-			t, err := template.NewTemplateResource(client, v.Template.Src, v.Template.Dst, v.Backend.Keys, v.FileMode, v.Backend.Prefix, v.Cmd.Reload, v.Cmd.Check, v.Template.Onetime)
+			t, err := template.NewTemplateResource(client, v.Template, v.Backend.Keys, v.Backend.Prefix, v.Cmd.Reload, v.Cmd.Check, v.Backend.Onetime)
 			if err != nil {
 				log.Error(err)
 				continue

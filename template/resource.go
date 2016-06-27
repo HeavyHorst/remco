@@ -24,36 +24,42 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
+type SrcDst struct {
+	Src       string
+	Dst       string
+	Mode      string
+	stageFile *os.File
+	fileMode  os.FileMode
+}
+
 // TemplateResource is the representation of a parsed template resource.
 type TemplateResource struct {
 	CheckCmd    string
-	Dest        string
-	FileMode    os.FileMode
 	Gid         int
 	Keys        []string
-	Mode        string
 	Prefix      string
 	ReloadCmd   string
-	Src         string
-	StageFile   *os.File
 	Uid         int
 	funcMap     map[string]interface{}
 	store       memkv.Store
 	storeClient backends.StoreClient
 	syncOnly    bool
 	onetime     bool
+	sources     []*SrcDst
 }
 
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewTemplateResource creates a TemplateResource.
-func NewTemplateResource(storeClient backends.StoreClient, src, dst string, keys []string, fileMode, prefix, reloadCmd, checkCmd string, onetime bool) (*TemplateResource, error) {
+func NewTemplateResource(storeClient backends.StoreClient, sources []*SrcDst, keys []string, prefix, reloadCmd, checkCmd string, onetime bool) (*TemplateResource, error) {
 	if storeClient == nil {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
 
-	if src == "" {
-		return nil, ErrEmptySrc
+	for _, v := range sources {
+		if v.Src == "" {
+			return nil, ErrEmptySrc
+		}
 	}
 
 	// TODO implement flags for these values
@@ -62,10 +68,7 @@ func NewTemplateResource(storeClient backends.StoreClient, src, dst string, keys
 	gid := os.Getegid()
 
 	tr := &TemplateResource{
-		Src:         src,
-		Dest:        dst,
 		Keys:        keys,
-		Mode:        fileMode,
 		Prefix:      prefix,
 		ReloadCmd:   reloadCmd,
 		CheckCmd:    checkCmd,
@@ -76,6 +79,7 @@ func NewTemplateResource(storeClient backends.StoreClient, src, dst string, keys
 		Gid:         gid,
 		syncOnly:    syncOnly,
 		onetime:     onetime,
+		sources:     sources,
 	}
 
 	//Wrap the Memkv functions, so that they work with pongo2
@@ -130,7 +134,13 @@ func NewTemplateResourceFromFlags(storeClient backends.StoreClient, flags *flag.
 	checkCmd, _ := flags.GetString("check_cmd")
 	onetime, _ := flags.GetBool("onetime")
 
-	return NewTemplateResource(storeClient, src, dst, keys, fileMode, prefix, reloadCmd, checkCmd, onetime)
+	sd := &SrcDst{
+		Src:  src,
+		Dst:  dst,
+		Mode: fileMode,
+	}
+
+	return NewTemplateResource(storeClient, []*SrcDst{sd}, keys, prefix, reloadCmd, checkCmd, onetime)
 }
 
 // setVars sets the Vars for template resource.
@@ -157,38 +167,44 @@ func (t *TemplateResource) setVars() error {
 // template and setting the desired owner, group, and mode. It also sets the
 // StageFile for the template resource.
 // It returns an error if any.
-func (t *TemplateResource) createStageFile() error {
-	log.Debug("Using source template " + t.Src)
+func (t *TemplateResource) createStageFileAndSync() error {
+	for _, s := range t.sources {
+		log.Debug("Using source template " + s.Src)
 
-	if !fileutil.IsFileExist(t.Src) {
-		return errors.New("Missing template: " + t.Src)
+		if !fileutil.IsFileExist(s.Src) {
+			return errors.New("Missing template: " + s.Src)
+		}
+
+		log.Debug("Compiling source template(pongo2) " + s.Src)
+		tmpl, err := pongo2.FromFile(s.Src)
+		if err != nil {
+			return fmt.Errorf("Unable to process template %s, %s", s.Src, err)
+		}
+
+		// create TempFile in Dest directory to avoid cross-filesystem issues
+		temp, err := ioutil.TempFile(filepath.Dir(s.Dst), "."+filepath.Base(s.Dst))
+		if err != nil {
+			return err
+		}
+
+		if err = tmpl.ExecuteWriter(t.funcMap, temp); err != nil {
+			temp.Close()
+			os.Remove(temp.Name())
+			return err
+		}
+
+		defer temp.Close()
+
+		// Set the owner, group, and mode on the stage file now to make it easier to
+		// compare against the destination configuration file later.
+		os.Chmod(temp.Name(), s.fileMode)
+		os.Chown(temp.Name(), t.Uid, t.Gid)
+		s.stageFile = temp
+
+		if err = t.sync(s); err != nil {
+			return err
+		}
 	}
-
-	log.Debug("Compiling source template(pongo2) " + t.Src)
-	tmpl, err := pongo2.FromFile(t.Src)
-	if err != nil {
-		return fmt.Errorf("Unable to process template %s, %s", t.Src, err)
-	}
-
-	// create TempFile in Dest directory to avoid cross-filesystem issues
-	temp, err := ioutil.TempFile(filepath.Dir(t.Dest), "."+filepath.Base(t.Dest))
-	if err != nil {
-		return err
-	}
-
-	if err = tmpl.ExecuteWriter(t.funcMap, temp); err != nil {
-		temp.Close()
-		os.Remove(temp.Name())
-		return err
-	}
-
-	defer temp.Close()
-
-	// Set the owner, group, and mode on the stage file now to make it easier to
-	// compare against the destination configuration file later.
-	os.Chmod(temp.Name(), t.FileMode)
-	os.Chown(temp.Name(), t.Uid, t.Gid)
-	t.StageFile = temp
 	return nil
 }
 
@@ -197,25 +213,25 @@ func (t *TemplateResource) createStageFile() error {
 // overwriting the target config file. Finally, sync will run a reload command
 // if set to have the application or service pick up the changes.
 // It returns an error if any.
-func (t *TemplateResource) sync() error {
-	staged := t.StageFile.Name()
+func (t *TemplateResource) sync(s *SrcDst) error {
+	staged := s.stageFile.Name()
 	defer os.Remove(staged)
 
-	log.Debug("Comparing candidate config to " + t.Dest)
-	ok, err := fileutil.SameFile(staged, t.Dest)
+	log.Debug("Comparing candidate config to " + s.Dst)
+	ok, err := fileutil.SameFile(staged, s.Dst)
 	if err != nil {
 		log.Error(err.Error())
 	}
 
 	if !ok {
-		log.Info("Target config " + t.Dest + " out of sync")
+		log.Info("Target config " + s.Dst + " out of sync")
 		if !t.syncOnly && t.CheckCmd != "" {
-			if err := t.check(); err != nil {
+			if err := t.check(staged); err != nil {
 				return errors.New("Config check failed: " + err.Error())
 			}
 		}
-		log.Debug("Overwriting target config " + t.Dest)
-		err := os.Rename(staged, t.Dest)
+		log.Debug("Overwriting target config " + s.Dst)
+		err := os.Rename(staged, s.Dst)
 		if err != nil {
 			if strings.Contains(err.Error(), "device or resource busy") {
 				log.Debug("Rename failed - target is likely a mount. Trying to write instead")
@@ -226,9 +242,9 @@ func (t *TemplateResource) sync() error {
 				if rerr != nil {
 					return rerr
 				}
-				err := ioutil.WriteFile(t.Dest, contents, t.FileMode)
+				err := ioutil.WriteFile(s.Dst, contents, s.fileMode)
 				// make sure owner and group match the temp file, in case the file was created with WriteFile
-				os.Chown(t.Dest, t.Uid, t.Gid)
+				os.Chown(s.Dst, t.Uid, t.Gid)
 				if err != nil {
 					return err
 				}
@@ -241,9 +257,9 @@ func (t *TemplateResource) sync() error {
 				return err
 			}
 		}
-		log.Info("Target config " + t.Dest + " has been updated")
+		log.Info("Target config " + s.Dst + " has been updated")
 	} else {
-		log.Debug("Target config " + t.Dest + " in sync")
+		log.Debug("Target config " + s.Dst + " in sync")
 	}
 	return nil
 }
@@ -254,10 +270,10 @@ func (t *TemplateResource) sync() error {
 // check to be run on the staged file before overwriting the destination config
 // file.
 // It returns nil if the check command returns 0 and there are no other errors.
-func (t *TemplateResource) check() error {
+func (t *TemplateResource) check(stageFile string) error {
 	var cmdBuffer bytes.Buffer
 	data := make(map[string]string)
-	data["src"] = t.StageFile.Name()
+	data["src"] = stageFile
 	tmpl, err := template.New("checkcmd").Parse(t.CheckCmd)
 	if err != nil {
 		return err
@@ -302,10 +318,7 @@ func (t *TemplateResource) process() error {
 	if err := t.setVars(); err != nil {
 		return err
 	}
-	if err := t.createStageFile(); err != nil {
-		return err
-	}
-	if err := t.sync(); err != nil {
+	if err := t.createStageFileAndSync(); err != nil {
 		return err
 	}
 	return nil
@@ -313,22 +326,24 @@ func (t *TemplateResource) process() error {
 
 // setFileMode sets the FileMode.
 func (t *TemplateResource) setFileMode() error {
-	if t.Mode == "" {
-		if !fileutil.IsFileExist(t.Dest) {
-			t.FileMode = 0644
+	for _, s := range t.sources {
+		if s.Mode == "" {
+			if !fileutil.IsFileExist(s.Dst) {
+				s.fileMode = 0644
+			} else {
+				fi, err := os.Stat(s.Dst)
+				if err != nil {
+					return err
+				}
+				s.fileMode = fi.Mode()
+			}
 		} else {
-			fi, err := os.Stat(t.Dest)
+			mode, err := strconv.ParseUint(s.Mode, 0, 32)
 			if err != nil {
 				return err
 			}
-			t.FileMode = fi.Mode()
+			s.fileMode = os.FileMode(mode)
 		}
-	} else {
-		mode, err := strconv.ParseUint(t.Mode, 0, 32)
-		if err != nil {
-			return err
-		}
-		t.FileMode = os.FileMode(mode)
 	}
 	return nil
 }
