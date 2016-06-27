@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fromConfig
+package advanced
 
 import (
 	"io/ioutil"
@@ -42,6 +42,7 @@ type tomlConf struct {
 			Dst     string
 		}
 		Backend struct {
+			Watch        bool
 			Name         string
 			Prefix       string
 			Interval     int
@@ -53,27 +54,32 @@ type tomlConf struct {
 	}
 }
 
-// Cmd represents the fromConfig command
-var Cmd = &cobra.Command{
-	Use:   "fromConfig",
-	Short: "",
-	Run: func(cmd *cobra.Command, args []string) {
-		cfg, _ := cmd.Flags().GetString("config")
+func (t *tomlConf) fromFile(cfg string) error {
+	f, err := os.Open(cfg)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	buf, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	if err := toml.Unmarshal(buf, t); err != nil {
+		return err
+	}
+	return nil
+}
 
-		f, err := os.Open(cfg)
-		if err != nil {
-			log.Error(err)
-			os.Exit(1)
-		}
-		defer f.Close()
-		buf, err := ioutil.ReadAll(f)
-		if err != nil {
-			log.Error(err)
-			os.Exit(1)
-		}
+// Cmd represents the advanced command
+var Cmd = &cobra.Command{
+	Use:   "advanced",
+	Short: "advanced mode - parses the provided config file and process any number of templates",
+	Run: func(cmd *cobra.Command, args []string) {
 		var c tomlConf
-		if err := toml.Unmarshal(buf, &c); err != nil {
-			log.Error(err)
+		cfg, _ := cmd.Flags().GetString("config")
+		err := c.fromFile(cfg)
+		if err != nil {
+			log.Critical(err)
 			os.Exit(1)
 		}
 
@@ -103,10 +109,14 @@ var Cmd = &cobra.Command{
 			}
 
 			wait.Add(1)
-			go func() {
+			go func(watch bool, interval int) {
 				defer wait.Done()
-				t.Monitor()
-			}()
+				if watch {
+					t.Monitor()
+				} else {
+					t.Interval(interval)
+				}
+			}(v.Backend.Watch, v.Backend.Interval)
 		}
 		wait.Wait()
 	},

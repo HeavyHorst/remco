@@ -10,9 +10,9 @@
     dst = "/home/rkaufmann/haproxy.cfg"
 
   [config.backend]
+    watch = true
     name = "etcd"
     prefix = "/"
-    interval = 1
     keys = ["/"]
     [config.backend.etcdconfig]
       nodes = ["http://127.0.0.1:4001"]
@@ -33,7 +33,7 @@
   [config.backend]
     name = "file"
     prefix = "/"
-    interval = 1
+    interval = 5
     keys = ["/"]
     [config.backend.fileconfig]
       filepath = "/home/rkaufmann/test.yml"
