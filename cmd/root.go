@@ -56,6 +56,8 @@ func init() {
 		switch l {
 		case "INFO":
 			log.Level = log.LevelInfo
+		case "WARN":
+			log.Level = log.LevelWarning
 		case "DEBUG":
 			log.Level = log.LevelDebug
 		case "ERROR":
