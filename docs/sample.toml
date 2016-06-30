@@ -1,27 +1,3 @@
-[[config]]  
-  [config.cmd]
-    check = ""
-    reload = ""
-
-  [[config.template]]
-    src = "/etc/confd/templates/test.cfg"
-    dst = "/home/rkaufmann/haproxy.cfg"
-    mode = "0644"
-  [[config.template]]
-    src = "/etc/confd/templates/test.cfg"
-    dst = "/home/rkaufmann/haproxy.cfg76"
-    mode = "0777"
-
-  [config.backend]
-    onetime = true
-    name = "etcd"
-    prefix = "/"
-    keys = ["/"]
-    [config.backend.etcdconfig]
-      nodes = ["http://127.0.0.1:4001"]
-      version = 2
-
-
 [[config]]
   [config.cmd]
     check = ""
@@ -32,11 +8,17 @@
     dst = "/home/rkaufmann/haproxy.cfg2"
 
   [config.backend]
-    onetime = true
-    name = "file"
-    prefix = "/"
-    interval = 5
-    keys = ["/"]
+    [config.backend.etcdconfig]
+      nodes = ["http://127.0.0.1:4001"]
+      watch = true
+      prefix = "/"
+      version = 2
+      interval = 1
+      keys = ["/"]
+
     [config.backend.fileconfig]
+      watch = true
       filepath = "/home/rkaufmann/test.yml"
-    
+      prefix = "/hallo"
+      interval = 5
+      keys = ["/"]

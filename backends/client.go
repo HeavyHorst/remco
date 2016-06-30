@@ -6,5 +6,5 @@ type StoreClient interface {
 }
 
 type BackendConfig interface {
-	NewClient() (StoreClient, error)
+	Connect() (StoreClient, error)
 }

@@ -19,7 +19,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/backends/consul"
 	"github.com/HeavyHorst/remco/backends/etcd"
 	"github.com/HeavyHorst/remco/backends/file"
@@ -37,15 +36,9 @@ type tomlConf struct {
 		}
 		Template []*template.SrcDst
 		Backend  struct {
-			Onetime      bool
-			Watch        bool
-			Name         string
-			Prefix       string
-			Interval     int
-			Keys         []string
-			Etcdconfig   etcd.Config
-			Fileconfig   file.Config
-			Consulconfig consul.Config
+			Etcdconfig   *etcd.Config
+			Fileconfig   *file.Config
+			Consulconfig *consul.Config
 		}
 	}
 }
@@ -72,6 +65,7 @@ var Cmd = &cobra.Command{
 	Short: "advanced mode - parses the provided config file and process any number of templates",
 	Run: func(cmd *cobra.Command, args []string) {
 		var c tomlConf
+
 		cfg, _ := cmd.Flags().GetString("config")
 		err := c.fromFile(cfg)
 		if err != nil {
@@ -81,38 +75,38 @@ var Cmd = &cobra.Command{
 
 		wait := &sync.WaitGroup{}
 		for _, v := range c.Config {
-			var client backends.StoreClient
-			var err error
+			var storeClients []template.StoreConfig
 
-			switch v.Backend.Name {
-			case "etcd":
-				client, err = v.Backend.Etcdconfig.NewClient()
-			case "file":
-				client, err = v.Backend.Fileconfig.NewClient()
-			case "consul":
-				client, err = v.Backend.Consulconfig.NewClient()
+			if v.Backend.Etcdconfig != nil {
+				_, err := v.Backend.Etcdconfig.Connect()
+				if err == nil {
+					storeClients = append(storeClients, v.Backend.Etcdconfig.StoreConfig)
+				}
+			}
+			if v.Backend.Fileconfig != nil {
+				_, err := v.Backend.Fileconfig.Connect()
+				if err == nil {
+					storeClients = append(storeClients, v.Backend.Fileconfig.StoreConfig)
+				}
+			}
+			if v.Backend.Consulconfig != nil {
+				_, err := v.Backend.Consulconfig.Connect()
+				if err == nil {
+					storeClients = append(storeClients, v.Backend.Consulconfig.StoreConfig)
+				}
 			}
 
-			if err != nil {
-				log.Error(err)
-				continue
-			}
-
-			t, err := template.NewTemplateResource(client, v.Template, v.Backend.Keys, v.Backend.Prefix, v.Cmd.Reload, v.Cmd.Check, v.Backend.Onetime)
+			t, err := template.NewTemplateResource(storeClients, v.Template, v.Cmd.Reload, v.Cmd.Check)
 			if err != nil {
 				log.Error(err)
 				continue
 			}
 
 			wait.Add(1)
-			go func(watch bool, interval int) {
+			go func() {
 				defer wait.Done()
-				if watch {
-					t.Monitor()
-				} else {
-					t.Interval(interval)
-				}
-			}(v.Backend.Watch, v.Backend.Interval)
+				t.Monitor()
+			}()
 		}
 		wait.Wait()
 	},

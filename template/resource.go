@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -32,27 +33,33 @@ type SrcDst struct {
 	fileMode  os.FileMode
 }
 
+type StoreConfig struct {
+	backends.StoreClient
+	Onetime  bool
+	Watch    bool
+	Prefix   string
+	Interval int
+	Keys     []string
+}
+
 // TemplateResource is the representation of a parsed template resource.
 type TemplateResource struct {
-	CheckCmd    string
-	Gid         int
-	Keys        []string
-	Prefix      string
-	ReloadCmd   string
-	Uid         int
-	funcMap     map[string]interface{}
-	store       memkv.Store
-	storeClient backends.StoreClient
-	syncOnly    bool
-	onetime     bool
-	sources     []*SrcDst
+	storeClients []StoreConfig
+	ReloadCmd    string
+	CheckCmd     string
+	Uid          int
+	Gid          int
+	funcMap      map[string]interface{}
+	store        memkv.Store
+	syncOnly     bool
+	sources      []*SrcDst
 }
 
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewTemplateResource creates a TemplateResource.
-func NewTemplateResource(storeClient backends.StoreClient, sources []*SrcDst, keys []string, prefix, reloadCmd, checkCmd string, onetime bool) (*TemplateResource, error) {
-	if storeClient == nil {
+func NewTemplateResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, checkCmd string) (*TemplateResource, error) {
+	if len(storeClients) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
 
@@ -68,18 +75,15 @@ func NewTemplateResource(storeClient backends.StoreClient, sources []*SrcDst, ke
 	gid := os.Getegid()
 
 	tr := &TemplateResource{
-		Keys:        keys,
-		Prefix:      prefix,
-		ReloadCmd:   reloadCmd,
-		CheckCmd:    checkCmd,
-		storeClient: storeClient,
-		store:       memkv.New(),
-		funcMap:     newFuncMap(),
-		Uid:         uid,
-		Gid:         gid,
-		syncOnly:    syncOnly,
-		onetime:     onetime,
-		sources:     sources,
+		storeClients: storeClients,
+		ReloadCmd:    reloadCmd,
+		CheckCmd:     checkCmd,
+		store:        memkv.New(),
+		funcMap:      newFuncMap(),
+		Uid:          uid,
+		Gid:          gid,
+		syncOnly:     syncOnly,
+		sources:      sources,
 	}
 
 	//Wrap the Memkv functions, so that they work with pongo2
@@ -124,7 +128,7 @@ func NewTemplateResource(storeClient backends.StoreClient, sources []*SrcDst, ke
 }
 
 // NewTemplateResourceFromFlags creates a TemplateResource from the provided commandline flags.
-func NewTemplateResourceFromFlags(storeClient backends.StoreClient, flags *flag.FlagSet) (*TemplateResource, error) {
+func NewTemplateResourceFromFlags(storeClient backends.StoreClient, flags *flag.FlagSet, watch bool) (*TemplateResource, error) {
 	src, _ := flags.GetString("src")
 	dst, _ := flags.GetString("dst")
 	keys, _ := flags.GetStringSlice("keys")
@@ -133,6 +137,7 @@ func NewTemplateResourceFromFlags(storeClient backends.StoreClient, flags *flag.
 	reloadCmd, _ := flags.GetString("reload_cmd")
 	checkCmd, _ := flags.GetString("check_cmd")
 	onetime, _ := flags.GetBool("onetime")
+	interval, _ := flags.GetInt("interval")
 
 	sd := &SrcDst{
 		Src:  src,
@@ -140,26 +145,34 @@ func NewTemplateResourceFromFlags(storeClient backends.StoreClient, flags *flag.
 		Mode: fileMode,
 	}
 
-	return NewTemplateResource(storeClient, []*SrcDst{sd}, keys, prefix, reloadCmd, checkCmd, onetime)
+	b := StoreConfig{
+		StoreClient: storeClient,
+		Onetime:     onetime,
+		Prefix:      prefix,
+		Watch:       watch,
+		Interval:    interval,
+		Keys:        keys,
+	}
+
+	return NewTemplateResource([]StoreConfig{b}, []*SrcDst{sd}, reloadCmd, checkCmd)
 }
 
 // setVars sets the Vars for template resource.
-func (t *TemplateResource) setVars() error {
+func (t *TemplateResource) setVars(storeClient StoreConfig) error {
 	var err error
 	log.Debug("Retrieving keys from store")
-	log.Debug("Key prefix set to " + t.Prefix)
+	log.Debug("Key prefix set to " + storeClient.Prefix)
 
-	result, err := t.storeClient.GetValues(appendPrefix(t.Prefix, t.Keys))
+	result, err := storeClient.GetValues(appendPrefix(storeClient.Prefix, storeClient.Keys))
 	if err != nil {
 		return err
 	}
 
-	t.store.Purge()
+	//t.store.Purge()
 
-	for k, v := range result {
-		t.store.Set(path.Join("/", strings.TrimPrefix(k, t.Prefix)), v)
+	for k, res := range result {
+		t.store.Set(path.Join("/", strings.TrimPrefix(k, storeClient.Prefix)), res)
 	}
-
 	return nil
 }
 
@@ -306,24 +319,6 @@ func (t *TemplateResource) reload() error {
 	return nil
 }
 
-// Process is a convenience function that wraps calls to the three main tasks
-// required to keep local configuration files in sync. First we gather vars
-// from the store, then we stage a candidate configuration file, and finally sync
-// things up.
-// It returns an error if any.
-func (t *TemplateResource) process() error {
-	if err := t.setFileMode(); err != nil {
-		return err
-	}
-	if err := t.setVars(); err != nil {
-		return err
-	}
-	if err := t.createStageFileAndSync(); err != nil {
-		return err
-	}
-	return nil
-}
-
 // setFileMode sets the FileMode.
 func (t *TemplateResource) setFileMode() error {
 	for _, s := range t.sources {
@@ -348,20 +343,38 @@ func (t *TemplateResource) setFileMode() error {
 	return nil
 }
 
-func (t *TemplateResource) Monitor() {
+// Process is a convenience function that wraps calls to the three main tasks
+// required to keep local configuration files in sync. First we gather vars
+// from the store, then we stage a candidate configuration file, and finally sync
+// things up.
+// It returns an error if any.
+func (t *TemplateResource) process(storeClient StoreConfig) error {
+	if err := t.setFileMode(); err != nil {
+		return err
+	}
+	if err := t.setVars(storeClient); err != nil {
+		return err
+	}
+	if err := t.createStageFileAndSync(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *TemplateResource) watch(storeClient StoreConfig) {
 	var lastIndex uint64
 	stopChan := make(chan bool)
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	defer close(stopChan)
-	keys := appendPrefix(t.Prefix, t.Keys)
+	keysPrefix := appendPrefix(storeClient.Prefix, storeClient.Keys)
 
 	go func() {
 		for {
-			if err := t.process(); err != nil {
+			if err := t.process(storeClient); err != nil {
 				log.Error(err)
 			}
-			index, err := t.storeClient.WatchPrefix(t.Prefix, keys, lastIndex, stopChan)
+			index, err := storeClient.WatchPrefix(storeClient.Prefix, keysPrefix, lastIndex, stopChan)
 			if err != nil {
 				log.Error(err)
 				// Prevent backend errors from consuming all resources.
@@ -381,19 +394,19 @@ func (t *TemplateResource) Monitor() {
 	}
 }
 
-func (t *TemplateResource) Interval(interval int) {
+func (t *TemplateResource) interval(storeClient StoreConfig) {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	for {
-		err := t.process()
-		if t.onetime {
+		err := t.process(storeClient)
+		if storeClient.Onetime {
 			if err != nil {
 				log.Error(err)
 			}
 			return
 		}
 		select {
-		case <-time.After(time.Duration(interval) * time.Second):
+		case <-time.After(time.Duration(storeClient.Interval) * time.Second):
 			if err != nil {
 				log.Error(err)
 			}
@@ -402,4 +415,24 @@ func (t *TemplateResource) Interval(interval int) {
 			return
 		}
 	}
+}
+
+func (t *TemplateResource) Monitor() {
+	wait := &sync.WaitGroup{}
+	for _, v := range t.storeClients {
+		if v.Watch {
+			wait.Add(1)
+			go func(sc StoreConfig) {
+				defer wait.Done()
+				t.watch(sc)
+			}(v)
+		} else {
+			wait.Add(1)
+			go func(sc StoreConfig) {
+				defer wait.Done()
+				t.interval(sc)
+			}(v)
+		}
+	}
+	wait.Wait()
 }
