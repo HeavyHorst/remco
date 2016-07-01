@@ -24,6 +24,12 @@ func newFuncMap() map[string]interface{} {
 	return m
 }
 
+func addFuncs(out, in map[string]interface{}) {
+	for name, fn := range in {
+		out[name] = fn
+	}
+}
+
 // Getenv retrieves the value of the environment variable named by the key.
 // It returns the value, which will the default value if the variable is not present.
 // If no default value was given - returns "".

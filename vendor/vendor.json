@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "XvMNuh8RF9GHORuuPnGTsZHVN3w=",
+			"path": "github.com/HeavyHorst/memkv",
+			"revision": "71620c547230ad53777a00e2ebd3bbab8353370e",
+			"revisionTime": "2016-02-24T08:34:39Z"
+		},
+		{
 			"checksumSHA1": "D4AnwC3e2PR9Fs8tWsLifUQ47sI=",
 			"path": "github.com/cloudflare/cfssl/log",
 			"revision": "d81c136a78422b6d7efd0c2fba65b9eb8e48a2c9",
@@ -133,12 +139,6 @@
 			"path": "github.com/kelseyhightower/confd/backends/consul",
 			"revision": "4c9c4335bd35fad095053bba4363b8e8d8487bbf",
 			"revisionTime": "2016-04-19T14:53:44Z"
-		},
-		{
-			"checksumSHA1": "D2QFYrg/6CTA+mBh/2e00ErY7Zw=",
-			"path": "github.com/kelseyhightower/memkv",
-			"revision": "71620c547230ad53777a00e2ebd3bbab8353370e",
-			"revisionTime": "2016-02-24T08:34:39Z"
 		},
 		{
 			"checksumSHA1": "MUYxtCY95dt/b/5cmzP0x1b9d/E=",

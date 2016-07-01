@@ -17,11 +17,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/HeavyHorst/memkv"
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/flosch/pongo2"
-	"github.com/kelseyhightower/memkv"
 	flag "github.com/spf13/pflag"
 )
 
@@ -40,6 +40,7 @@ type StoreConfig struct {
 	Prefix   string
 	Interval int
 	Keys     []string
+	store    *memkv.Store
 }
 
 // TemplateResource is the representation of a parsed template resource.
@@ -86,43 +87,13 @@ func NewTemplateResource(storeClients []StoreConfig, sources []*SrcDst, reloadCm
 		sources:      sources,
 	}
 
-	//Wrap the Memkv functions, so that they work with pongo2
-	get := func(key string) memkv.KVPair {
-		val, err := tr.store.Get(key)
-		if err != nil {
-			log.Warning(err)
-		}
-		return val
-	}
-	gets := func(pattern string) memkv.KVPairs {
-		val, err := tr.store.GetAll(pattern)
-		if err != nil {
-			log.Warning(err)
-		}
-		return val
-	}
-	getv := func(key string, v ...string) string {
-		val, err := tr.store.GetValue(key, v...)
-		if err != nil {
-			log.Warning(err)
-		}
-		return val
-	}
-	getvs := func(pattern string) []string {
-		val, err := tr.store.GetAllValues(pattern)
-		if err != nil {
-			log.Warning(err)
-		}
-		return val
+	// initialize the inidividual backend memkv Stores
+	for i := range tr.storeClients {
+		store := memkv.New()
+		tr.storeClients[i].store = &store
 	}
 
-	tr.funcMap["exists"] = tr.store.Exists
-	tr.funcMap["ls"] = tr.store.List
-	tr.funcMap["lsdir"] = tr.store.ListDir
-	tr.funcMap["get"] = get
-	tr.funcMap["gets"] = gets
-	tr.funcMap["getv"] = getv
-	tr.funcMap["getvs"] = getvs
+	addFuncs(tr.funcMap, tr.store.FuncMap)
 
 	return tr, nil
 }
@@ -168,11 +139,18 @@ func (t *TemplateResource) setVars(storeClient StoreConfig) error {
 		return err
 	}
 
-	//t.store.Purge()
+	storeClient.store.Purge()
 
 	for k, res := range result {
-		t.store.Set(path.Join("/", strings.TrimPrefix(k, storeClient.Prefix)), res)
+		storeClient.store.Set(path.Join("/", strings.TrimPrefix(k, storeClient.Prefix)), res)
 	}
+
+	fmt.Println(storeClient.store.GetAll("/myapp/database/url"))
+
+	//merge all stores
+	t.store.Purge()
+	//t.store.GetAll
+
 	return nil
 }
 

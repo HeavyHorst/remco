@@ -9,16 +9,16 @@
 
   [config.backend]
     [config.backend.etcdconfig]
-      nodes = ["http://127.0.0.1:4001"]
+      nodes = ["127.0.0.1:2379"]
       watch = true
       prefix = "/"
-      version = 2
+      version = 3
       interval = 1
       keys = ["/"]
 
     [config.backend.fileconfig]
       watch = true
       filepath = "/home/rkaufmann/test.yml"
-      prefix = "/hallo"
+      prefix = "/"
       interval = 5
       keys = ["/"]
