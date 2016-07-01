@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/kelseyhightower/memkv"
+	"github.com/HeavyHorst/memkv"
 )
 
 type sortSRV []*net.SRV

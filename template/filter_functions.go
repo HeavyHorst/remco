@@ -7,9 +7,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/HeavyHorst/memkv"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/flosch/pongo2"
-	"github.com/kelseyhightower/memkv"
 )
 
 func init() {

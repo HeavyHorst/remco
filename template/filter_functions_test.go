@@ -3,8 +3,8 @@ package template
 import (
 	"testing"
 
+	"github.com/HeavyHorst/memkv"
 	"github.com/flosch/pongo2"
-	"github.com/kelseyhightower/memkv"
 	. "gopkg.in/check.v1"
 )
 
