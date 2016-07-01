@@ -73,10 +73,6 @@ func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]stri
 }
 
 func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error) {
-	if waitIndex == 0 {
-		return 1, nil
-	}
-
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return 0, err

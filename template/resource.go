@@ -54,6 +54,7 @@ type Resource struct {
 	store        memkv.Store
 	syncOnly     bool
 	sources      []*SrcDst
+	sync.Mutex
 }
 
 var ErrEmptySrc = errors.New("empty src template")
@@ -257,6 +258,50 @@ func (t *Resource) sync(s *SrcDst) error {
 	return nil
 }
 
+// setFileMode sets the FileMode.
+func (t *Resource) setFileMode() error {
+	for _, s := range t.sources {
+		if s.Mode == "" {
+			if !fileutil.IsFileExist(s.Dst) {
+				s.fileMode = 0644
+			} else {
+				fi, err := os.Stat(s.Dst)
+				if err != nil {
+					return err
+				}
+				s.fileMode = fi.Mode()
+			}
+		} else {
+			mode, err := strconv.ParseUint(s.Mode, 0, 32)
+			if err != nil {
+				return err
+			}
+			s.fileMode = os.FileMode(mode)
+		}
+	}
+	return nil
+}
+
+// Process is a convenience function that wraps calls to the three main tasks
+// required to keep local configuration files in sync. First we gather vars
+// from the store, then we stage a candidate configuration file, and finally sync
+// things up.
+// It returns an error if any.
+func (t *Resource) process(storeClient StoreConfig) error {
+	t.Lock()
+	defer t.Unlock()
+	if err := t.setFileMode(); err != nil {
+		return err
+	}
+	if err := t.setVars(storeClient); err != nil {
+		return err
+	}
+	if err := t.createStageFileAndSync(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // check executes the check command to validate the staged config file. The
 // command is modified so that any references to src template are substituted
 // with a string representing the full path of the staged file. This allows the
@@ -296,48 +341,6 @@ func (t *Resource) reload() error {
 		return err
 	}
 	log.Debug(fmt.Sprintf("%q", string(output)))
-	return nil
-}
-
-// setFileMode sets the FileMode.
-func (t *Resource) setFileMode() error {
-	for _, s := range t.sources {
-		if s.Mode == "" {
-			if !fileutil.IsFileExist(s.Dst) {
-				s.fileMode = 0644
-			} else {
-				fi, err := os.Stat(s.Dst)
-				if err != nil {
-					return err
-				}
-				s.fileMode = fi.Mode()
-			}
-		} else {
-			mode, err := strconv.ParseUint(s.Mode, 0, 32)
-			if err != nil {
-				return err
-			}
-			s.fileMode = os.FileMode(mode)
-		}
-	}
-	return nil
-}
-
-// Process is a convenience function that wraps calls to the three main tasks
-// required to keep local configuration files in sync. First we gather vars
-// from the store, then we stage a candidate configuration file, and finally sync
-// things up.
-// It returns an error if any.
-func (t *Resource) process(storeClient StoreConfig) error {
-	if err := t.setFileMode(); err != nil {
-		return err
-	}
-	if err := t.setVars(storeClient); err != nil {
-		return err
-	}
-	if err := t.createStageFileAndSync(); err != nil {
-		return err
-	}
 	return nil
 }
 
