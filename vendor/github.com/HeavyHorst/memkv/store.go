@@ -100,8 +100,17 @@ func (s Store) GetAllKVs() KVPairs {
 
 // GetValue gets the value associated with key. If there are no values
 // associated with key, GetValue returns "".
-func (s Store) GetValue(key string) string {
-	return s.Get(key).Value
+func (s Store) GetValue(key string, v ...string) string {
+	defaultValue := ""
+	if len(v) > 0 {
+		defaultValue = v[0]
+	}
+
+	kv := s.Get(key)
+	if kv.Key == "" {
+		return defaultValue
+	}
+	return kv.Value
 }
 
 func (s Store) GetAllValues(pattern string) []string {
