@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "LdZ/+ZvYj7O5QXhcmHyOYQwPoZc=",
+			"checksumSHA1": "vbO85FWJsJ8jNLPStBu/3MYuEyM=",
 			"path": "github.com/HeavyHorst/memkv",
-			"revision": "cbeffafb66fad1cec4998d9a6de258ba6542c71e",
-			"revisionTime": "2016-07-01T15:52:02Z"
+			"revision": "9ddcd0c67e130d3b4075f7641cc3f5fd3b8f9025",
+			"revisionTime": "2016-07-01T16:11:02Z"
 		},
 		{
 			"checksumSHA1": "D4AnwC3e2PR9Fs8tWsLifUQ47sI=",
