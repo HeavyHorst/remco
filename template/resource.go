@@ -145,11 +145,13 @@ func (t *TemplateResource) setVars(storeClient StoreConfig) error {
 		storeClient.store.Set(path.Join("/", strings.TrimPrefix(k, storeClient.Prefix)), res)
 	}
 
-	fmt.Println(storeClient.store.GetAll("/myapp/database/url"))
-
 	//merge all stores
 	t.store.Purge()
-	//t.store.GetAll
+	for _, v := range t.storeClients {
+		for _, kv := range v.store.GetAllKVs() {
+			t.store.Set(kv.Key, kv.Value)
+		}
+	}
 
 	return nil
 }
