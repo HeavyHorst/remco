@@ -43,8 +43,8 @@ type StoreConfig struct {
 	store    *memkv.Store
 }
 
-// TemplateResource is the representation of a parsed template resource.
-type TemplateResource struct {
+// Resource is the representation of a parsed template resource.
+type Resource struct {
 	storeClients []StoreConfig
 	ReloadCmd    string
 	CheckCmd     string
@@ -58,8 +58,8 @@ type TemplateResource struct {
 
 var ErrEmptySrc = errors.New("empty src template")
 
-// NewTemplateResource creates a TemplateResource.
-func NewTemplateResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, checkCmd string) (*TemplateResource, error) {
+// NewResource creates a Resource.
+func NewResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, checkCmd string) (*Resource, error) {
 	if len(storeClients) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
@@ -75,7 +75,7 @@ func NewTemplateResource(storeClients []StoreConfig, sources []*SrcDst, reloadCm
 	uid := os.Geteuid()
 	gid := os.Getegid()
 
-	tr := &TemplateResource{
+	tr := &Resource{
 		storeClients: storeClients,
 		ReloadCmd:    reloadCmd,
 		CheckCmd:     checkCmd,
@@ -98,8 +98,8 @@ func NewTemplateResource(storeClients []StoreConfig, sources []*SrcDst, reloadCm
 	return tr, nil
 }
 
-// NewTemplateResourceFromFlags creates a TemplateResource from the provided commandline flags.
-func NewTemplateResourceFromFlags(storeClient backends.StoreClient, flags *flag.FlagSet, watch bool) (*TemplateResource, error) {
+// NewResourceFromFlags creates a Resource from the provided commandline flags.
+func NewResourceFromFlags(storeClient backends.StoreClient, flags *flag.FlagSet, watch bool) (*Resource, error) {
 	src, _ := flags.GetString("src")
 	dst, _ := flags.GetString("dst")
 	keys, _ := flags.GetStringSlice("keys")
@@ -125,11 +125,11 @@ func NewTemplateResourceFromFlags(storeClient backends.StoreClient, flags *flag.
 		Keys:        keys,
 	}
 
-	return NewTemplateResource([]StoreConfig{b}, []*SrcDst{sd}, reloadCmd, checkCmd)
+	return NewResource([]StoreConfig{b}, []*SrcDst{sd}, reloadCmd, checkCmd)
 }
 
 // setVars sets the Vars for template resource.
-func (t *TemplateResource) setVars(storeClient StoreConfig) error {
+func (t *Resource) setVars(storeClient StoreConfig) error {
 	var err error
 	log.Debug("Retrieving keys from store")
 	log.Debug("Key prefix set to " + storeClient.Prefix)
@@ -160,7 +160,7 @@ func (t *TemplateResource) setVars(storeClient StoreConfig) error {
 // template and setting the desired owner, group, and mode. It also sets the
 // StageFile for the template resource.
 // It returns an error if any.
-func (t *TemplateResource) createStageFileAndSync() error {
+func (t *Resource) createStageFileAndSync() error {
 	for _, s := range t.sources {
 		log.Debug("Using source template " + s.Src)
 
@@ -206,7 +206,7 @@ func (t *TemplateResource) createStageFileAndSync() error {
 // overwriting the target config file. Finally, sync will run a reload command
 // if set to have the application or service pick up the changes.
 // It returns an error if any.
-func (t *TemplateResource) sync(s *SrcDst) error {
+func (t *Resource) sync(s *SrcDst) error {
 	staged := s.stageFile.Name()
 	defer os.Remove(staged)
 
@@ -263,7 +263,7 @@ func (t *TemplateResource) sync(s *SrcDst) error {
 // check to be run on the staged file before overwriting the destination config
 // file.
 // It returns nil if the check command returns 0 and there are no other errors.
-func (t *TemplateResource) check(stageFile string) error {
+func (t *Resource) check(stageFile string) error {
 	var cmdBuffer bytes.Buffer
 	data := make(map[string]string)
 	data["src"] = stageFile
@@ -287,7 +287,7 @@ func (t *TemplateResource) check(stageFile string) error {
 
 // reload executes the reload command.
 // It returns nil if the reload command returns 0.
-func (t *TemplateResource) reload() error {
+func (t *Resource) reload() error {
 	log.Debug("Running " + t.ReloadCmd)
 	c := exec.Command("/bin/sh", "-c", t.ReloadCmd)
 	output, err := c.CombinedOutput()
@@ -300,7 +300,7 @@ func (t *TemplateResource) reload() error {
 }
 
 // setFileMode sets the FileMode.
-func (t *TemplateResource) setFileMode() error {
+func (t *Resource) setFileMode() error {
 	for _, s := range t.sources {
 		if s.Mode == "" {
 			if !fileutil.IsFileExist(s.Dst) {
@@ -328,7 +328,7 @@ func (t *TemplateResource) setFileMode() error {
 // from the store, then we stage a candidate configuration file, and finally sync
 // things up.
 // It returns an error if any.
-func (t *TemplateResource) process(storeClient StoreConfig) error {
+func (t *Resource) process(storeClient StoreConfig) error {
 	if err := t.setFileMode(); err != nil {
 		return err
 	}
@@ -341,7 +341,7 @@ func (t *TemplateResource) process(storeClient StoreConfig) error {
 	return nil
 }
 
-func (t *TemplateResource) watch(storeClient StoreConfig) {
+func (t *Resource) watch(storeClient StoreConfig) {
 	var lastIndex uint64
 	stopChan := make(chan bool)
 	signalChan := make(chan os.Signal, 1)
@@ -374,7 +374,7 @@ func (t *TemplateResource) watch(storeClient StoreConfig) {
 	}
 }
 
-func (t *TemplateResource) interval(storeClient StoreConfig) {
+func (t *Resource) interval(storeClient StoreConfig) {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	for {
@@ -397,7 +397,7 @@ func (t *TemplateResource) interval(storeClient StoreConfig) {
 	}
 }
 
-func (t *TemplateResource) Monitor() {
+func (t *Resource) Monitor() {
 	wait := &sync.WaitGroup{}
 	for _, v := range t.storeClients {
 		if v.Watch {

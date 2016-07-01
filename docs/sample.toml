@@ -5,7 +5,7 @@
 
   [[config.template]]
     src = "/etc/confd/templates/test.cfg"
-    dst = "/home/rkaufmann/haproxy.cfg2"
+    dst = "/home/rkaufmann/haproxy.cfg"
 
   [config.backend]
     [config.backend.etcdconfig]

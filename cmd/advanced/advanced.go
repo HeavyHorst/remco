@@ -96,7 +96,7 @@ var Cmd = &cobra.Command{
 				}
 			}
 
-			t, err := template.NewTemplateResource(storeClients, v.Template, v.Cmd.Reload, v.Cmd.Check)
+			t, err := template.NewResource(storeClients, v.Template, v.Cmd.Reload, v.Cmd.Check)
 			if err != nil {
 				log.Error(err)
 				continue
