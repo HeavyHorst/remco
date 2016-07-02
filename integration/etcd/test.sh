@@ -12,7 +12,7 @@ remco poll --onetime  etcd \
     --log-level=debug \
     --src=./integration/templates/basic.conf.tmpl \
     --dst=/tmp/remco-basic-test.conf \
-    --nodes=127.0.0.1:2379
+    --nodes=http://127.0.0.1:2379 \
     --apiversion=2
 
 cmp /tmp/remco-basic-test.conf ./integration/config/test.config || cat /tmp/remco-basic-test.conf
