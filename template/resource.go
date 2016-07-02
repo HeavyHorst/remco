@@ -54,7 +54,6 @@ type Resource struct {
 	store        memkv.Store
 	syncOnly     bool
 	sources      []*SrcDst
-	sync.Mutex
 }
 
 var ErrEmptySrc = errors.New("empty src template")
@@ -288,8 +287,6 @@ func (t *Resource) setFileMode() error {
 // things up.
 // It returns an error if any.
 func (t *Resource) process(storeClient StoreConfig) error {
-	t.Lock()
-	defer t.Unlock()
 	if err := t.setFileMode(); err != nil {
 		return err
 	}
@@ -344,19 +341,15 @@ func (t *Resource) reload() error {
 	return nil
 }
 
-func (t *Resource) watch(storeClient StoreConfig) {
+func (t *Resource) watch(storeClient StoreConfig, stopChan chan bool, processChan chan StoreConfig) {
 	var lastIndex uint64
-	stopChan := make(chan bool)
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
-	defer close(stopChan)
 	keysPrefix := appendPrefix(storeClient.Prefix, storeClient.Keys)
 
-	go func() {
-		for {
-			if err := t.process(storeClient); err != nil {
-				log.Error(err)
-			}
+	for {
+		select {
+		case <-stopChan:
+			return
+		default:
 			index, err := storeClient.WatchPrefix(storeClient.Prefix, keysPrefix, lastIndex, stopChan)
 			if err != nil {
 				log.Error(err)
@@ -364,58 +357,81 @@ func (t *Resource) watch(storeClient StoreConfig) {
 				time.Sleep(time.Second * 2)
 				continue
 			}
+			processChan <- storeClient
 			lastIndex = index
-		}
-	}()
-
-	for {
-		select {
-		case s := <-signalChan:
-			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			return
 		}
 	}
 }
 
-func (t *Resource) interval(storeClient StoreConfig) {
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+func (t *Resource) interval(storeClient StoreConfig, stopChan chan bool, processChan chan StoreConfig) {
+	if storeClient.Onetime {
+		processChan <- storeClient
+		return
+	}
+
 	for {
-		err := t.process(storeClient)
-		if storeClient.Onetime {
-			if err != nil {
-				log.Error(err)
-			}
-			return
-		}
 		select {
-		case <-time.After(time.Duration(storeClient.Interval) * time.Second):
-			if err != nil {
-				log.Error(err)
-			}
-		case s := <-signalChan:
-			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
+		case <-stopChan:
 			return
+		case <-time.After(time.Duration(storeClient.Interval) * time.Second):
+			processChan <- storeClient
 		}
 	}
 }
 
 func (t *Resource) Monitor() {
-	wait := &sync.WaitGroup{}
-	for _, v := range t.storeClients {
-		if v.Watch {
-			wait.Add(1)
-			go func(sc StoreConfig) {
-				defer wait.Done()
-				t.watch(sc)
-			}(v)
-		} else {
-			wait.Add(1)
-			go func(sc StoreConfig) {
-				defer wait.Done()
-				t.interval(sc)
-			}(v)
+	wg := &sync.WaitGroup{}
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	stopChan := make(chan bool)
+	processChan := make(chan StoreConfig)
+
+	defer close(processChan)
+
+	//load all KV-pairs the first time
+	if err := t.setFileMode(); err != nil {
+		log.Error(err)
+	}
+	for _, storeClient := range t.storeClients {
+		if err := t.setVars(storeClient); err != nil {
+			log.Error(err)
 		}
 	}
-	wait.Wait()
+	if err := t.createStageFileAndSync(); err != nil {
+		log.Error(err)
+	}
+
+	for _, sc := range t.storeClients {
+		wg.Add(1)
+		if sc.Watch {
+			go func(s StoreConfig) {
+				defer wg.Done()
+				t.watch(s, stopChan, processChan)
+			}(sc)
+		} else {
+			go func(s StoreConfig) {
+				defer wg.Done()
+				t.interval(s, stopChan, processChan)
+			}(sc)
+		}
+	}
+
+	for {
+		select {
+		case storeClient := <-processChan:
+			if err := t.process(storeClient); err != nil {
+				log.Error(err)
+			}
+		case s := <-signalChan:
+			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
+			close(stopChan)
+			// drain processChan
+			go func() {
+				for range processChan {
+				}
+			}()
+			wg.Wait()
+			return
+		}
+	}
 }

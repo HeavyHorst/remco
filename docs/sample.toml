@@ -20,5 +20,5 @@
       watch = true
       filepath = "/home/rkaufmann/test.yml"
       prefix = "/"
-      interval = 5
+      interval = 1
       keys = ["/"]

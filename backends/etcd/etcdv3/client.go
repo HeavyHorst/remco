@@ -89,6 +89,9 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 
 	rch := c.client.Watch(ctx, prefix, clientv3.WithPrefix())
 	for wresp := range rch {
+		if wresp.Err() != nil {
+			return waitIndex, err
+		}
 		for _, ev := range wresp.Events {
 			// Only return if we have a key prefix we care about.
 			// This is not an exact match on the key so there is a chance
