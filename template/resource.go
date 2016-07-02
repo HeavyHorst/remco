@@ -35,6 +35,7 @@ type SrcDst struct {
 
 type StoreConfig struct {
 	backends.StoreClient
+	Name     string
 	Onetime  bool
 	Watch    bool
 	Prefix   string
@@ -99,7 +100,7 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, check
 }
 
 // NewResourceFromFlags creates a Resource from the provided commandline flags.
-func NewResourceFromFlags(storeClient backends.StoreClient, flags *flag.FlagSet, watch bool) (*Resource, error) {
+func NewResourceFromFlags(s backends.Store, flags *flag.FlagSet, watch bool) (*Resource, error) {
 	src, _ := flags.GetString("src")
 	dst, _ := flags.GetString("dst")
 	keys, _ := flags.GetStringSlice("keys")
@@ -117,7 +118,8 @@ func NewResourceFromFlags(storeClient backends.StoreClient, flags *flag.FlagSet,
 	}
 
 	b := StoreConfig{
-		StoreClient: storeClient,
+		StoreClient: s.Client,
+		Name:        s.Name,
 		Onetime:     onetime,
 		Prefix:      prefix,
 		Watch:       watch,
@@ -131,7 +133,7 @@ func NewResourceFromFlags(storeClient backends.StoreClient, flags *flag.FlagSet,
 // setVars sets the Vars for template resource.
 func (t *Resource) setVars(storeClient StoreConfig) error {
 	var err error
-	log.Debug("Retrieving keys from store")
+	log.Debug("Retrieving keys from store: " + storeClient.Name)
 	log.Debug("Key prefix set to " + storeClient.Prefix)
 
 	result, err := storeClient.GetValues(appendPrefix(storeClient.Prefix, storeClient.Keys))

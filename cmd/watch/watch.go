@@ -38,12 +38,12 @@ func init() {
 }
 
 func watch(bc backends.BackendConfig, cmd *cobra.Command) error {
-	client, err := bc.Connect()
+	store, err := bc.Connect()
 	if err != nil {
 		return err
 	}
 
-	t, err := template.NewResourceFromFlags(client, cmd.Flags(), true)
+	t, err := template.NewResourceFromFlags(store, cmd.Flags(), true)
 	if err != nil {
 		return err
 	}
@@ -53,12 +53,12 @@ func watch(bc backends.BackendConfig, cmd *cobra.Command) error {
 }
 
 func poll(bc backends.BackendConfig, cmd *cobra.Command) error {
-	client, err := bc.Connect()
+	store, err := bc.Connect()
 	if err != nil {
 		return err
 	}
 
-	t, err := template.NewResourceFromFlags(client, cmd.Flags(), false)
+	t, err := template.NewResourceFromFlags(store, cmd.Flags(), false)
 	if err != nil {
 		return err
 	}

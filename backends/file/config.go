@@ -11,12 +11,16 @@ type Config struct {
 	template.StoreConfig
 }
 
-func (c *Config) Connect() (backends.StoreClient, error) {
+func (c *Config) Connect() (backends.Store, error) {
 	log.Info("Filepath set to " + c.Filepath)
 	client, err := NewFileClient(c.Filepath)
 	if err != nil {
-		return nil, err
+		return backends.Store{}, err
 	}
 	c.StoreConfig.StoreClient = client
-	return client, nil
+	c.StoreConfig.Name = "file"
+	return backends.Store{
+		Name:   "file",
+		Client: client,
+	}, nil
 }

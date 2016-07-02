@@ -18,12 +18,16 @@ type Config struct {
 	template.StoreConfig
 }
 
-func (c *Config) Connect() (backends.StoreClient, error) {
+func (c *Config) Connect() (backends.Store, error) {
 	log.Info("Backend nodes set to " + strings.Join(c.Nodes, ", "))
 	client, err := consul.New(c.Nodes, c.Scheme, c.Cert, c.Key, c.CaCert)
 	if err != nil {
-		return nil, err
+		return backends.Store{}, err
 	}
 	c.StoreConfig.StoreClient = client
-	return client, nil
+	c.StoreConfig.Name = "consul"
+	return backends.Store{
+		Name:   c.StoreConfig.Name,
+		Client: client,
+	}, nil
 }
