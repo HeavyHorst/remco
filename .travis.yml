@@ -1,5 +1,14 @@
 language: go
 
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  #install consul
+  - docker run -d --net=host --name=dev-consul consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul
+
 go:
   - 1.5
   - 1.6
@@ -7,3 +16,6 @@ go:
 
 env:
   - GO15VENDOREXPERIMENT=1
+
+script:
+  - bash integration/consul/test.sh
