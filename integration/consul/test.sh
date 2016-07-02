@@ -15,3 +15,5 @@ remco poll --onetime  consul \
     --dst=/tmp/remco-basic-test.conf \
     --keys=/database/host, /database/password, /database/port, /database/username \
     --nodes=127.0.0.1:8500
+
+cat /tmp/remco-basic-test.conf

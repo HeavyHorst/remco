@@ -1,6 +1,27 @@
+## Base getenv
+
 hostname: {{ getenv("HOSTNAME") }}
 [database]
 host={{ getv("/database/host") }}
 password={{ getv("/database/password") }}
 port={{ getv("/database/port") }}
 username={{ getv("/database/username") }}
+
+## exists test
+
+{% if exists ("/key") %}
+    value: {{ getv ("/key") }}
+{% endif %}
+
+{% if exists("/doesnotexist") %}
+    This line will not be printed
+    value: {{ getv ("/key") }}
+{% endif %}
+
+## iteration
+
+upstream app {
+{% for server in gets("/upstream/*") %}  
+  server {{ server }};
+{% endfor %}
+}
