@@ -341,40 +341,39 @@ func (t *Resource) reload() error {
 	return nil
 }
 
-func (t *Resource) watch(storeClient StoreConfig, stopChan chan bool, processChan chan StoreConfig) {
+func (s StoreConfig) watch(stopChan chan bool, processChan chan StoreConfig) {
 	var lastIndex uint64
-	keysPrefix := appendPrefix(storeClient.Prefix, storeClient.Keys)
+	keysPrefix := appendPrefix(s.Prefix, s.Keys)
 
 	for {
 		select {
 		case <-stopChan:
 			return
 		default:
-			index, err := storeClient.WatchPrefix(storeClient.Prefix, keysPrefix, lastIndex, stopChan)
+			index, err := s.WatchPrefix(s.Prefix, keysPrefix, lastIndex, stopChan)
 			if err != nil {
 				log.Error(err)
 				// Prevent backend errors from consuming all resources.
 				time.Sleep(time.Second * 2)
 				continue
 			}
-			processChan <- storeClient
+			processChan <- s
 			lastIndex = index
 		}
 	}
 }
 
-func (t *Resource) interval(storeClient StoreConfig, stopChan chan bool, processChan chan StoreConfig) {
-	if storeClient.Onetime {
-		processChan <- storeClient
+func (s StoreConfig) interval(stopChan chan bool, processChan chan StoreConfig) {
+	if s.Onetime {
+		processChan <- s
 		return
 	}
-
 	for {
 		select {
 		case <-stopChan:
 			return
-		case <-time.After(time.Duration(storeClient.Interval) * time.Second):
-			processChan <- storeClient
+		case <-time.After(time.Duration(s.Interval) * time.Second):
+			processChan <- s
 		}
 	}
 }
@@ -406,12 +405,13 @@ func (t *Resource) Monitor() {
 		if sc.Watch {
 			go func(s StoreConfig) {
 				defer wg.Done()
-				t.watch(s, stopChan, processChan)
+				//t.watch(s, stopChan, processChan)
+				s.watch(stopChan, processChan)
 			}(sc)
 		} else {
 			go func(s StoreConfig) {
 				defer wg.Done()
-				t.interval(s, stopChan, processChan)
+				s.interval(stopChan, processChan)
 			}(sc)
 		}
 	}
