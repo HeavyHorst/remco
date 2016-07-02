@@ -28,13 +28,14 @@ type Store struct {
 func New() Store {
 	s := Store{m: make(map[string]KVPair)}
 	s.FuncMap = map[string]interface{}{
-		"exists": s.Exists,
-		"ls":     s.List,
-		"lsdir":  s.ListDir,
-		"get":    s.Get,
-		"gets":   s.GetAll,
-		"getv":   s.GetValue,
-		"getvs":  s.GetAllValues,
+		"exists":    s.Exists,
+		"ls":        s.List,
+		"lsdir":     s.ListDir,
+		"get":       s.Get,
+		"gets":      s.GetAll,
+		"getallkvs": s.GetAllKVs,
+		"getv":      s.GetValue,
+		"getvs":     s.GetAllValues,
 	}
 	return s
 }
@@ -88,12 +89,13 @@ func (s Store) GetAll(pattern string) KVPairs {
 
 // GetAllKVs returns all KV-Pairs
 func (s Store) GetAllKVs() KVPairs {
-	ks := make(KVPairs, len(s.m))
+	ks := make(KVPairs, 0)
 	s.RLock()
 	defer s.RUnlock()
 	for _, kv := range s.m {
 		ks = append(ks, kv)
 	}
+	sort.Sort(ks)
 	return ks
 }
 

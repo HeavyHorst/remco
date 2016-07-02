@@ -138,20 +138,20 @@ func (s *FilterSuite) TestFilterSortByLengthKVPair(t *C) {
 	a := memkv.KVPair{Key: "123", Value: "Test"}
 	b := memkv.KVPair{Key: "1234", Value: "Test"}
 	c := memkv.KVPair{Key: "foobar", Value: "Test"}
-	in := pongo2.AsValue([]memkv.KVPair{a, c, b})
-	expected := []memkv.KVPair{a, b, c}
-	expectedRev := []memkv.KVPair{c, b, a}
+	in := pongo2.AsValue(memkv.KVPairs{a, c, b})
+	expected := memkv.KVPairs{a, b, c}
+	expectedRev := memkv.KVPairs{c, b, a}
 	res, err := filterSortByLength(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
-	m1 := res.Interface().([]memkv.KVPair)
+	m1 := res.Interface().(memkv.KVPairs)
 	t.Check(m1, DeepEquals, expected)
 
 	rev, err := filterReverse(res, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
-	m2 := rev.Interface().([]memkv.KVPair)
+	m2 := rev.Interface().(memkv.KVPairs)
 	t.Check(m2, DeepEquals, expectedRev)
 }
