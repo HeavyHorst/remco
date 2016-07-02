@@ -54,15 +54,15 @@ func init() {
 	cobra.OnInitialize(func() {
 		l, _ := RootCmd.Flags().GetString("log-level")
 		switch l {
-		case "INFO":
+		case "info":
 			log.Level = log.LevelInfo
-		case "WARN":
+		case "warn":
 			log.Level = log.LevelWarning
-		case "DEBUG":
+		case "debug":
 			log.Level = log.LevelDebug
-		case "ERROR":
+		case "error":
 			log.Level = log.LevelError
-		case "CRITICAL":
+		case "critical":
 			log.Level = log.LevelCritical
 		}
 	})
