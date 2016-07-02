@@ -9,8 +9,8 @@ username={{ getv("/database/username") }}
 
 ## exists test
 
-{% if exists ("/key") %}
-    value: {{ getv ("/key") }}
+{% if exists ("/database/host") %}
+    value: {{ getv ("/database/host") }}
 {% endif %}
 
 {% if exists("/doesnotexist") %}
@@ -22,6 +22,6 @@ username={{ getv("/database/username") }}
 
 upstream app {
 {% for server in gets("/upstream/*") %}  
-  server {{ server }};
+  server {{ server.Value }};
 {% endfor %}
 }
