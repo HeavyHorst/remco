@@ -7,7 +7,7 @@ services:
 
 before_install:
   #install consul
-  - docker run -d --net=host --name=dev-consul consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul
+  - docker run -d -p 8500:8500 -e CONSUL_BIND_INTERFACE=eth0 -e CONSUL_CLIENT_INTERFACE=eth0 --name=dev-consul consul
 
 go:
   - 1.5
