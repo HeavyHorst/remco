@@ -367,7 +367,6 @@ func (s StoreConfig) watch(stopChan chan bool, processChan chan StoreConfig) {
 
 func (s StoreConfig) interval(stopChan chan bool, processChan chan StoreConfig) {
 	if s.Onetime {
-		processChan <- s
 		return
 	}
 	for {
@@ -419,7 +418,7 @@ func (t *Resource) Monitor() {
 	}
 
 	go func() {
-		// If there is no go routine left - quit
+		// If there is no goroutine left - quit
 		wg.Wait()
 		signalChan <- syscall.SIGINT
 	}()
