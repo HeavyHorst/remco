@@ -6,8 +6,10 @@ services:
   - docker
 
 before_install:
-  #install consul
+  #start consul
   - docker run -d -p 8500:8500 -e CONSUL_BIND_INTERFACE=eth0 -e CONSUL_CLIENT_INTERFACE=eth0 --name=dev-consul consul
+  #start etcd
+  - docker run -d --name etcdv3 --net=host quay.io/coreos/etcd:v3.0.1
 
 go:
   - 1.5
@@ -20,3 +22,4 @@ env:
 script:
   - go test -v ./...
   - bash integration/consul/test.sh
+  - bash integration/etcd/test.sh

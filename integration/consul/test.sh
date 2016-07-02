@@ -13,7 +13,6 @@ remco poll --onetime  consul \
     --log-level=debug \
     --src=./integration/templates/basic.conf.tmpl \
     --dst=/tmp/remco-basic-test.conf \
-    --keys=/database/host, /database/password, /database/port, /database/username \
     --nodes=127.0.0.1:8500
 
 cmp /tmp/remco-basic-test.conf ./integration/config/test.config || cat /tmp/remco-basic-test.conf
