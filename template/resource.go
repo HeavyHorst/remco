@@ -418,6 +418,12 @@ func (t *Resource) Monitor() {
 		}
 	}
 
+	go func() {
+		// If there is no go routine left - quit
+		wg.Wait()
+		signalChan <- syscall.SIGINT
+	}()
+
 	for {
 		select {
 		case storeClient := <-processChan:
