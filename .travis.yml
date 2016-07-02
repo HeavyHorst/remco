@@ -18,4 +18,5 @@ env:
   - GO15VENDOREXPERIMENT=1
 
 script:
+  - go test -v ./...
   - bash integration/consul/test.sh
