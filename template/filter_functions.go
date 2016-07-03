@@ -3,7 +3,6 @@ package template
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"path"
 	"sort"
 	"strings"
@@ -105,7 +104,6 @@ func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *
 		sort.Sort(byLength(v))
 		return pongo2.AsValue(v), nil
 	case memkv.KVPairs:
-		fmt.Println("hallo")
 		v := values.(memkv.KVPairs)
 		sort.Sort(byLengthKV(v))
 		return pongo2.AsValue(v), nil
