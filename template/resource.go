@@ -49,8 +49,8 @@ type Resource struct {
 	storeClients []StoreConfig
 	ReloadCmd    string
 	CheckCmd     string
-	Uid          int
-	Gid          int
+	UID          int
+	GID          int
 	funcMap      map[string]interface{}
 	store        memkv.Store
 	syncOnly     bool
@@ -73,8 +73,8 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, check
 
 	// TODO implement flags for these values
 	syncOnly := false
-	uid := os.Geteuid()
-	gid := os.Getegid()
+	UID := os.Geteuid()
+	GID := os.Getegid()
 
 	tr := &Resource{
 		storeClients: storeClients,
@@ -82,8 +82,8 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, check
 		CheckCmd:     checkCmd,
 		store:        memkv.New(),
 		funcMap:      newFuncMap(),
-		Uid:          uid,
-		Gid:          gid,
+		UID:          UID,
+		GID:          GID,
 		syncOnly:     syncOnly,
 		sources:      sources,
 	}
@@ -193,7 +193,7 @@ func (t *Resource) createStageFileAndSync() error {
 		// Set the owner, group, and mode on the stage file now to make it easier to
 		// compare against the destination configuration file later.
 		os.Chmod(temp.Name(), s.fileMode)
-		os.Chown(temp.Name(), t.Uid, t.Gid)
+		os.Chown(temp.Name(), t.UID, t.GID)
 		s.stageFile = temp
 
 		if err = t.sync(s); err != nil {
@@ -239,7 +239,7 @@ func (t *Resource) sync(s *SrcDst) error {
 				}
 				err := ioutil.WriteFile(s.Dst, contents, s.fileMode)
 				// make sure owner and group match the temp file, in case the file was created with WriteFile
-				os.Chown(s.Dst, t.Uid, t.Gid)
+				os.Chown(s.Dst, t.UID, t.GID)
 				if err != nil {
 					return err
 				}
@@ -296,6 +296,23 @@ func (t *Resource) process(storeClient StoreConfig) error {
 		return err
 	}
 	if err := t.createStageFileAndSync(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *Resource) processAll() error {
+	//load all KV-pairs the first time
+	var err error
+	if err = t.setFileMode(); err != nil {
+		return err
+	}
+	for _, storeClient := range t.storeClients {
+		if err := t.setVars(storeClient); err != nil {
+			return err
+		}
+	}
+	if err = t.createStageFileAndSync(); err != nil {
 		return err
 	}
 	return nil
@@ -388,16 +405,7 @@ func (t *Resource) Monitor() {
 
 	defer close(processChan)
 
-	//load all KV-pairs the first time
-	if err := t.setFileMode(); err != nil {
-		log.Error(err)
-	}
-	for _, storeClient := range t.storeClients {
-		if err := t.setVars(storeClient); err != nil {
-			log.Error(err)
-		}
-	}
-	if err := t.createStageFileAndSync(); err != nil {
+	if err := t.processAll(); err != nil {
 		log.Error(err)
 	}
 
