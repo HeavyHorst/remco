@@ -1,3 +1,5 @@
+#!/bin/bash
+
 remco poll --onetime  file \
     --log-level=debug \
     --src=./integration/templates/basic.conf.tmpl \
