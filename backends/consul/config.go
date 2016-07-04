@@ -19,7 +19,7 @@ type Config struct {
 }
 
 func (c *Config) Connect() (backends.Store, error) {
-	log.Info("Backend nodes set to " + strings.Join(c.Nodes, ", "))
+	log.Info("consul backend nodes set to " + strings.Join(c.Nodes, ", "))
 	client, err := consul.New(c.Nodes, c.Scheme, c.Cert, c.Key, c.CaCert)
 	if err != nil {
 		return backends.Store{}, err

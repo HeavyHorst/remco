@@ -23,7 +23,7 @@ type Config struct {
 }
 
 func (c *Config) Connect() (backends.Store, error) {
-	log.Info("Backend nodes set to " + strings.Join(c.Nodes, ", "))
+	log.Info("etcd backend nodes set to " + strings.Join(c.Nodes, ", "))
 	var client backends.StoreClient
 	var err error
 
