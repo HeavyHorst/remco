@@ -29,8 +29,31 @@ type SrcDst struct {
 	Src       string
 	Dst       string
 	Mode      string
+	UID       int
+	GID       int
 	stageFile *os.File
 	fileMode  os.FileMode
+}
+
+func (s *SrcDst) setFileMode() error {
+	if s.Mode == "" {
+		if !fileutil.IsFileExist(s.Dst) {
+			s.fileMode = 0644
+		} else {
+			fi, err := os.Stat(s.Dst)
+			if err != nil {
+				return err
+			}
+			s.fileMode = fi.Mode()
+		}
+	} else {
+		mode, err := strconv.ParseUint(s.Mode, 0, 32)
+		if err != nil {
+			return err
+		}
+		s.fileMode = os.FileMode(mode)
+	}
+	return nil
 }
 
 type StoreConfig struct {
@@ -49,8 +72,6 @@ type Resource struct {
 	storeClients []StoreConfig
 	ReloadCmd    string
 	CheckCmd     string
-	UID          int
-	GID          int
 	funcMap      map[string]interface{}
 	store        memkv.Store
 	syncOnly     bool
@@ -73,8 +94,6 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, check
 
 	// TODO implement flags for these values
 	syncOnly := false
-	UID := os.Geteuid()
-	GID := os.Getegid()
 
 	tr := &Resource{
 		storeClients: storeClients,
@@ -82,8 +101,6 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, check
 		CheckCmd:     checkCmd,
 		store:        memkv.New(),
 		funcMap:      newFuncMap(),
-		UID:          UID,
-		GID:          GID,
 		syncOnly:     syncOnly,
 		sources:      sources,
 	}
@@ -110,11 +127,15 @@ func NewResourceFromFlags(s backends.Store, flags *flag.FlagSet, watch bool) (*R
 	checkCmd, _ := flags.GetString("check_cmd")
 	onetime, _ := flags.GetBool("onetime")
 	interval, _ := flags.GetInt("interval")
+	UID := os.Geteuid()
+	GID := os.Getegid()
 
 	sd := &SrcDst{
 		Src:  src,
 		Dst:  dst,
 		Mode: fileMode,
+		GID:  GID,
+		UID:  UID,
 	}
 
 	b := StoreConfig{
@@ -193,7 +214,7 @@ func (t *Resource) createStageFileAndSync() error {
 		// Set the owner, group, and mode on the stage file now to make it easier to
 		// compare against the destination configuration file later.
 		os.Chmod(temp.Name(), s.fileMode)
-		os.Chown(temp.Name(), t.UID, t.GID)
+		os.Chown(temp.Name(), s.UID, s.GID)
 		s.stageFile = temp
 
 		if err = t.sync(s); err != nil {
@@ -239,7 +260,7 @@ func (t *Resource) sync(s *SrcDst) error {
 				}
 				err := ioutil.WriteFile(s.Dst, contents, s.fileMode)
 				// make sure owner and group match the temp file, in case the file was created with WriteFile
-				os.Chown(s.Dst, t.UID, t.GID)
+				os.Chown(s.Dst, s.UID, s.GID)
 				if err != nil {
 					return err
 				}
@@ -262,22 +283,8 @@ func (t *Resource) sync(s *SrcDst) error {
 // setFileMode sets the FileMode.
 func (t *Resource) setFileMode() error {
 	for _, s := range t.sources {
-		if s.Mode == "" {
-			if !fileutil.IsFileExist(s.Dst) {
-				s.fileMode = 0644
-			} else {
-				fi, err := os.Stat(s.Dst)
-				if err != nil {
-					return err
-				}
-				s.fileMode = fi.Mode()
-			}
-		} else {
-			mode, err := strconv.ParseUint(s.Mode, 0, 32)
-			if err != nil {
-				return err
-			}
-			s.fileMode = os.FileMode(mode)
+		if err := s.setFileMode(); err != nil {
+			return nil
 		}
 	}
 	return nil
