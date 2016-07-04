@@ -1,0 +1,8 @@
+#!/bin/bash
+
+mkfifo /tmp/fifo-$$
+
+grep -v 'no test files' </tmp/fifo-$$ & go test ./... -gocheck.v >/tmp/fifo-$$
+RES=$?
+rm /tmp/fifo-$$
+exit $RES
