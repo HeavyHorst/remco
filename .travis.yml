@@ -20,7 +20,7 @@ env:
   - GO15VENDOREXPERIMENT=1
 
 script:
-  - go test -v ./...
+  - ./test
   - bash integration/consul/test.sh
   - bash integration/etcd/test.sh
   - bash integration/file/test.sh
