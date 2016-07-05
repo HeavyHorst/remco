@@ -122,8 +122,8 @@ func (t *Resource) setVars(storeClient StoreConfig) error {
 
 	storeClient.store.Purge()
 
-	for k, res := range result {
-		storeClient.store.Set(path.Join("/", strings.TrimPrefix(k, storeClient.Prefix)), res)
+	for key, value := range result {
+		storeClient.store.Set(path.Join("/", strings.TrimPrefix(key, storeClient.Prefix)), value)
 	}
 
 	//merge all stores
