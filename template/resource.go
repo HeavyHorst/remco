@@ -37,7 +37,6 @@ type Resource struct {
 	storeClients []StoreConfig
 	funcMap      map[string]interface{}
 	store        memkv.Store
-	syncOnly     bool
 	sources      []*SrcDst
 }
 
@@ -55,14 +54,10 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst) (*Resource, erro
 		}
 	}
 
-	// TODO implement flags for these values
-	syncOnly := false
-
 	tr := &Resource{
 		storeClients: storeClients,
 		store:        memkv.New(),
 		funcMap:      newFuncMap(),
-		syncOnly:     syncOnly,
 		sources:      sources,
 	}
 
@@ -204,7 +199,7 @@ func (t *Resource) sync(s *SrcDst) error {
 
 	if !ok {
 		log.Info("Target config " + s.Dst + " out of sync")
-		if !t.syncOnly && s.CheckCmd != "" {
+		if s.CheckCmd != "" {
 			if err := s.check(staged); err != nil {
 				return errors.New("Config check failed: " + err.Error())
 			}
@@ -231,7 +226,7 @@ func (t *Resource) sync(s *SrcDst) error {
 				return err
 			}
 		}
-		if !t.syncOnly && s.ReloadCmd != "" {
+		if s.ReloadCmd != "" {
 			if err := s.reload(); err != nil {
 				return err
 			}
