@@ -1,11 +1,10 @@
 [[config]]
-  [config.cmd]
-    check = ""
-    reload = ""
 
   [[config.template]]
     src = "/etc/confd/templates/test.cfg"
     dst = "/home/rkaufmann/haproxy.cfg"
+    checkCmd = "echo 'check'"
+    reloadCmd = "echo 'reload'"
 
   [config.backend]
     [config.backend.etcdconfig]

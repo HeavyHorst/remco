@@ -16,10 +16,6 @@ import (
 
 type tomlConf struct {
 	Config []struct {
-		Cmd struct {
-			Check  string
-			Reload string
-		}
 		Template []*template.SrcDst
 		Backend  struct {
 			Etcdconfig   *etcd.Config
@@ -82,7 +78,7 @@ var Cmd = &cobra.Command{
 				}
 			}
 
-			t, err := template.NewResource(storeClients, v.Template, v.Cmd.Reload, v.Cmd.Check)
+			t, err := template.NewResource(storeClients, v.Template)
 			if err != nil {
 				log.Error(err)
 				continue

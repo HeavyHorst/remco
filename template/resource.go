@@ -1,17 +1,13 @@
 package template
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -24,37 +20,6 @@ import (
 	"github.com/flosch/pongo2"
 	flag "github.com/spf13/pflag"
 )
-
-type SrcDst struct {
-	Src       string
-	Dst       string
-	Mode      string
-	UID       int
-	GID       int
-	stageFile *os.File
-	fileMode  os.FileMode
-}
-
-func (s *SrcDst) setFileMode() error {
-	if s.Mode == "" {
-		if !fileutil.IsFileExist(s.Dst) {
-			s.fileMode = 0644
-		} else {
-			fi, err := os.Stat(s.Dst)
-			if err != nil {
-				return err
-			}
-			s.fileMode = fi.Mode()
-		}
-	} else {
-		mode, err := strconv.ParseUint(s.Mode, 0, 32)
-		if err != nil {
-			return err
-		}
-		s.fileMode = os.FileMode(mode)
-	}
-	return nil
-}
 
 type StoreConfig struct {
 	backends.StoreClient
@@ -70,8 +35,6 @@ type StoreConfig struct {
 // Resource is the representation of a parsed template resource.
 type Resource struct {
 	storeClients []StoreConfig
-	ReloadCmd    string
-	CheckCmd     string
 	funcMap      map[string]interface{}
 	store        memkv.Store
 	syncOnly     bool
@@ -81,7 +44,7 @@ type Resource struct {
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, checkCmd string) (*Resource, error) {
+func NewResource(storeClients []StoreConfig, sources []*SrcDst) (*Resource, error) {
 	if len(storeClients) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
@@ -97,8 +60,6 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst, reloadCmd, check
 
 	tr := &Resource{
 		storeClients: storeClients,
-		ReloadCmd:    reloadCmd,
-		CheckCmd:     checkCmd,
 		store:        memkv.New(),
 		funcMap:      newFuncMap(),
 		syncOnly:     syncOnly,
@@ -131,11 +92,13 @@ func NewResourceFromFlags(s backends.Store, flags *flag.FlagSet, watch bool) (*R
 	GID := os.Getegid()
 
 	sd := &SrcDst{
-		Src:  src,
-		Dst:  dst,
-		Mode: fileMode,
-		GID:  GID,
-		UID:  UID,
+		Src:       src,
+		Dst:       dst,
+		Mode:      fileMode,
+		ReloadCmd: reloadCmd,
+		CheckCmd:  checkCmd,
+		GID:       GID,
+		UID:       UID,
 	}
 
 	b := StoreConfig{
@@ -148,7 +111,7 @@ func NewResourceFromFlags(s backends.Store, flags *flag.FlagSet, watch bool) (*R
 		Keys:        keys,
 	}
 
-	return NewResource([]StoreConfig{b}, []*SrcDst{sd}, reloadCmd, checkCmd)
+	return NewResource([]StoreConfig{b}, []*SrcDst{sd})
 }
 
 // setVars sets the Vars for template resource.
@@ -241,8 +204,8 @@ func (t *Resource) sync(s *SrcDst) error {
 
 	if !ok {
 		log.Info("Target config " + s.Dst + " out of sync")
-		if !t.syncOnly && t.CheckCmd != "" {
-			if err := t.check(staged); err != nil {
+		if !t.syncOnly && s.CheckCmd != "" {
+			if err := s.check(staged); err != nil {
 				return errors.New("Config check failed: " + err.Error())
 			}
 		}
@@ -268,8 +231,8 @@ func (t *Resource) sync(s *SrcDst) error {
 				return err
 			}
 		}
-		if !t.syncOnly && t.ReloadCmd != "" {
-			if err := t.reload(); err != nil {
+		if !t.syncOnly && s.ReloadCmd != "" {
+			if err := s.reload(); err != nil {
 				return err
 			}
 		}
@@ -322,48 +285,6 @@ func (t *Resource) processAll() error {
 	if err = t.createStageFileAndSync(); err != nil {
 		return err
 	}
-	return nil
-}
-
-// check executes the check command to validate the staged config file. The
-// command is modified so that any references to src template are substituted
-// with a string representing the full path of the staged file. This allows the
-// check to be run on the staged file before overwriting the destination config
-// file.
-// It returns nil if the check command returns 0 and there are no other errors.
-func (t *Resource) check(stageFile string) error {
-	var cmdBuffer bytes.Buffer
-	data := make(map[string]string)
-	data["src"] = stageFile
-	tmpl, err := template.New("checkcmd").Parse(t.CheckCmd)
-	if err != nil {
-		return err
-	}
-	if err := tmpl.Execute(&cmdBuffer, data); err != nil {
-		return err
-	}
-	log.Debug("Running " + cmdBuffer.String())
-	c := exec.Command("/bin/sh", "-c", cmdBuffer.String())
-	output, err := c.CombinedOutput()
-	if err != nil {
-		log.Error(fmt.Sprintf("%q", string(output)))
-		return err
-	}
-	log.Debug(fmt.Sprintf("%q", string(output)))
-	return nil
-}
-
-// reload executes the reload command.
-// It returns nil if the reload command returns 0.
-func (t *Resource) reload() error {
-	log.Debug("Running " + t.ReloadCmd)
-	c := exec.Command("/bin/sh", "-c", t.ReloadCmd)
-	output, err := c.CombinedOutput()
-	if err != nil {
-		log.Error(fmt.Sprintf("%q", string(output)))
-		return err
-	}
-	log.Debug(fmt.Sprintf("%q", string(output)))
 	return nil
 }
 
