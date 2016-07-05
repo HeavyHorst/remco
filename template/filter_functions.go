@@ -78,7 +78,9 @@ func filterUnmarshalJSONObject(in *pongo2.Value, param *pongo2.Value) (*pongo2.V
 	}
 
 	var ret map[string]interface{}
-	json.Unmarshal([]byte(in.String()), &ret)
+	if err := json.Unmarshal([]byte(in.String()), &ret); err != nil {
+		log.Warning(err)
+	}
 	return pongo2.AsValue(ret), nil
 }
 
@@ -88,7 +90,9 @@ func filterUnmarshalJSONArray(in *pongo2.Value, param *pongo2.Value) (*pongo2.Va
 	}
 
 	var ret []interface{}
-	json.Unmarshal([]byte(in.String()), &ret)
+	if err := json.Unmarshal([]byte(in.String()), &ret); err != nil {
+		log.Warning(err)
+	}
 	return pongo2.AsValue(ret), nil
 }
 
