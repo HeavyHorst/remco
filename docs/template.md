@@ -163,3 +163,20 @@ Works with []string and []KVPair.
 {{dir}}
 {% endfor %}
 ```
+
+### decrypt
+Decrypts the stored data. Data must follow the following format, `base64(gpg(gzip(data)))`.
+
+This is compatible with [crypt](https://github.com/xordataexchange/crypt/tree/master/bin/crypt).
+
+Works with string, []string, KVPair, KVPairs
+
+```
+{{ getv("/test/data") | decrypt:"/path/to/your/armored/private/key" }}
+```
+
+#### Storing data using gpg
+```
+data = `echo 'secret text' | gzip -c | gpg2 --compress-level 0 --encrypt --default-recipient <your-recipient> | base64`
+ETCDCTL_API=3 etcdctl put /test/data $data
+```
