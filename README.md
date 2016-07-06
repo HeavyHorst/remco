@@ -2,7 +2,7 @@
 #Remco
 
 ## Documentation
-### [Template](https://heavyhorst.github.io/remco/template)
+### [Template](http://documentup.com/HeavyHorst/remco/docs/template)
 
 ## Project Status
 Remco is at an early stage and under active development. We do not recommend its use in production, but we encourage you to try out Remco and provide feedback via issues and pull requests.
