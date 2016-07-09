@@ -15,7 +15,8 @@ import (
 )
 
 type tomlConf struct {
-	Config []struct {
+	LogLevel string `toml:"log-level"`
+	Resource []struct {
 		Template []*template.SrcDst
 		Backend  struct {
 			Etcdconfig   *etcd.Config
@@ -55,8 +56,23 @@ var Cmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if c.LogLevel != "" {
+			switch c.LogLevel {
+			case "info":
+				log.Level = log.LevelInfo
+			case "warn":
+				log.Level = log.LevelWarning
+			case "debug":
+				log.Level = log.LevelDebug
+			case "error":
+				log.Level = log.LevelError
+			case "critical":
+				log.Level = log.LevelCritical
+			}
+		}
+
 		wait := &sync.WaitGroup{}
-		for _, v := range c.Config {
+		for _, v := range c.Resource {
 			var storeClients []template.StoreConfig
 
 			if v.Backend.Etcdconfig != nil {

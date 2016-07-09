@@ -1,13 +1,22 @@
-[[config]]
+#remco.toml
+################################################################
+# Global configuration
+################################################################
+log-level = "debug"
 
-  [[config.template]]
+
+################################################################
+# Resource configuration
+################################################################
+[[resource]]
+  [[resource.template]]
     src = "/etc/confd/templates/test.cfg"
     dst = "/home/rkaufmann/haproxy.cfg"
     checkCmd = "echo 'check'"
     reloadCmd = "echo 'reload'"
 
-  [config.backend]
-    [config.backend.etcdconfig]
+  [resource.backend]
+    [resource.backend.etcdconfig]
       nodes = ["127.0.0.1:2379"]
       watch = true
       prefix = "/"
@@ -15,7 +24,7 @@
       interval = 1
       keys = ["/"]
 
-    [config.backend.fileconfig]
+    [resource.backend.fileconfig]
       watch = true
       filepath = "/home/rkaufmann/test.yml"
       prefix = "/"
