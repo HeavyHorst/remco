@@ -130,6 +130,9 @@ func (t *Resource) setVars(storeClient StoreConfig) error {
 	t.store.Purge()
 	for _, v := range t.storeClients {
 		for _, kv := range v.store.GetAllKVs() {
+			if t.store.Exists(kv.Key) {
+				log.Warningf("Key collision - %s", kv.Key)
+			}
 			t.store.Set(kv.Key, kv.Value)
 		}
 	}
@@ -319,11 +322,12 @@ func (s StoreConfig) interval(stopChan chan bool, processChan chan StoreConfig) 
 	}
 }
 
-func (t *Resource) Monitor() {
+func (t *Resource) Monitor(stopChan chan bool) {
 	wg := &sync.WaitGroup{}
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
-	stopChan := make(chan bool)
+	done := make(chan bool)
+	stopIntervalWatch := make(chan bool)
 	processChan := make(chan StoreConfig)
 
 	defer close(processChan)
@@ -338,12 +342,12 @@ func (t *Resource) Monitor() {
 			go func(s StoreConfig) {
 				defer wg.Done()
 				//t.watch(s, stopChan, processChan)
-				s.watch(stopChan, processChan)
+				s.watch(stopIntervalWatch, processChan)
 			}(sc)
 		} else {
 			go func(s StoreConfig) {
 				defer wg.Done()
-				s.interval(stopChan, processChan)
+				s.interval(stopIntervalWatch, processChan)
 			}(sc)
 		}
 	}
@@ -351,7 +355,7 @@ func (t *Resource) Monitor() {
 	go func() {
 		// If there is no goroutine left - quit
 		wg.Wait()
-		signalChan <- syscall.SIGINT
+		close(done)
 	}()
 
 	for {
@@ -360,15 +364,15 @@ func (t *Resource) Monitor() {
 			if err := t.process(storeClient); err != nil {
 				log.Error(err)
 			}
-		case s := <-signalChan:
-			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			close(stopChan)
-			// drain processChan
+		case <-stopChan:
+			close(stopIntervalWatch)
 			go func() {
 				for range processChan {
 				}
 			}()
 			wg.Wait()
+			return
+		case <-done:
 			return
 		}
 	}

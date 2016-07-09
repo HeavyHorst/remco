@@ -1,9 +1,12 @@
 package advanced
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/HeavyHorst/remco/backends/consul"
 	"github.com/HeavyHorst/remco/backends/etcd"
@@ -71,6 +74,11 @@ var Cmd = &cobra.Command{
 			}
 		}
 
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+		stopChan := make(chan bool)
+		done := make(chan bool)
+
 		wait := &sync.WaitGroup{}
 		for _, v := range c.Resource {
 			var storeClients []template.StoreConfig
@@ -103,10 +111,27 @@ var Cmd = &cobra.Command{
 			wait.Add(1)
 			go func() {
 				defer wait.Done()
-				t.Monitor()
+				t.Monitor(stopChan)
 			}()
 		}
-		wait.Wait()
+
+		go func() {
+			// If there is no goroutine left - quit
+			wait.Wait()
+			close(done)
+		}()
+
+		for {
+			select {
+			case s := <-signalChan:
+				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
+				close(stopChan)
+				wait.Wait()
+				return
+			case <-done:
+				return
+			}
+		}
 	},
 }
 

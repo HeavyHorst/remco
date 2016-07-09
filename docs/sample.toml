@@ -12,20 +12,22 @@ log-level = "debug"
   [[resource.template]]
     src = "/etc/confd/templates/test.cfg"
     dst = "/home/rkaufmann/haproxy.cfg"
-    checkCmd = "echo 'check'"
-    reloadCmd = "echo 'reload'"
+    checkCmd = ""
+    reloadCmd = ""
 
   [resource.backend]
     [resource.backend.etcdconfig]
-      nodes = ["127.0.0.1:2379"]
+      nodes = ["http://127.0.0.1:2379"]
       watch = true
       prefix = "/"
-      version = 3
+      version = 2
+      onetime = true
       interval = 1
       keys = ["/"]
 
     [resource.backend.fileconfig]
       watch = true
+      onetime = true
       filepath = "/home/rkaufmann/test.yml"
       prefix = "/"
       interval = 1

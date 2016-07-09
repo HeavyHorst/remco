@@ -136,6 +136,9 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 	for {
 		resp, err := watcher.Next(ctx)
 		if err != nil {
+			if err == context.Canceled {
+				return 0, nil
+			}
 			switch e := err.(type) {
 			case *client.Error:
 				if e.Code == 401 {
