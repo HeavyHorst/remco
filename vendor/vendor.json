@@ -9,10 +9,10 @@
 			"revisionTime": "2016-07-02T21:06:43Z"
 		},
 		{
-			"checksumSHA1": "D4AnwC3e2PR9Fs8tWsLifUQ47sI=",
-			"path": "github.com/cloudflare/cfssl/log",
-			"revision": "d81c136a78422b6d7efd0c2fba65b9eb8e48a2c9",
-			"revisionTime": "2016-02-19T01:11:34Z"
+			"checksumSHA1": "SdEcxwaW92m0H3pao3BPj2ZpvaU=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "f7f79f729e0fbe2fcc061db48a9ba0263f588252",
+			"revisionTime": "2016-01-19T00:00:32Z"
 		},
 		{
 			"checksumSHA1": "r1CX8/M/ipvntOfH0rT9jOQ6fdM=",
@@ -161,6 +161,12 @@
 			"revisionTime": "2016-04-19T14:53:44Z"
 		},
 		{
+			"checksumSHA1": "hBgLmZ/4mCxmnH88mqFKBkpJFUY=",
+			"path": "github.com/mgutz/ansi",
+			"revision": "c286dcecd19ff979eeb73ea444e479b903f2cfcb",
+			"revisionTime": "2015-09-14T16:22:38Z"
+		},
+		{
 			"checksumSHA1": "A6nZdZ1/lTOVINhIndyw2ZWN9JU=",
 			"path": "github.com/naoina/go-stringutil",
 			"revision": "6b638e95a32d0c1131db0e7fe83775cbea4a0d0b",
@@ -195,6 +201,12 @@
 			"path": "github.com/ugorji/go/codec",
 			"revision": "9f21f8ea305046b8d17a799e2c73069533a99d24",
 			"revisionTime": "2016-02-17T16:15:51Z"
+		},
+		{
+			"checksumSHA1": "78ZklhBVMCDjf6qLiyQp3mTbGXo=",
+			"path": "github.com/x-cray/logrus-prefixed-formatter",
+			"revision": "78e945f7d6bfe5a81ce6121d92d8118e44303e58",
+			"revisionTime": "2016-06-25T16:39:23Z"
 		},
 		{
 			"checksumSHA1": "TT1rac6kpQp2vz24m5yDGUNQ/QQ=",
