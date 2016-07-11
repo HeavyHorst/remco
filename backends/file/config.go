@@ -4,6 +4,7 @@ import (
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
+	"github.com/Sirupsen/logrus"
 )
 
 type Config struct {
@@ -12,7 +13,10 @@ type Config struct {
 }
 
 func (c *Config) Connect() (backends.Store, error) {
-	log.Info("Filepath set to " + c.Filepath)
+	log.WithFields(logrus.Fields{
+		"backend":  "file",
+		"filepath": c.Filepath,
+	}).Info("Set filepath")
 	client, err := NewFileClient(c.Filepath)
 	if err != nil {
 		return backends.Store{}, err

@@ -1,10 +1,10 @@
 package fileutil
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/HeavyHorst/remco/log"
+	"github.com/Sirupsen/logrus"
 )
 
 // fileInfo describes a configuration file and is returned by fileStat.
@@ -40,16 +40,32 @@ func SameFile(src, dest string) (bool, error) {
 		return false, err
 	}
 	if d.Uid != s.Uid {
-		log.Info(fmt.Sprintf("%s has UID %d should be %d", dest, d.Uid, s.Uid))
+		log.WithFields(logrus.Fields{
+			"config":  dest,
+			"current": d.Uid,
+			"new":     s.Uid,
+		}).Info("wrong UID")
 	}
 	if d.Gid != s.Gid {
-		log.Info(fmt.Sprintf("%s has GID %d should be %d", dest, d.Gid, s.Gid))
+		log.WithFields(logrus.Fields{
+			"config":  dest,
+			"current": d.Gid,
+			"new":     s.Gid,
+		}).Info("wrong GID")
 	}
 	if d.Mode != s.Mode {
-		log.Info(fmt.Sprintf("%s has mode %s should be %s", dest, os.FileMode(d.Mode), os.FileMode(s.Mode)))
+		log.WithFields(logrus.Fields{
+			"config":  dest,
+			"current": os.FileMode(d.Mode),
+			"new":     os.FileMode(s.Mode),
+		}).Info("wrong filemode")
 	}
 	if d.Hash != s.Hash {
-		log.Info(fmt.Sprintf("%s has hashsum %s should be %s", dest, d.Hash, s.Hash))
+		log.WithFields(logrus.Fields{
+			"config":  dest,
+			"current": d.Hash,
+			"new":     s.Hash,
+		}).Info("wrong hashsum")
 	}
 	if d.Uid != s.Uid || d.Gid != s.Gid || d.Mode != s.Mode || d.Hash != s.Hash {
 		return false, nil

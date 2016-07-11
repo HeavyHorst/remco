@@ -23,6 +23,8 @@ func init() {
 
 // SetLevel sets the log level. Valid levels are panic, fatal, error, warn, info and debug.
 func SetLevel(level string) error {
+	lock.Lock()
+	defer lock.Unlock()
 	lvl, err := log.ParseLevel(level)
 	if err != nil {
 		return err
@@ -64,4 +66,9 @@ func Warning(v ...interface{}) {
 	lock.Lock()
 	defer lock.Unlock()
 	logger.Warning(v)
+}
+
+// WithFields is a Wrapper for logrus.WithFields
+func WithFields(fields log.Fields) *log.Entry {
+	return logger.WithFields(fields)
 }

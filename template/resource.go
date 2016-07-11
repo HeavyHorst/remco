@@ -17,6 +17,7 @@ import (
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template/fileutil"
+	"github.com/Sirupsen/logrus"
 	"github.com/flosch/pongo2"
 	flag "github.com/spf13/pflag"
 )
@@ -112,8 +113,11 @@ func NewResourceFromFlags(s backends.Store, flags *flag.FlagSet, watch bool) (*R
 // setVars sets the Vars for template resource.
 func (t *Resource) setVars(storeClient StoreConfig) error {
 	var err error
-	log.Debug("Retrieving keys from store: " + storeClient.Name)
-	log.Debug("Key prefix set to " + storeClient.Prefix)
+
+	log.WithFields(logrus.Fields{
+		"store":      storeClient.Name,
+		"key_prefix": storeClient.Prefix,
+	}).Debug("Retrieving keys")
 
 	result, err := storeClient.GetValues(appendPrefix(storeClient.Prefix, storeClient.Keys))
 	if err != nil {
@@ -146,13 +150,14 @@ func (t *Resource) setVars(storeClient StoreConfig) error {
 // It returns an error if any.
 func (t *Resource) createStageFileAndSync() error {
 	for _, s := range t.sources {
-		log.Debug("Using source template " + s.Src)
-
 		if !fileutil.IsFileExist(s.Src) {
 			return errors.New("Missing template: " + s.Src)
 		}
 
-		log.Debug("Compiling source template(pongo2) " + s.Src)
+		log.WithFields(logrus.Fields{
+			"template": s.Src,
+		}).Debug("Compiling source template")
+
 		tmpl, err := pongo2.FromFile(s.Src)
 		if err != nil {
 			return fmt.Errorf("Unable to process template %s, %s", s.Src, err)
@@ -194,20 +199,29 @@ func (t *Resource) sync(s *SrcDst) error {
 	staged := s.stageFile.Name()
 	defer os.Remove(staged)
 
-	log.Debug("Comparing candidate config to " + s.Dst)
+	log.WithFields(logrus.Fields{
+		"staged": path.Base(staged),
+		"dest":   s.Dst,
+	}).Debug("Comparing staged and dest config files")
+
 	ok, err := fileutil.SameFile(staged, s.Dst)
 	if err != nil {
 		log.Error(err.Error())
 	}
 
 	if !ok {
-		log.Info("Target config " + s.Dst + " out of sync")
+		log.WithFields(logrus.Fields{
+			"config": s.Dst,
+		}).Info("Target config out of sync")
+
 		if s.CheckCmd != "" {
 			if err := s.check(staged); err != nil {
 				return errors.New("Config check failed: " + err.Error())
 			}
 		}
-		log.Debug("Overwriting target config " + s.Dst)
+		log.WithFields(logrus.Fields{
+			"config": s.Dst,
+		}).Debug("Overwriting target config")
 		err := os.Rename(staged, s.Dst)
 		if err != nil {
 			if strings.Contains(err.Error(), "device or resource busy") {
@@ -234,9 +248,16 @@ func (t *Resource) sync(s *SrcDst) error {
 				return err
 			}
 		}
-		log.Info("Target config " + s.Dst + " has been updated")
+
+		log.WithFields(logrus.Fields{
+			"config": s.Dst,
+		}).Info("Target config has been updated")
+
 	} else {
-		log.Debug("Target config " + s.Dst + " in sync")
+		log.WithFields(logrus.Fields{
+			"config": s.Dst,
+		}).Debug("Target config in sync")
+
 	}
 	return nil
 }

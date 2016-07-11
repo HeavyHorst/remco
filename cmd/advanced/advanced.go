@@ -137,6 +137,8 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, reloadFunc func() (toml
 				time.Sleep(2 * time.Second)
 				continue
 			}
+			c = &newConf
+			//c = &newConf
 			wg.Add(1)
 			// stop the old Resource
 			stopWatch <- true
@@ -145,7 +147,7 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, reloadFunc func() (toml
 			log.Debug("Starting the new instance")
 			go func() {
 				defer wg.Done()
-				newConf.watch(stopWatch)
+				c.watch(stopWatch)
 			}()
 		}
 	}()

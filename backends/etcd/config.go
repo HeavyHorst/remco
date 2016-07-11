@@ -1,13 +1,12 @@
 package etcd
 
 import (
-	"strings"
-
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/backends/etcd/etcdv2"
 	"github.com/HeavyHorst/remco/backends/etcd/etcdv3"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
+	"github.com/Sirupsen/logrus"
 )
 
 type Config struct {
@@ -23,7 +22,11 @@ type Config struct {
 }
 
 func (c *Config) Connect() (backends.Store, error) {
-	log.Info("etcd backend nodes set to " + strings.Join(c.Nodes, ", "))
+	//log.Info("etcd backend nodes set to " + strings.Join(c.Nodes, ", "))
+	log.WithFields(logrus.Fields{
+		"backend": "etcd",
+		"nodes":   c.Nodes,
+	}).Info("Set backend nodes")
 	var client backends.StoreClient
 	var err error
 
