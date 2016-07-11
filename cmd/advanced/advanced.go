@@ -128,7 +128,7 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, reloadFunc func() (toml
 		stop := make(chan bool)
 		for {
 			cli.WatchPrefix("", []string{}, 0, stop)
-			log.Debug("Config changed on disk - reload remco")
+			log.Info("Config changed on disk - reload remco")
 			time.Sleep(1 * time.Second)
 
 			newConf, err := reloadFunc()

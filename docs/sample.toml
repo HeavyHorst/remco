@@ -29,6 +29,6 @@ log-level = "debug"
       watch = true
       #onetime = true
       filepath = "/home/rkaufmann/test.yml"
-      #prefix = "/"
+      prefix = "/"
       interval = 1
       keys = ["/"]

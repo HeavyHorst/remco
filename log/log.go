@@ -2,12 +2,14 @@ package log
 
 import (
 	"os"
+	"sync"
 
 	log "github.com/Sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 var logger *log.Entry
+var lock sync.RWMutex
 
 func init() {
 	host, _ := os.Hostname()
@@ -31,25 +33,35 @@ func SetLevel(level string) error {
 
 // Debug logs a message with severity DEBUG.
 func Debug(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	logger.Debug(v)
 }
 
 // Error logs a message with severity ERROR.
 func Error(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	logger.Error(v)
 }
 
 // Fatal logs a message with severity ERROR followed by a call to os.Exit().
 func Fatal(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	logger.Fatal(v)
 }
 
 // Info logs a message with severity INFO.
 func Info(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	logger.Info(v)
 }
 
 // Warning logs a message with severity WARNING.
 func Warning(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	logger.Warning(v)
 }
