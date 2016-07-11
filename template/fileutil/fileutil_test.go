@@ -17,7 +17,7 @@ type TestSuite struct{}
 var _ = Suite(&TestSuite{})
 
 func init() {
-	log.Level = log.LevelWarning
+	log.SetLevel("warning")
 }
 
 func testSameFile(t *C, srcTxt, dstTxt string) bool {
