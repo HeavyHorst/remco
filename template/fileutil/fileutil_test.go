@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cloudflare/cfssl/log"
+	"github.com/HeavyHorst/remco/log"
 	. "gopkg.in/check.v1"
 )
 

@@ -7,7 +7,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Client provides a shell for the yaml client
 type Client struct {
 	filepath string
 }
@@ -82,5 +81,4 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 			return 0, nil
 		}
 	}
-	return waitIndex, nil
 }

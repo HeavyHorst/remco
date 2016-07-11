@@ -17,18 +17,18 @@ log-level = "debug"
 
   [resource.backend]
     [resource.backend.etcdconfig]
-      nodes = ["http://127.0.0.1:2379"]
+      nodes = ["127.0.0.1:2379"]
       watch = true
       prefix = "/"
-      version = 2
-      onetime = true
+      version = 3
+      #onetime = true
       interval = 1
       keys = ["/"]
 
     [resource.backend.fileconfig]
       watch = true
-      onetime = true
+      #onetime = true
       filepath = "/home/rkaufmann/test.yml"
-      prefix = "/"
+      #prefix = "/"
       interval = 1
       keys = ["/"]

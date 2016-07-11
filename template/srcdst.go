@@ -8,8 +8,8 @@ import (
 	"os/exec"
 	"strconv"
 
+	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template/fileutil"
-	"github.com/cloudflare/cfssl/log"
 )
 
 type SrcDst struct {

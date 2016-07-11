@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudflare/cfssl/log"
+	"github.com/HeavyHorst/remco/log"
 )
 
 // fileInfo describes a configuration file and is returned by fileStat.

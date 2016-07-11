@@ -3,6 +3,7 @@ package template
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
 	"sort"
@@ -11,7 +12,7 @@ import (
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/HeavyHorst/memkv"
-	"github.com/cloudflare/cfssl/log"
+	"github.com/HeavyHorst/remco/log"
 	"github.com/flosch/pongo2"
 )
 
@@ -173,7 +174,7 @@ func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo
 		for _, v := range i {
 			dvalue, err := decrypt(v.Value, entityList)
 			if err != nil {
-				log.Warningf("Couldn't decrypt `%s` - %s", v.Value, err)
+				log.Warning(fmt.Sprintf("Couldn't decrypt `%s` - %s", v.Value, err))
 			}
 			new = append(new, memkv.KVPair{Key: v.Key, Value: dvalue})
 		}
@@ -182,7 +183,7 @@ func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo
 		i := input.(memkv.KVPair)
 		dvalue, err := decrypt(i.Value, entityList)
 		if err != nil {
-			log.Warningf("Couldn't decrypt `%s` - %s", i.Value, err)
+			log.Warning(fmt.Sprintf("Couldn't decrypt `%s` - %s", i.Value, err))
 		}
 		return pongo2.AsValue(memkv.KVPair{Key: i.Key, Value: dvalue}), nil
 	case []string:
@@ -191,7 +192,7 @@ func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo
 		for _, v := range i {
 			dvalue, err := decrypt(v, entityList)
 			if err != nil {
-				log.Warningf("Couldn't decrypt `%s` - %s", v, err)
+				log.Warning(fmt.Sprintf("Couldn't decrypt `%s` - %s", v, err))
 			}
 			new = append(new, dvalue)
 		}

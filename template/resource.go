@@ -15,8 +15,8 @@ import (
 
 	"github.com/HeavyHorst/memkv"
 	"github.com/HeavyHorst/remco/backends"
+	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template/fileutil"
-	"github.com/cloudflare/cfssl/log"
 	"github.com/flosch/pongo2"
 	flag "github.com/spf13/pflag"
 )
@@ -131,7 +131,7 @@ func (t *Resource) setVars(storeClient StoreConfig) error {
 	for _, v := range t.storeClients {
 		for _, kv := range v.store.GetAllKVs() {
 			if t.store.Exists(kv.Key) {
-				log.Warningf("Key collision - %s", kv.Key)
+				log.Warning("Key collision - " + kv.Key)
 			}
 			t.store.Set(kv.Key, kv.Value)
 		}
