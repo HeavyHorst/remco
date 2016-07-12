@@ -15,6 +15,7 @@ log-format = "text"
     dst = "/home/rkaufmann/haproxy.cfg"
     checkCmd = ""
     reloadCmd = ""
+    mode = "0644"
 
   [resource.backend]
     [resource.backend.etcdconfig]

@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"os"
 	"sync"
 
@@ -16,7 +17,7 @@ func init() {
 	SetFormatter("text")
 	log.SetLevel(log.DebugLevel)
 	logger = log.WithFields(log.Fields{
-		"prefix":   "remco",
+		"prefix":   fmt.Sprintf("%s[%d]", os.Args[0], os.Getpid()),
 		"hostname": host,
 	})
 }
