@@ -3,6 +3,7 @@
 # Global configuration
 ################################################################
 log-level = "debug"
+log-format = "text"
 
 
 ################################################################
@@ -25,10 +26,10 @@ log-level = "debug"
       interval = 1
       keys = ["/"]
 
-    [resource.backend.fileconfig]
-      watch = true
-      #onetime = true
-      filepath = "/home/rkaufmann/test.yml"
-      prefix = "/"
-      interval = 1
-      keys = ["/"]
+   # [resource.backend.fileconfig]
+   #   watch = true
+   #   #onetime = true
+   #   filepath = "/home/rkaufmann/test.yml"
+   #   prefix = "/"
+   #   interval = 1
+   #   keys = ["/"]
