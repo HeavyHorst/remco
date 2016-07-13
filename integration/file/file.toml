@@ -1,0 +1,21 @@
+#remco.toml
+################################################################
+# Global configuration
+################################################################
+log-level = "debug"
+log-format = "text"
+
+
+################################################################
+# Resource configuration
+################################################################
+[[resource]]
+  [[resource.template]]
+    src = "./integration/templates/basic.conf.tmpl"
+    dst = "/tmp/remco-basic-test.conf"
+
+  [resource.backend]
+    [resource.backend.fileconfig]
+      onetime = true
+      filepath = "./integration/file/config.yml"
+      keys = ["/"]
