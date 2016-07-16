@@ -17,7 +17,13 @@ log-format = "text"
   [resource.backend]
     [resource.backend.vaultconfig]
       onetime = true
-      auth_type = token
-      auth_token = §§token§§
-      node = http://127.0.0.1:8200
-      keys = ["/"]
+      auth_type = "token"
+      auth_token = "§§token§§"
+      node = "http://127.0.0.1:8200"
+      keys = [
+          "/database/host",
+          "/database/password",
+          "/database/port",
+          "/database/username",
+          "/upstream",
+      ]

@@ -1,10 +1,8 @@
 #!/bin/bash
 set -e
 ROOT_TOKEN=$(vault read -field id auth/token/lookup-self)
-sed -i -- 's/§§token§§/$ROOT_TOKEN/g' integration/vault/vault.toml
+sed -i -- "s/§§token§§/${ROOT_TOKEN}/g" integration/vault/vault.toml
 
-
-cat integration/vault/vault.toml
 
 vault mount -path database generic
 vault mount -path upstream generic
