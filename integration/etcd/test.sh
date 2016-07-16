@@ -14,7 +14,7 @@ docker run -ti --rm -e ETCDCTL_API=3 --net=host quay.io/coreos/etcd:v3.0.1 etcdc
 docker run -ti --rm -e ETCDCTL_API=3 --net=host quay.io/coreos/etcd:v3.0.1 etcdctl --endpoints=127.0.0.1:2379 put /upstream/app1 10.0.1.10:8080
 docker run -ti --rm -e ETCDCTL_API=3 --net=host quay.io/coreos/etcd:v3.0.1 etcdctl --endpoints=127.0.0.1:2379 put /upstream/app2 10.0.1.11:8080
 
-remco advanced --config integration/etcd/etcd.toml
+remco config file -c integration/etcd/etcd.toml
 
 cmp /tmp/remco-basic-test-etcdv2.conf ./integration/config/test.config || cat /tmp/remco-basic-test-etcdv2.conf
 cmp /tmp/remco-basic-test-etcdv3.conf ./integration/config/test.config || cat /tmp/remco-basic-test-etcdv3.conf
