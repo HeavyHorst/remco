@@ -1,15 +1,17 @@
 language: go
 
-sudo: required
-
-services:
-  - docker
-
 before_install:
-  #start consul
-  - docker run -d -p 8500:8500 -e CONSUL_BIND_INTERFACE=eth0 -e CONSUL_CLIENT_INTERFACE=eth0 --name=dev-consul consul
-  #start etcd
-  - docker run -d --name etcdv3 --net=host quay.io/coreos/etcd:v3.0.1
+  # install consul
+  - wget https://releases.hashicorp.com/consul/0.6.4/consul_0.6.4_linux_amd64.zip
+  - unzip consul_0.6.4_linux_amd64.zip
+  - sudo mv consul /bin/
+  - consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul &
+  # install etcd
+  - wget https://github.com/coreos/etcd/releases/download/v3.0.3/etcd-v3.0.3-linux-amd64.tar.gz -o etcd-v3.0.3-linux-amd64.tar.gz
+  - tar xzf etcd-v3.0.3-linux-amd64.tar.gz
+  - sudo mv etcd-v3.0.3-linux-amd64/etcd /bin/
+  - sudo mv etcd-v3.0.3-linux-amd64/etcdctl /bin/
+  - etcd &
   # Install vault
   - wget https://releases.hashicorp.com/vault/0.6.0/vault_0.6.0_linux_amd64.zip
   - unzip vault_0.6.0_linux_amd64.zip
