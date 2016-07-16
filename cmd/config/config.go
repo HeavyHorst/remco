@@ -27,8 +27,8 @@ var CfgCmd = &cobra.Command{
 }
 
 type tomlConf struct {
-	LogLevel  string `toml:"log-level"`
-	LogFormat string `toml:"log-format"`
+	LogLevel  string `toml:"log_level"`
+	LogFormat string `toml:"log_format"`
 	Resource  []struct {
 		Template []*template.SrcDst
 		Backend  struct {

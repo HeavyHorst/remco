@@ -25,5 +25,6 @@ log-format = "text"
           "/database/password",
           "/database/port",
           "/database/username",
-          "/upstream",
+          "/upstream/app1",
+          "/upstream/app2",
       ]

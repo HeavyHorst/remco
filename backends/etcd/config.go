@@ -11,10 +11,10 @@ import (
 
 type Config struct {
 	Nodes        []string
-	ClientCert   string
-	ClientKey    string
-	ClientCaKeys string
-	BasicAuth    bool
+	ClientCert   string `toml:"client_cert"`
+	ClientKey    string `toml:"client_key"`
+	ClientCaKeys string `toml:"client_ca_keys"`
+	BasicAuth    bool   `toml:"basic_auth"`
 	Username     string
 	Password     string
 	Version      int
