@@ -1,8 +1,6 @@
 package config
 
 import (
-	"os"
-
 	"github.com/HeavyHorst/remco/backends/file"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/spf13/cobra"
@@ -29,14 +27,13 @@ var FileCmd = &cobra.Command{
 		// we need a working config here - exit on error
 		c, err := loadConf()
 		if err != nil {
-			log.Error(err.Error())
-			os.Exit(1)
+			log.Fatal(err.Error())
 		}
 		c.configWatch(f, "", loadConf)
 	},
 }
 
 func init() {
-	FileCmd.Flags().StringP("config", "c", "", "Absolute path to the config file")
+	FileCmd.Flags().StringP("config", "c", "", "Relative path to the config file")
 	CfgCmd.AddCommand(FileCmd)
 }
