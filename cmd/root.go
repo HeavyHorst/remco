@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/HeavyHorst/remco/cmd/advanced"
+	"github.com/HeavyHorst/remco/cmd/config"
 )
 
 // This represents the base command when called without any subcommands
@@ -24,5 +24,5 @@ func Execute() {
 }
 
 func init() {
-	RootCmd.AddCommand(advanced.Cmd)
+	RootCmd.AddCommand(config.CfgCmd)
 }

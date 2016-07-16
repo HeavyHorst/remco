@@ -1,4 +1,4 @@
-package advanced
+package config
 
 import (
 	"fmt"
@@ -16,7 +16,14 @@ import (
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/naoina/toml"
+	"github.com/spf13/cobra"
 )
+
+// CfgCmd represents the config command
+var CfgCmd = &cobra.Command{
+	Use:   "config",
+	Short: "parses the provided config file and process any number of templates",
+}
 
 type tomlConf struct {
 	LogLevel  string `toml:"log-level"`

@@ -1,4 +1,4 @@
-package advanced
+package config
 
 import (
 	"os"
@@ -9,9 +9,9 @@ import (
 )
 
 // Cmd represents the advanced command
-var Cmd = &cobra.Command{
-	Use:   "advanced",
-	Short: "advanced mode - parses the provided config file and process any number of templates",
+var FileCmd = &cobra.Command{
+	Use:   "file",
+	Short: "load a config file from a file",
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, _ := cmd.Flags().GetString("config")
 		f, _ := file.NewFileClient(cfg)
@@ -37,5 +37,6 @@ var Cmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.Flags().String("config", "", "Absolute path to the config file")
+	FileCmd.Flags().StringP("config", "c", "", "Absolute path to the config file")
+	CfgCmd.AddCommand(FileCmd)
 }
