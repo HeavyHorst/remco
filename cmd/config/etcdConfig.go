@@ -17,13 +17,13 @@ var EtcdCmd = &cobra.Command{
 	Short: "load a config file from etcd",
 	Run: func(cmd *cobra.Command, args []string) {
 		nodes, _ := cmd.Flags().GetStringSlice("nodes")
-		cert, _ := cmd.Flags().GetString("cert")
-		key, _ := cmd.Flags().GetString("key")
-		caCert, _ := cmd.Flags().GetString("caCert")
+		cert, _ := cmd.Flags().GetString("client-cert")
+		key, _ := cmd.Flags().GetString("client-key")
+		caCert, _ := cmd.Flags().GetString("client-ca-keys")
 		basicAuth, _ := cmd.Flags().GetBool("basicAuth")
 		username, _ := cmd.Flags().GetString("username")
 		password, _ := cmd.Flags().GetString("password")
-		api, _ := cmd.Flags().GetInt("apiversion")
+		api, _ := cmd.Flags().GetInt("api-version")
 		config, _ := cmd.Flags().GetString("config")
 
 		var e backends.StoreClient
@@ -69,13 +69,13 @@ var EtcdCmd = &cobra.Command{
 
 func init() {
 	EtcdCmd.Flags().StringSlice("nodes", []string{"http://127.0.0.1:2379"}, "The etcd nodes")
-	EtcdCmd.Flags().String("cert", "", "The client cert file")
-	EtcdCmd.Flags().String("key", "", "The client key file")
-	EtcdCmd.Flags().String("caCert", "", "The client CA key file")
+	EtcdCmd.Flags().String("client-cert", "", "The client cert file")
+	EtcdCmd.Flags().String("client-key", "", "The client key file")
+	EtcdCmd.Flags().String("client-ca-keys", "", "The client CA key file")
 	EtcdCmd.Flags().Bool("basicAuth", false, "Enable etcd basic auth with username and password")
 	EtcdCmd.Flags().String("username", "", "username")
 	EtcdCmd.Flags().String("password", "", "password")
-	EtcdCmd.Flags().Int("apiversion", 2, "The etcd version (2/3)")
+	EtcdCmd.Flags().Int("api-version", 2, "The etcd version (2/3)")
 	EtcdCmd.Flags().StringP("config", "c", "", "The path in etcd where the config is stored")
 
 	CfgCmd.AddCommand(EtcdCmd)

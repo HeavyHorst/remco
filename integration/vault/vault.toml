@@ -1,0 +1,23 @@
+#remco.toml
+################################################################
+# Global configuration
+################################################################
+log-level = "debug"
+log-format = "text"
+
+
+################################################################
+# Resource configuration
+################################################################
+[[resource]]
+  [[resource.template]]
+    src = "./integration/templates/basic.conf.tmpl"
+    dst = "/tmp/remco-basic-test.conf"
+
+  [resource.backend]
+    [resource.backend.vaultconfig]
+      onetime = true
+      auth_type = token
+      auth_token = §§token§§
+      node = http://127.0.0.1:8200
+      keys = ["/"]

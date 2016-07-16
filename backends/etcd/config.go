@@ -10,14 +10,14 @@ import (
 )
 
 type Config struct {
-	Nodes     []string
-	Cert      string
-	Key       string
-	CaCert    string
-	BasicAuth bool
-	Username  string
-	Password  string
-	Version   int
+	Nodes        []string
+	ClientCert   string
+	ClientKey    string
+	ClientCaKeys string
+	BasicAuth    bool
+	Username     string
+	Password     string
+	Version      int
 	template.StoreConfig
 }
 
@@ -31,10 +31,10 @@ func (c *Config) Connect() (backends.Store, error) {
 	var err error
 
 	if c.Version == 3 {
-		client, err = etcdv3.NewEtcdClient(c.Nodes, c.Cert, c.Key, c.CaCert, c.BasicAuth, c.Username, c.Password)
+		client, err = etcdv3.NewEtcdClient(c.Nodes, c.ClientCert, c.ClientKey, c.ClientCaKeys, c.BasicAuth, c.Username, c.Password)
 		c.StoreConfig.Name = "etcdv3"
 	} else {
-		client, err = etcdv2.NewEtcdClient(c.Nodes, c.Cert, c.Key, c.CaCert, c.BasicAuth, c.Username, c.Password)
+		client, err = etcdv2.NewEtcdClient(c.Nodes, c.ClientCert, c.ClientKey, c.ClientCaKeys, c.BasicAuth, c.Username, c.Password)
 		c.StoreConfig.Name = "etcd"
 	}
 

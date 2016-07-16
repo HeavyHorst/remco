@@ -13,6 +13,7 @@ import (
 	"github.com/HeavyHorst/remco/backends/consul"
 	"github.com/HeavyHorst/remco/backends/etcd"
 	"github.com/HeavyHorst/remco/backends/file"
+	"github.com/HeavyHorst/remco/backends/vault"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/naoina/toml"
@@ -34,6 +35,7 @@ type tomlConf struct {
 			Etcdconfig   *etcd.Config
 			Fileconfig   *file.Config
 			Consulconfig *consul.Config
+			Vaultconfig  *vault.Config
 		}
 	}
 }
@@ -86,6 +88,12 @@ func (c *tomlConf) watch(stop chan bool) {
 			_, err := v.Backend.Consulconfig.Connect()
 			if err == nil {
 				storeClients = append(storeClients, v.Backend.Consulconfig.StoreConfig)
+			}
+		}
+		if v.Backend.Vaultconfig != nil {
+			_, err := v.Backend.Vaultconfig.Connect()
+			if err == nil {
+				storeClients = append(storeClients, v.Backend.Vaultconfig.StoreConfig)
 			}
 		}
 

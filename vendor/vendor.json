@@ -99,6 +99,13 @@
 			"revisionTime": "2016-06-23T18:35:23Z"
 		},
 		{
+			"checksumSHA1": "mAoQ2DtqFYrTEgwGDjwV3XZvVNI=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/fatih/structs",
+			"path": "github.com/fatih/structs",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
 			"checksumSHA1": "rbJzKkkLXx3KmAo3e+cODbJw4B8=",
 			"path": "github.com/flosch/pongo2",
 			"revision": "7f5515449ea9bbeb00256d9cbb654c556e7d0146",
@@ -167,9 +174,79 @@
 			"revisionTime": "2016-05-10T14:18:56Z"
 		},
 		{
+			"checksumSHA1": "bJJp3lBIn2Lt/9ZGivcjLw8o2Hg=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl",
+			"path": "github.com/hashicorp/hcl",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "WP5ODRo9+USuAsKYPu5RW3q8Epg=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl/hcl/ast",
+			"path": "github.com/hashicorp/hcl/hcl/ast",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "5AUUwTIswg6icr/6vgCs0zFJl4w=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl/hcl/parser",
+			"path": "github.com/hashicorp/hcl/hcl/parser",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "AwXW3BDC53INB5cY2CLmtIFfOPw=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl/hcl/scanner",
+			"path": "github.com/hashicorp/hcl/hcl/scanner",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "wh2mSXMC88JiAy8FIrTtL7OmY7Q=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl/hcl/strconv",
+			"path": "github.com/hashicorp/hcl/hcl/strconv",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "mCxZsnCaqyKhAC5iulJQpt8LIqA=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl/hcl/token",
+			"path": "github.com/hashicorp/hcl/hcl/token",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "uEaK2zagnGctsUmjWt8ZYmK1Yvs=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl/json/parser",
+			"path": "github.com/hashicorp/hcl/json/parser",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "S1e0F9ZKSnqgOLfjDTYazRL28tA=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl/json/scanner",
+			"path": "github.com/hashicorp/hcl/json/scanner",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "fNlXQCQEnb+B3k5UDL/r15xtSJY=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl/json/token",
+			"path": "github.com/hashicorp/hcl/json/token",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
 			"checksumSHA1": "oO8c5+ZEFssewIqvHJkGEXHV+i0=",
 			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/serf/coordinate",
 			"path": "github.com/hashicorp/serf/coordinate",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "Nijb9L3JdKk54Mld/sybup7f8oc=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/vault/api",
+			"path": "github.com/hashicorp/vault/api",
 			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
 			"revisionTime": "2016-05-10T14:18:56Z"
 		},
@@ -180,10 +257,29 @@
 			"revisionTime": "2016-05-10T14:18:56Z"
 		},
 		{
+			"checksumSHA1": "sBa1fahxV53rEgRd55HV0CiCEWM=",
+			"path": "github.com/kelseyhightower/confd/backends/vault",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
+			"checksumSHA1": "5qTCgivGtIdM+A+dpS8tflZeECo=",
+			"path": "github.com/kelseyhightower/confd/log",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
+		},
+		{
 			"checksumSHA1": "hBgLmZ/4mCxmnH88mqFKBkpJFUY=",
 			"path": "github.com/mgutz/ansi",
 			"revision": "c286dcecd19ff979eeb73ea444e479b903f2cfcb",
 			"revisionTime": "2015-09-14T16:22:38Z"
+		},
+		{
+			"checksumSHA1": "KCJhN9Dx329wAN/SeL4CxeypPyk=",
+			"origin": "github.com/kelseyhightower/confd/vendor/github.com/mitchellh/mapstructure",
+			"path": "github.com/mitchellh/mapstructure",
+			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
+			"revisionTime": "2016-05-10T14:18:56Z"
 		},
 		{
 			"checksumSHA1": "A6nZdZ1/lTOVINhIndyw2ZWN9JU=",

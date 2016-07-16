@@ -9,11 +9,11 @@ import (
 )
 
 type Config struct {
-	Nodes  []string
-	Scheme string
-	Cert   string
-	Key    string
-	CaCert string
+	Nodes        []string
+	Scheme       string
+	ClientCert   string
+	ClientKey    string
+	ClientCaKeys string
 	template.StoreConfig
 }
 
@@ -22,7 +22,7 @@ func (c *Config) Connect() (backends.Store, error) {
 		"backend": "consul",
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
-	client, err := consul.New(c.Nodes, c.Scheme, c.Cert, c.Key, c.CaCert)
+	client, err := consul.New(c.Nodes, c.Scheme, c.ClientCert, c.ClientKey, c.ClientCaKeys)
 	if err != nil {
 		return backends.Store{}, err
 	}
