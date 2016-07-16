@@ -139,7 +139,7 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFu
 		var lastIndex uint64
 		stop := make(chan bool)
 		for {
-			index, err := cli.WatchPrefix(prefix, []string{}, lastIndex, stop)
+			index, err := cli.WatchPrefix(prefix, []string{""}, lastIndex, stop)
 			if err != nil {
 				log.Error(err)
 				// Prevent backend errors from consuming all resources.
@@ -147,7 +147,7 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFu
 				continue
 			}
 			lastIndex = index
-			log.Info("Config changed on disk - reload remco")
+			log.Info("Configuration has changed - reload remco")
 			time.Sleep(1 * time.Second)
 
 			newConf, err := reloadFunc()
