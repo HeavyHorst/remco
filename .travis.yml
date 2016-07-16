@@ -17,12 +17,10 @@ before_install:
   - vault server -dev &
 
 go:
-  - 1.5
   - 1.6
   - tip
 
 env:
-  - GO15VENDOREXPERIMENT=1
   - VAULT_ADDR='http://127.0.0.1:8200'
 
 script:
