@@ -7,7 +7,7 @@ before_install:
   - sudo mv consul /bin/
   - consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul &
   # install etcd
-  - wget https://github.com/coreos/etcd/releases/download/v3.0.3/etcd-v3.0.3-linux-amd64.tar.gz -o etcd-v3.0.3-linux-amd64.tar.gz
+  - curl -L https://github.com/coreos/etcd/releases/download/v3.0.3/etcd-v3.0.3-linux-amd64.tar.gz -o etcd-v3.0.3-linux-amd64.tar.gz
   - tar xzf etcd-v3.0.3-linux-amd64.tar.gz
   - sudo mv etcd-v3.0.3-linux-amd64/etcd /bin/
   - sudo mv etcd-v3.0.3-linux-amd64/etcdctl /bin/
