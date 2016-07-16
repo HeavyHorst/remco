@@ -20,7 +20,7 @@ log-format = "text"
   [resource.backend]
     [resource.backend.etcdconfig]
       nodes = ["127.0.0.1:2379"]
-      watch = true
+      #watch = true
       prefix = "/"
       version = 3
       onetime = true
