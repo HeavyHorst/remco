@@ -28,9 +28,11 @@ var EtcdCmd = &cobra.Command{
 
 		var e backends.StoreClient
 		var err error
-		if api == 2 {
+
+		switch api {
+		case 2:
 			e, err = etcdv2.NewEtcdClient(nodes, cert, key, caCert, basicAuth, username, password)
-		} else if api == 3 {
+		default:
 			e, err = etcdv3.NewEtcdClient(nodes, cert, key, caCert, basicAuth, username, password)
 		}
 
