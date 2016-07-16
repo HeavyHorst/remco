@@ -55,6 +55,13 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst) (*Resource, erro
 		}
 	}
 
+	for i := range storeClients {
+		if storeClients[i].Interval <= 0 {
+			log.Warning("Interval needs to be > 0: setting interval to 60")
+			storeClients[i].Interval = 60
+		}
+	}
+
 	tr := &Resource{
 		storeClients: storeClients,
 		store:        memkv.New(),
@@ -84,6 +91,7 @@ func NewResourceFromFlags(s backends.Store, flags *flag.FlagSet, watch bool) (*R
 	checkCmd, _ := flags.GetString("check_cmd")
 	onetime, _ := flags.GetBool("onetime")
 	interval, _ := flags.GetInt("interval")
+
 	UID := os.Geteuid()
 	GID := os.Getegid()
 
