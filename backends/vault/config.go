@@ -44,6 +44,14 @@ func (c *Config) Connect() (backends.Store, error) {
 	}
 	c.Backend.StoreClient = client
 	c.Backend.Name = "vault"
+
+	if c.Backend.Watch {
+		log.WithFields(logrus.Fields{
+			"backend": "vault",
+		}).Warn("Watch is not supported, using interval instead")
+		c.Backend.Watch = false
+	}
+
 	return backends.Store{
 		Name:   c.Backend.Name,
 		Client: client,

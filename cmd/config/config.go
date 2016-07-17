@@ -16,6 +16,7 @@ import (
 	"github.com/HeavyHorst/remco/backends/vault"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
+	"github.com/Sirupsen/logrus"
 	"github.com/naoina/toml"
 	"github.com/spf13/cobra"
 )
@@ -76,24 +77,40 @@ func (c *tomlConf) watch(stop chan bool) {
 			_, err := v.Backend.Etcdconfig.Connect()
 			if err == nil {
 				backends = append(backends, v.Backend.Etcdconfig.Backend)
+			} else {
+				log.WithFields(logrus.Fields{
+					"backend": "etcd",
+				}).Error(err)
 			}
 		}
 		if v.Backend.Fileconfig != nil {
 			_, err := v.Backend.Fileconfig.Connect()
 			if err == nil {
 				backends = append(backends, v.Backend.Fileconfig.Backend)
+			} else {
+				log.WithFields(logrus.Fields{
+					"backend": "file",
+				}).Error(err)
 			}
 		}
 		if v.Backend.Consulconfig != nil {
 			_, err := v.Backend.Consulconfig.Connect()
 			if err == nil {
 				backends = append(backends, v.Backend.Consulconfig.Backend)
+			} else {
+				log.WithFields(logrus.Fields{
+					"backend": "consul",
+				}).Error(err)
 			}
 		}
 		if v.Backend.Vaultconfig != nil {
 			_, err := v.Backend.Vaultconfig.Connect()
 			if err == nil {
 				backends = append(backends, v.Backend.Vaultconfig.Backend)
+			} else {
+				log.WithFields(logrus.Fields{
+					"backend": "vault",
+				}).Error(err)
 			}
 		}
 
