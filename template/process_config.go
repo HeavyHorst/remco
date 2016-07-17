@@ -12,7 +12,7 @@ import (
 	"github.com/HeavyHorst/remco/template/fileutil"
 )
 
-type SrcDst struct {
+type ProcessConfig struct {
 	Src       string
 	Dst       string
 	Mode      string
@@ -24,7 +24,7 @@ type SrcDst struct {
 	fileMode  os.FileMode
 }
 
-func (s *SrcDst) setFileMode() error {
+func (s *ProcessConfig) setFileMode() error {
 	if s.Mode == "" {
 		if !fileutil.IsFileExist(s.Dst) {
 			s.fileMode = 0644
@@ -51,7 +51,7 @@ func (s *SrcDst) setFileMode() error {
 // check to be run on the staged file before overwriting the destination config
 // file.
 // It returns nil if the check command returns 0 and there are no other errors.
-func (s *SrcDst) check(stageFile string) error {
+func (s *ProcessConfig) check(stageFile string) error {
 	var cmdBuffer bytes.Buffer
 	data := make(map[string]string)
 	data["src"] = stageFile
@@ -75,7 +75,7 @@ func (s *SrcDst) check(stageFile string) error {
 
 // reload executes the reload command.
 // It returns nil if the reload command returns 0.
-func (s *SrcDst) reload() error {
+func (s *ProcessConfig) reload() error {
 	log.Debug("Running " + s.ReloadCmd)
 	c := exec.Command("/bin/sh", "-c", s.ReloadCmd)
 	output, err := c.CombinedOutput()

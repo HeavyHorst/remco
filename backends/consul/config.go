@@ -11,10 +11,10 @@ import (
 type Config struct {
 	Nodes        []string
 	Scheme       string
-	ClientCert   string
-	ClientKey    string
-	ClientCaKeys string
-	template.StoreConfig
+	ClientCert   string `toml:"client_cert"`
+	ClientKey    string `toml:"client_key"`
+	ClientCaKeys string `toml:"client_ca_keys"`
+	template.Backend
 }
 
 func (c *Config) Connect() (backends.Store, error) {
@@ -26,10 +26,10 @@ func (c *Config) Connect() (backends.Store, error) {
 	if err != nil {
 		return backends.Store{}, err
 	}
-	c.StoreConfig.StoreClient = client
-	c.StoreConfig.Name = "consul"
+	c.Backend.StoreClient = client
+	c.Backend.Name = "consul"
 	return backends.Store{
-		Name:   c.StoreConfig.Name,
+		Name:   c.Backend.Name,
 		Client: client,
 	}, nil
 }

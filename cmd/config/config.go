@@ -30,7 +30,7 @@ type tomlConf struct {
 	LogLevel  string `toml:"log_level"`
 	LogFormat string `toml:"log_format"`
 	Resource  []struct {
-		Template []*template.SrcDst
+		Template []*template.ProcessConfig
 		Backend  struct {
 			Etcdconfig   *etcd.Config
 			Fileconfig   *file.Config
@@ -70,34 +70,34 @@ func (c *tomlConf) watch(stop chan bool) {
 
 	wait := &sync.WaitGroup{}
 	for _, v := range c.Resource {
-		var storeClients []template.StoreConfig
+		var backends []template.Backend
 
 		if v.Backend.Etcdconfig != nil {
 			_, err := v.Backend.Etcdconfig.Connect()
 			if err == nil {
-				storeClients = append(storeClients, v.Backend.Etcdconfig.StoreConfig)
+				backends = append(backends, v.Backend.Etcdconfig.Backend)
 			}
 		}
 		if v.Backend.Fileconfig != nil {
 			_, err := v.Backend.Fileconfig.Connect()
 			if err == nil {
-				storeClients = append(storeClients, v.Backend.Fileconfig.StoreConfig)
+				backends = append(backends, v.Backend.Fileconfig.Backend)
 			}
 		}
 		if v.Backend.Consulconfig != nil {
 			_, err := v.Backend.Consulconfig.Connect()
 			if err == nil {
-				storeClients = append(storeClients, v.Backend.Consulconfig.StoreConfig)
+				backends = append(backends, v.Backend.Consulconfig.Backend)
 			}
 		}
 		if v.Backend.Vaultconfig != nil {
 			_, err := v.Backend.Vaultconfig.Connect()
 			if err == nil {
-				storeClients = append(storeClients, v.Backend.Vaultconfig.StoreConfig)
+				backends = append(backends, v.Backend.Vaultconfig.Backend)
 			}
 		}
 
-		t, err := template.NewResource(storeClients, v.Template)
+		t, err := template.NewResource(backends, v.Template)
 		if err != nil {
 			log.Error(err.Error())
 			continue

@@ -21,7 +21,7 @@ import (
 	"github.com/flosch/pongo2"
 )
 
-type StoreConfig struct {
+type Backend struct {
 	backends.StoreClient
 	Name     string
 	Onetime  bool
@@ -34,17 +34,17 @@ type StoreConfig struct {
 
 // Resource is the representation of a parsed template resource.
 type Resource struct {
-	storeClients []StoreConfig
-	funcMap      map[string]interface{}
-	store        memkv.Store
-	sources      []*SrcDst
+	backends []Backend
+	funcMap  map[string]interface{}
+	store    memkv.Store
+	sources  []*ProcessConfig
 }
 
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(storeClients []StoreConfig, sources []*SrcDst) (*Resource, error) {
-	if len(storeClients) == 0 {
+func NewResource(backends []Backend, sources []*ProcessConfig) (*Resource, error) {
+	if len(backends) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
 
@@ -54,24 +54,22 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst) (*Resource, erro
 		}
 	}
 
-	for i := range storeClients {
-		if storeClients[i].Interval <= 0 && storeClients[i].Onetime == false {
-			log.Warning("Interval needs to be > 0: setting interval to 60")
-			storeClients[i].Interval = 60
-		}
-	}
-
 	tr := &Resource{
-		storeClients: storeClients,
-		store:        memkv.New(),
-		funcMap:      newFuncMap(),
-		sources:      sources,
+		backends: backends,
+		store:    memkv.New(),
+		funcMap:  newFuncMap(),
+		sources:  sources,
 	}
 
 	// initialize the inidividual backend memkv Stores
-	for i := range tr.storeClients {
+	for i := range tr.backends {
 		store := memkv.New()
-		tr.storeClients[i].store = &store
+		tr.backends[i].store = &store
+
+		if tr.backends[i].Interval <= 0 && tr.backends[i].Onetime == false {
+			log.Warning("Interval needs to be > 0: setting interval to 60")
+			tr.backends[i].Interval = 60
+		}
 	}
 
 	addFuncs(tr.funcMap, tr.store.FuncMap)
@@ -80,7 +78,7 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst) (*Resource, erro
 }
 
 // setVars sets the Vars for template resource.
-func (t *Resource) setVars(storeClient StoreConfig) error {
+func (t *Resource) setVars(storeClient Backend) error {
 	var err error
 
 	log.WithFields(logrus.Fields{
@@ -101,7 +99,7 @@ func (t *Resource) setVars(storeClient StoreConfig) error {
 
 	//merge all stores
 	t.store.Purge()
-	for _, v := range t.storeClients {
+	for _, v := range t.backends {
 		for _, kv := range v.store.GetAllKVs() {
 			if t.store.Exists(kv.Key) {
 				log.Warning("Key collision - " + kv.Key)
@@ -164,7 +162,7 @@ func (t *Resource) createStageFileAndSync() error {
 // overwriting the target config file. Finally, sync will run a reload command
 // if set to have the application or service pick up the changes.
 // It returns an error if any.
-func (t *Resource) sync(s *SrcDst) error {
+func (t *Resource) sync(s *ProcessConfig) error {
 	staged := s.stageFile.Name()
 	defer os.Remove(staged)
 
@@ -246,7 +244,7 @@ func (t *Resource) setFileMode() error {
 // from the store, then we stage a candidate configuration file, and finally sync
 // things up.
 // It returns an error if any.
-func (t *Resource) process(storeClient StoreConfig) error {
+func (t *Resource) process(storeClient Backend) error {
 	if err := t.setFileMode(); err != nil {
 		return err
 	}
@@ -265,7 +263,7 @@ func (t *Resource) processAll() error {
 	if err = t.setFileMode(); err != nil {
 		return err
 	}
-	for _, storeClient := range t.storeClients {
+	for _, storeClient := range t.backends {
 		if err := t.setVars(storeClient); err != nil {
 			return err
 		}
@@ -276,7 +274,7 @@ func (t *Resource) processAll() error {
 	return nil
 }
 
-func (s StoreConfig) watch(stopChan chan bool, processChan chan StoreConfig) {
+func (s Backend) watch(stopChan chan bool, processChan chan Backend) {
 	var lastIndex uint64
 	keysPrefix := appendPrefix(s.Prefix, s.Keys)
 
@@ -298,7 +296,7 @@ func (s StoreConfig) watch(stopChan chan bool, processChan chan StoreConfig) {
 	}
 }
 
-func (s StoreConfig) interval(stopChan chan bool, processChan chan StoreConfig) {
+func (s Backend) interval(stopChan chan bool, processChan chan Backend) {
 	if s.Onetime {
 		return
 	}
@@ -318,7 +316,7 @@ func (t *Resource) Monitor(stopChan chan bool) {
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	done := make(chan bool)
 	stopIntervalWatch := make(chan bool)
-	processChan := make(chan StoreConfig)
+	processChan := make(chan Backend)
 
 	defer close(processChan)
 
@@ -326,16 +324,16 @@ func (t *Resource) Monitor(stopChan chan bool) {
 		log.Error(err)
 	}
 
-	for _, sc := range t.storeClients {
+	for _, sc := range t.backends {
 		wg.Add(1)
 		if sc.Watch {
-			go func(s StoreConfig) {
+			go func(s Backend) {
 				defer wg.Done()
 				//t.watch(s, stopChan, processChan)
 				s.watch(stopIntervalWatch, processChan)
 			}(sc)
 		} else {
-			go func(s StoreConfig) {
+			go func(s Backend) {
 				defer wg.Done()
 				s.interval(stopIntervalWatch, processChan)
 			}(sc)

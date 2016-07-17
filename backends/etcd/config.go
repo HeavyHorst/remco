@@ -18,7 +18,7 @@ type Config struct {
 	Username     string
 	Password     string
 	Version      int
-	template.StoreConfig
+	template.Backend
 }
 
 func (c *Config) Connect() (backends.Store, error) {
@@ -32,19 +32,19 @@ func (c *Config) Connect() (backends.Store, error) {
 
 	if c.Version == 3 {
 		client, err = etcdv3.NewEtcdClient(c.Nodes, c.ClientCert, c.ClientKey, c.ClientCaKeys, c.BasicAuth, c.Username, c.Password)
-		c.StoreConfig.Name = "etcdv3"
+		c.Backend.Name = "etcdv3"
 	} else {
 		client, err = etcdv2.NewEtcdClient(c.Nodes, c.ClientCert, c.ClientKey, c.ClientCaKeys, c.BasicAuth, c.Username, c.Password)
-		c.StoreConfig.Name = "etcd"
+		c.Backend.Name = "etcd"
 	}
 
 	if err != nil {
 		return backends.Store{}, err
 	}
 
-	c.StoreConfig.StoreClient = client
+	c.Backend.StoreClient = client
 	return backends.Store{
-		Name:   c.StoreConfig.Name,
+		Name:   c.Backend.Name,
 		Client: client,
 	}, nil
 }

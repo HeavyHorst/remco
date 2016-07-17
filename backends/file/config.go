@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Filepath string
-	template.StoreConfig
+	template.Backend
 }
 
 func (c *Config) Connect() (backends.Store, error) {
@@ -21,8 +21,8 @@ func (c *Config) Connect() (backends.Store, error) {
 	if err != nil {
 		return backends.Store{}, err
 	}
-	c.StoreConfig.StoreClient = client
-	c.StoreConfig.Name = "file"
+	c.Backend.StoreClient = client
+	c.Backend.Name = "file"
 	return backends.Store{
 		Name:   "file",
 		Client: client,
