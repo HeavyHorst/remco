@@ -24,7 +24,7 @@ log_format = "text"
       prefix = "/"
       version = 3
       onetime = true
-      interval = 1
+      interval = 0
       keys = ["/"]
 
     #[resource.backend.fileconfig]

@@ -19,7 +19,6 @@ import (
 	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/Sirupsen/logrus"
 	"github.com/flosch/pongo2"
-	flag "github.com/spf13/pflag"
 )
 
 type StoreConfig struct {
@@ -56,7 +55,7 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst) (*Resource, erro
 	}
 
 	for i := range storeClients {
-		if storeClients[i].Interval <= 0 {
+		if storeClients[i].Interval <= 0 && storeClients[i].Onetime == false {
 			log.Warning("Interval needs to be > 0: setting interval to 60")
 			storeClients[i].Interval = 60
 		}
@@ -78,44 +77,6 @@ func NewResource(storeClients []StoreConfig, sources []*SrcDst) (*Resource, erro
 	addFuncs(tr.funcMap, tr.store.FuncMap)
 
 	return tr, nil
-}
-
-// NewResourceFromFlags creates a Resource from the provided commandline flags.
-func NewResourceFromFlags(s backends.Store, flags *flag.FlagSet, watch bool) (*Resource, error) {
-	src, _ := flags.GetString("src")
-	dst, _ := flags.GetString("dst")
-	keys, _ := flags.GetStringSlice("keys")
-	fileMode, _ := flags.GetString("fileMode")
-	prefix, _ := flags.GetString("prefix")
-	reloadCmd, _ := flags.GetString("reload_cmd")
-	checkCmd, _ := flags.GetString("check_cmd")
-	onetime, _ := flags.GetBool("onetime")
-	interval, _ := flags.GetInt("interval")
-
-	UID := os.Geteuid()
-	GID := os.Getegid()
-
-	sd := &SrcDst{
-		Src:       src,
-		Dst:       dst,
-		Mode:      fileMode,
-		ReloadCmd: reloadCmd,
-		CheckCmd:  checkCmd,
-		GID:       GID,
-		UID:       UID,
-	}
-
-	b := StoreConfig{
-		StoreClient: s.Client,
-		Name:        s.Name,
-		Onetime:     onetime,
-		Prefix:      prefix,
-		Watch:       watch,
-		Interval:    interval,
-		Keys:        keys,
-	}
-
-	return NewResource([]StoreConfig{b}, []*SrcDst{sd})
 }
 
 // setVars sets the Vars for template resource.
