@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -38,6 +39,26 @@ type tomlConf struct {
 			Consulconfig *consul.Config
 			Vaultconfig  *vault.Config
 		}
+	}
+}
+
+func defaultReload(client backends.StoreClient, config string) func() (tomlConf, error) {
+	//load the new config
+	return func() (tomlConf, error) {
+		var c tomlConf
+		values, err := client.GetValues([]string{config})
+		if err != nil {
+			return c, err
+		}
+		if len(values) == 0 {
+			return c, errors.New("configuration is empty")
+		}
+
+		if err := toml.Unmarshal([]byte(values[config]), &c); err != nil {
+			return c, err
+		}
+
+		return c, nil
 	}
 }
 
