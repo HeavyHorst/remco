@@ -20,18 +20,47 @@ log_format = "text"
   [resource.backend]
     [resource.backend.etcdconfig]
       nodes = ["127.0.0.1:2379"]
+      client_cert = "/path/to/client_cert"
+      client_key = "/path/to/client_key"
+      client_ca_keys = "/path/to/client_ca_keys"
+      basic_auth = false
+      username = admin
+      password = p@SsWord
+      version = 3
+
+      # These values are valid in every backend
       watch = true
       prefix = "/"
-      version = 3
       onetime = true
       interval = 1
       keys = ["/"]
 
-    #[resource.backend.fileconfig]
-      ## watch = true
-      #onetime = true
-      #filepath = "/home/rkaufmann/test.yml"
-      #prefix = "/"
-      #interval = 1
-      #keys = ["/"]
+    [resource.backend.fileconfig]
+      filepath = "/etc/remco/test.yml"
+
+    [resource.backend.consulconfig]
+      nodes = ["127.0.0.1:8500"]
+      scheme = "http" #{http/https}
+      client_cert = "/path/to/client_cert"
+      client_key = "/path/to/client_key"
+      client_ca_keys = "/path/to/client_ca_keys"
+    
+    [resource.backend.vaultconfig]
+      node = "http://127.0.0.1:8200"
+	    ## Token based auth backend
+      auth_type = "token"
+      auth_token = vault_token
+      ## AppID based auth backend
+      # auth_type = "app-id"
+      # app_id = "vault_app_id"
+      # user_id = "vault_user_id"
+      ## userpass based auth backend
+      # auth_type = "userpass"
+      # username = "username"
+      # password = "password"
+      client_cert = "/path/to/client_cert"
+      client_key = "/path/to/client_key"
+      client_ca_keys = "/path/to/client_ca_keys"
+
+
       
