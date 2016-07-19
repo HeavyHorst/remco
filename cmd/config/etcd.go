@@ -36,8 +36,8 @@ func init() {
 	EtcdCmd.Flags().StringVar(&etcdConfig.ClientKey, "client-key", "", "The client key file")
 	EtcdCmd.Flags().StringVar(&etcdConfig.ClientCaKeys, "client-ca-keys", "", "The client CA key file")
 	EtcdCmd.Flags().BoolVar(&etcdConfig.BasicAuth, "basicAuth", false, "Enable etcd basic auth with username and password")
-	EtcdCmd.Flags().StringVar(&etcdConfig.Username, "username", "", "username")
-	EtcdCmd.Flags().StringVar(&etcdConfig.Password, "password", "", "password")
+	EtcdCmd.Flags().StringVar(&etcdConfig.Username, "username", "", "The username")
+	EtcdCmd.Flags().StringVar(&etcdConfig.Password, "password", "", "The password")
 	EtcdCmd.Flags().IntVar(&etcdConfig.Version, "api-version", 2, "The etcd version (2/3)")
 	EtcdCmd.Flags().StringP("config", "c", "", "The path in etcd where the config is stored")
 

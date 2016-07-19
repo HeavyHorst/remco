@@ -251,6 +251,12 @@
 			"revisionTime": "2016-05-10T14:18:56Z"
 		},
 		{
+			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
+			"path": "github.com/inconshreveable/mousetrap",
+			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+			"revisionTime": "2014-10-17T20:07:13Z"
+		},
+		{
 			"checksumSHA1": "SBu6v9PlA4CCVOt8nGmgIXyi+5g=",
 			"path": "github.com/kelseyhightower/confd/backends/consul",
 			"revision": "c6622ed25cf9a77804542c6d32c9ee306894f14d",
