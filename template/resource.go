@@ -142,13 +142,14 @@ func (t *Resource) createStageFileAndSync() error {
 			return err
 		}
 
-		defer temp.Close()
 
 		// Set the owner, group, and mode on the stage file now to make it easier to
 		// compare against the destination configuration file later.
 		os.Chmod(temp.Name(), s.fileMode)
 		os.Chown(temp.Name(), s.UID, s.GID)
 		s.stageFile = temp
+
+		temp.Close()
 
 		if err = t.sync(s); err != nil {
 			return err
