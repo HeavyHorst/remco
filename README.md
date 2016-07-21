@@ -7,7 +7,7 @@ Remcos main purposes are (like confd's):
   - reloading applications to pick up new config file changes
 
 ## Differences between remco and confd
-   - multiple source/destination pairs per template resource - userful for programs that need more than one config file
+   - multiple source/destination pairs per template resource - useful for programs that need more than one config file
    - multiple backends per template resource - get normal config values from etcd and secrets from vault
    - remco can be remotely configured over etcd, consul, file etc..
    - [pongo2](https://github.com/flosch/pongo2) template engine instead of go's text/template
