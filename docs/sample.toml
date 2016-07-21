@@ -24,8 +24,8 @@ log_format = "text"
       client_key = "/path/to/client_key"
       client_ca_keys = "/path/to/client_ca_keys"
       basic_auth = false
-      username = admin
-      password = p@SsWord
+      username = "admin"
+      password = "p@SsWord"
       version = 3
 
       # These values are valid in every backend
@@ -49,7 +49,7 @@ log_format = "text"
       node = "http://127.0.0.1:8200"
 	    ## Token based auth backend
       auth_type = "token"
-      auth_token = vault_token
+      auth_token = "vault_token"
       ## AppID based auth backend
       # auth_type = "app-id"
       # app_id = "vault_app_id"
