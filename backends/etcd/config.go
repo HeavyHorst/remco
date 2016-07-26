@@ -21,7 +21,11 @@ type Config struct {
 	template.Backend
 }
 
-func (c *Config) Connect() (backends.Store, error) {
+func (c *Config) Connect() (template.Backend, error) {
+	if c == nil {
+		return template.Backend{}, backends.ErrNilConfig
+	}
+
 	//log.Info("etcd backend nodes set to " + strings.Join(c.Nodes, ", "))
 	log.WithFields(logrus.Fields{
 		"backend": "etcd",
@@ -39,12 +43,9 @@ func (c *Config) Connect() (backends.Store, error) {
 	}
 
 	if err != nil {
-		return backends.Store{}, err
+		return c.Backend, err
 	}
 
 	c.Backend.StoreClient = client
-	return backends.Store{
-		Name:   c.Backend.Name,
-		Client: client,
-	}, nil
+	return c.Backend, nil
 }

@@ -12,19 +12,20 @@ type Config struct {
 	template.Backend
 }
 
-func (c *Config) Connect() (backends.Store, error) {
+func (c *Config) Connect() (template.Backend, error) {
+	if c == nil {
+		return template.Backend{}, backends.ErrNilConfig
+	}
+
 	log.WithFields(logrus.Fields{
 		"backend":  "file",
 		"filepath": c.Filepath,
 	}).Info("Set filepath")
 	client, err := NewFileClient(c.Filepath)
 	if err != nil {
-		return backends.Store{}, err
+		return c.Backend, err
 	}
 	c.Backend.StoreClient = client
 	c.Backend.Name = "file"
-	return backends.Store{
-		Name:   "file",
-		Client: client,
-	}, nil
+	return c.Backend, nil
 }

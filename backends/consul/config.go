@@ -17,19 +17,20 @@ type Config struct {
 	template.Backend
 }
 
-func (c *Config) Connect() (backends.Store, error) {
+func (c *Config) Connect() (template.Backend, error) {
+	if c == nil {
+		return template.Backend{}, backends.ErrNilConfig
+	}
+
 	log.WithFields(logrus.Fields{
 		"backend": "consul",
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
 	client, err := consul.New(c.Nodes, c.Scheme, c.ClientCert, c.ClientKey, c.ClientCaKeys)
 	if err != nil {
-		return backends.Store{}, err
+		return c.Backend, err
 	}
 	c.Backend.StoreClient = client
 	c.Backend.Name = "consul"
-	return backends.Store{
-		Name:   c.Backend.Name,
-		Client: client,
-	}, nil
+	return c.Backend, nil
 }

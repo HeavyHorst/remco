@@ -92,50 +92,26 @@ func (c *tomlConf) watch(stop chan bool) {
 
 	wait := &sync.WaitGroup{}
 	for _, v := range c.Resource {
-		var backends []template.Backend
+		var backendList []template.Backend
+		backendConfigMap := map[string]template.BackendConfig{
+			"etcd":   v.Backend.Etcdconfig,
+			"file":   v.Backend.Fileconfig,
+			"consul": v.Backend.Consulconfig,
+			"vault":  v.Backend.Vaultconfig,
+		}
 
-		if v.Backend.Etcdconfig != nil {
-			_, err := v.Backend.Etcdconfig.Connect()
+		for name, config := range backendConfigMap {
+			b, err := config.Connect()
 			if err == nil {
-				backends = append(backends, v.Backend.Etcdconfig.Backend)
-			} else {
+				backendList = append(backendList, b)
+			} else if err != backends.ErrNilConfig {
 				log.WithFields(logrus.Fields{
-					"backend": "etcd",
-				}).Error(err)
-			}
-		}
-		if v.Backend.Fileconfig != nil {
-			_, err := v.Backend.Fileconfig.Connect()
-			if err == nil {
-				backends = append(backends, v.Backend.Fileconfig.Backend)
-			} else {
-				log.WithFields(logrus.Fields{
-					"backend": "file",
-				}).Error(err)
-			}
-		}
-		if v.Backend.Consulconfig != nil {
-			_, err := v.Backend.Consulconfig.Connect()
-			if err == nil {
-				backends = append(backends, v.Backend.Consulconfig.Backend)
-			} else {
-				log.WithFields(logrus.Fields{
-					"backend": "consul",
-				}).Error(err)
-			}
-		}
-		if v.Backend.Vaultconfig != nil {
-			_, err := v.Backend.Vaultconfig.Connect()
-			if err == nil {
-				backends = append(backends, v.Backend.Vaultconfig.Backend)
-			} else {
-				log.WithFields(logrus.Fields{
-					"backend": "vault",
+					"backend": name,
 				}).Error(err)
 			}
 		}
 
-		t, err := template.NewResource(backends, v.Template)
+		t, err := template.NewResource(backendList, v.Template)
 		if err != nil {
 			log.Error(err.Error())
 			continue

@@ -22,7 +22,11 @@ type Config struct {
 	template.Backend
 }
 
-func (c *Config) Connect() (backends.Store, error) {
+func (c *Config) Connect() (template.Backend, error) {
+	if c == nil {
+		return template.Backend{}, backends.ErrNilConfig
+	}
+
 	log.WithFields(logrus.Fields{
 		"backend": "vault",
 		"nodes":   []string{c.Node},
@@ -40,7 +44,7 @@ func (c *Config) Connect() (backends.Store, error) {
 	}
 	client, err := vault.New(c.Node, c.AuthType, vaultConfig)
 	if err != nil {
-		return backends.Store{}, err
+		return c.Backend, err
 	}
 	c.Backend.StoreClient = client
 	c.Backend.Name = "vault"
@@ -52,8 +56,5 @@ func (c *Config) Connect() (backends.Store, error) {
 		c.Backend.Watch = false
 	}
 
-	return backends.Store{
-		Name:   c.Backend.Name,
-		Client: client,
-	}, nil
+	return c.Backend, nil
 }

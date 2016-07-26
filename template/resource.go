@@ -21,6 +21,10 @@ import (
 	"github.com/flosch/pongo2"
 )
 
+type BackendConfig interface {
+	Connect() (Backend, error)
+}
+
 type Backend struct {
 	backends.StoreClient
 	Name     string
@@ -141,7 +145,6 @@ func (t *Resource) createStageFileAndSync() error {
 			os.Remove(temp.Name())
 			return err
 		}
-
 
 		// Set the owner, group, and mode on the stage file now to make it easier to
 		// compare against the destination configuration file later.
