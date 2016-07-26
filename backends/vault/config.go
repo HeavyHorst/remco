@@ -8,6 +8,7 @@ import (
 	"github.com/kelseyhightower/confd/backends/vault"
 )
 
+// Config represents the config for the vault backend.
 type Config struct {
 	Node         string
 	AuthType     string `toml:"auth_type"`
@@ -22,6 +23,7 @@ type Config struct {
 	template.Backend
 }
 
+// Connect creates a new vaultClient and fills the underlying template.Backend with the vault-Backend specific data.
 func (c *Config) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, backends.ErrNilConfig

@@ -8,6 +8,7 @@ import (
 	"github.com/kelseyhightower/confd/backends/consul"
 )
 
+// Config represents the config for the consul backend.
 type Config struct {
 	Nodes        []string
 	Scheme       string
@@ -17,6 +18,7 @@ type Config struct {
 	template.Backend
 }
 
+// Connect creates a new consulClient and fills the underlying template.Backend with the consul-Backend specific data.
 func (c *Config) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, backends.ErrNilConfig

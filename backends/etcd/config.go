@@ -9,6 +9,7 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
+// Config represents the config for the etcd backend.
 type Config struct {
 	Nodes        []string
 	ClientCert   string `toml:"client_cert"`
@@ -21,12 +22,12 @@ type Config struct {
 	template.Backend
 }
 
+// Connect creates a new etcd{2,3}Client and fills the underlying template.Backend with the etcd-Backend specific data.
 func (c *Config) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, backends.ErrNilConfig
 	}
 
-	//log.Info("etcd backend nodes set to " + strings.Join(c.Nodes, ", "))
 	log.WithFields(logrus.Fields{
 		"backend": "etcd",
 		"nodes":   c.Nodes,

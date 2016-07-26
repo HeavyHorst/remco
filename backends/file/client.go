@@ -7,14 +7,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Client is a wrapper around the file client
 type Client struct {
 	filepath string
 }
 
+// NewFileClient returns a new FileClient
 func NewFileClient(filepath string) (*Client, error) {
 	return &Client{filepath}, nil
 }
 
+// GetValues returns all key-value pairs from the yaml or json file.
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	yamlMap := make(map[interface{}]interface{})
 	vars := make(map[string]string)
@@ -57,6 +60,8 @@ func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]stri
 	return nil
 }
 
+// WatchPrefix watches the file for changes with fsnotify.
+// Prefix, keys and waitIndex are only here to implement the StoreClient interface.
 func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {

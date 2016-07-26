@@ -72,6 +72,7 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	return vars, nil
 }
 
+// WatchPrefix watches a specific prefix for changes.
 func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancelRoutine := make(chan bool)

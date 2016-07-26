@@ -23,7 +23,7 @@ func IsFileExist(fpath string) bool {
 	return true
 }
 
-// sameFile reports whether src and dest config files are equal.
+// SameFile reports whether src and dest config files are equal.
 // Two config files are equal when they have the same file contents and
 // Unix permissions. The owner, group, and mode must match.
 // It return false in other cases.

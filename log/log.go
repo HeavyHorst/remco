@@ -22,6 +22,7 @@ func init() {
 	})
 }
 
+// SetFormatter sets the formatter. Valid formatters are json and text.
 func SetFormatter(format string) {
 	lock.Lock()
 	defer lock.Unlock()

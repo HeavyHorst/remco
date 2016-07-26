@@ -21,10 +21,13 @@ import (
 	"github.com/flosch/pongo2"
 )
 
+// A BackendConfig - Every backend implements this interface. If Connect is called a new connection to the underlaying kv-store will be established.
+// Connect should also set the name and the StoreClient of the Backend. The other values of Backend will be loaded from the configuration file.
 type BackendConfig interface {
 	Connect() (Backend, error)
 }
 
+// Backend is the representation of a template backend like etcd or consul
 type Backend struct {
 	backends.StoreClient
 	Name     string
@@ -44,6 +47,7 @@ type Resource struct {
 	sources  []*ProcessConfig
 }
 
+// ErrEmptySrc is returned if an emty src template is passed to NewResource
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
@@ -81,7 +85,7 @@ func NewResource(backends []Backend, sources []*ProcessConfig) (*Resource, error
 	return tr, nil
 }
 
-// setVars sets the Vars for template resource.
+// setVars sets the Vars for a template resource.
 func (t *Resource) setVars(storeClient Backend) error {
 	var err error
 
@@ -314,6 +318,8 @@ func (s Backend) interval(stopChan chan bool, processChan chan Backend) {
 	}
 }
 
+// Monitor will start to monitor all given Backends for changes.
+// It will process all given tamplates on changes.
 func (t *Resource) Monitor(stopChan chan bool) {
 	wg := &sync.WaitGroup{}
 	signalChan := make(chan os.Signal, 1)

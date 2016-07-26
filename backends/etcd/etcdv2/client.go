@@ -115,6 +115,7 @@ func nodeWalk(node *client.Node, vars map[string]string) error {
 	return nil
 }
 
+// WatchPrefix watches a specific prefix for changes.
 func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error) {
 	// Setting AfterIndex to 0 (default) means that the Watcher
 	// should start watching for events starting at the current

@@ -9,7 +9,7 @@ import (
 	"github.com/HeavyHorst/remco/cmd/config"
 )
 
-// This represents the base command when called without any subcommands
+// RootCmd - This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use: "remco",
 }

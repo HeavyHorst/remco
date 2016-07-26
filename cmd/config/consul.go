@@ -9,6 +9,7 @@ import (
 
 var consulConfig = &consul.Config{}
 
+// ConsulCmd represents the consul command
 var ConsulCmd = &cobra.Command{
 	Use:   "consul",
 	Short: "load a config file from consul",

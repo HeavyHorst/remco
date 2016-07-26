@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Cmd represents the advanced command
+// FileCmd represents the file command
 var FileCmd = &cobra.Command{
 	Use:   "file",
 	Short: "load a config file from a file",

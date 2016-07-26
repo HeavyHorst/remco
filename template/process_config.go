@@ -12,6 +12,7 @@ import (
 	"github.com/HeavyHorst/remco/template/fileutil"
 )
 
+// ProcessConfig contains all data needed for the template processing
 type ProcessConfig struct {
 	Src       string
 	Dst       string
