@@ -77,7 +77,7 @@ func (c *tomlConf) watch(stop chan bool) {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	stopChan := make(chan bool)
-	done := make(chan bool)
+	done := make(chan struct{})
 
 	if c.LogLevel != "" {
 		err := log.SetLevel(c.LogLevel)
@@ -173,6 +173,7 @@ func (c *tomlConf) watch(stop chan bool) {
 
 func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFunc func() (tomlConf, error)) {
 	wg := &sync.WaitGroup{}
+	done := make(chan struct{})
 
 	wg.Add(1)
 	stopWatch := make(chan bool)
@@ -181,6 +182,7 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFu
 		c.watch(stopWatch)
 	}()
 
+	watchConfChan := make(chan struct{})
 	go func() {
 		var lastIndex uint64
 		stop := make(chan bool)
@@ -193,6 +195,19 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFu
 				continue
 			}
 			lastIndex = index
+			watchConfChan <- struct{}{}
+		}
+	}()
+
+	go func() {
+		// If there is no goroutine left - quit
+		wg.Wait()
+		close(done)
+	}()
+
+	for {
+		select {
+		case <-watchConfChan:
 			log.Info("Configuration has changed - reload remco")
 			time.Sleep(1 * time.Second)
 
@@ -201,19 +216,19 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFu
 				log.Error(err.Error())
 				continue
 			}
-			//c = &newConf
 
 			wg.Add(1)
 			// stop the old Resource
-			stopWatch <- true
 			log.Debug("Stopping the old instance")
+			stopWatch <- true
 			// and start the new Resource
 			log.Debug("Starting the new instance")
 			go func() {
 				defer wg.Done()
 				newConf.watch(stopWatch)
 			}()
+		case <-done:
+			return
 		}
-	}()
-	wg.Wait()
+	}
 }
