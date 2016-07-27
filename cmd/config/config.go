@@ -42,6 +42,7 @@ type tomlConf struct {
 	}
 }
 
+// the default config load function - works with every StoreClient
 func defaultReload(client backends.StoreClient, config string) func() (tomlConf, error) {
 	//load the new config
 	return func() (tomlConf, error) {
@@ -53,20 +54,20 @@ func defaultReload(client backends.StoreClient, config string) func() (tomlConf,
 		if len(values) == 0 {
 			return c, errors.New("configuration is empty")
 		}
-
-		if err := toml.Unmarshal([]byte(values[config]), &c); err != nil {
+		if err := toml.Unmarshal([]byte(os.ExpandEnv(values[config])), &c); err != nil {
 			return c, err
 		}
-
 		return c, nil
 	}
 }
 
+// load a config from file
 func (c *tomlConf) fromFile(cfg string) error {
 	buf, err := ioutil.ReadFile(cfg)
 	if err != nil {
 		return err
 	}
+	buf = []byte(os.ExpandEnv(string(buf)))
 	if err := toml.Unmarshal(buf, c); err != nil {
 		return err
 	}
