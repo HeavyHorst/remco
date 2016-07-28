@@ -10,7 +10,7 @@ The configuration file is in TOML format. TOML looks very similar to INI configu
 
 ##Using Environment Variables
 If you wish to use environmental variables in your config files as a way
-to configure values, you can simply use \$VARIABLE_NAME or \${VARIABLE_NAME} and the text will be replaced with the value of the environmental variable VARIABLE_NAME.
+to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and the text will be replaced with the value of the environmental variable VARIABLE_NAME.
 
 ##Backend config options
 ###etcd
