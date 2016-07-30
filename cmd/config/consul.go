@@ -27,7 +27,7 @@ var ConsulCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		c.configWatch(s.StoreClient, "", loadConf)
+		c.configWatch(s.StoreClient, config, loadConf)
 	},
 }
 
