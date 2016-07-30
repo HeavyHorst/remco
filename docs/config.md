@@ -1,6 +1,9 @@
 #Configuring remco
-
 The configuration file is in TOML format. TOML looks very similar to INI configuration formats, but with slightly more rich data structures and nesting support.
+
+##Using Environment Variables
+If you wish to use environmental variables in your config files as a way
+to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and the text will be replaced with the value of the environmental variable VARIABLE_NAME.
 
 ##Global configuration options
  - **log_level(string):** 
@@ -8,14 +11,35 @@ The configuration file is in TOML format. TOML looks very similar to INI configu
  - **log_format(string):** 
    - The format of the log messages. Valid formats are *text* and *json*.
 
-##Using Environment Variables
-If you wish to use environmental variables in your config files as a way
-to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and the text will be replaced with the value of the environmental variable VARIABLE_NAME.
+##Template configuration options
+ - **src(string):**
+    - The path of the template that will be used to render the application's configuration file.
+ - **dst(string):**
+    - The location to place the rendered configuration file.
+ - **checkCmd(string):**
+    - The command to check config. Use {{.src}} to reference the rendered source template.
+ - **reloadCmd(string):**
+    - The command to reload config.
+ - **mode(string):**
+    - The permission mode of the file.
 
-##Backend config options
+##Backend configuration options
+
+###valid in every backend
+ - **watch(bool):**
+   - Enable watch support. Default is false.
+ - **prefix(string):**
+   - Key path prefix. Default is "".
+ - **interval(int):**
+   - The backend polling interval. Only used when watch mode is disabled.
+ - **onetime(bool):**
+   - Render the config file and quit. Only used when watch mode is disabled.
+ - **keys([]string):**
+   - The backend keys that the template requires to be rendered correctly. The child keys are also loaded.
+
 ###etcd
  - **nodes([]string):**
-    - List of backend nodes.
+   - List of backend nodes.
  - **client_cert(string, optional):**
    - The client cert file.
  - **client_key(string, optional):**
@@ -68,3 +92,35 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - The client key file.
  - **client_ca_keys(string, optional):**
    - The client CA key file.
+
+#Example
+```TOML
+log_level = "debug"
+log_format = "text"
+
+[[resource]]
+  [[resource.template]]
+    src = "/path/to/template"
+    dst = "/path/to/destionation/file"
+    checkCmd = ""
+    reloadCmd = ""
+    mode = "0644"
+    
+    [resource.backend.etcdconfig]
+      nodes = ["127.0.0.1:2379"]
+      version = 3
+      watch = true
+      prefix = "/production"
+      keys = ["/some_key"]
+      
+    [resource.backend.vaultconfig]
+      node = "http://127.0.0.1:8200"
+      auth_type = "token"
+      auth_token = "vault_token"
+      client_cert = "/path/to/client_cert"
+      client_key = "/path/to/client_key"
+      client_ca_keys = "/path/to/client_ca_keys"
+      interval = 60
+      prefix = "/production"
+      keys = ["/some_secret_key"]
+```
