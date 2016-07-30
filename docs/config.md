@@ -16,24 +16,24 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
     - The path of the template that will be used to render the application's configuration file.
  - **dst(string):**
     - The location to place the rendered configuration file.
- - **checkCmd(string):**
+ - **checkCmd(string, optional):**
     - The command to check config. Use {{.src}} to reference the rendered source template.
- - **reloadCmd(string):**
+ - **reloadCmd(string, optional):**
     - The command to reload config.
- - **mode(string):**
-    - The permission mode of the file.
+ - **mode(string, optional):**
+    - The permission mode of the file. Default is "0644".
 
 ##Backend configuration options
 
 ###valid in every backend
- - **watch(bool):**
+ - **watch(bool, optional):**
    - Enable watch support. Default is false.
  - **prefix(string):**
    - Key path prefix. Default is "".
  - **interval(int):**
    - The backend polling interval. Only used when watch mode is disabled.
- - **onetime(bool):**
-   - Render the config file and quit. Only used when watch mode is disabled.
+ - **onetime(bool, optional):**
+   - Render the config file and quit. Only used when watch mode is disabled. Default is false.
  - **keys([]string):**
    - The backend keys that the template requires to be rendered correctly. The child keys are also loaded.
 
