@@ -13,6 +13,7 @@ Remcos main purposes are (like confd's):
    - [pongo2](https://github.com/flosch/pongo2) template engine instead of go's text/template
 
 ## Documentation
+### [Configuration](https://github.com/HeavyHorst/remco/blob/master/docs/config.md)
 ### [Template](http://documentup.com/HeavyHorst/remco/docs/template)
 
 ## Project Status
