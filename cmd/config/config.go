@@ -18,6 +18,7 @@ import (
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
+	"github.com/mitchellh/hashstructure"
 	"github.com/naoina/toml"
 	"github.com/spf13/cobra"
 )
@@ -40,6 +41,7 @@ type tomlConf struct {
 			Vaultconfig  *vault.Config
 		}
 	}
+	hash uint64
 }
 
 // the default config load function - works with every StoreClient
@@ -57,8 +59,17 @@ func defaultReload(client backends.StoreClient, config string) func() (tomlConf,
 		if err := toml.Unmarshal([]byte(os.ExpandEnv(values[config])), &c); err != nil {
 			return c, err
 		}
+		c.hash = c.getHash()
 		return c, nil
 	}
+}
+
+func (c *tomlConf) getHash() uint64 {
+	hash, err := hashstructure.Hash(c, nil)
+	if err != nil {
+		return 0
+	}
+	return hash
 }
 
 // load a config from file
@@ -71,6 +82,7 @@ func (c *tomlConf) fromFile(cfg string) error {
 	if err := toml.Unmarshal(buf, c); err != nil {
 		return err
 	}
+	c.hash = c.getHash()
 	return nil
 }
 
@@ -185,7 +197,6 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFu
 	for {
 		select {
 		case <-watchConfChan:
-			log.Info("Configuration has changed - reload remco")
 			time.Sleep(1 * time.Second)
 
 			newConf, err := reloadFunc()
@@ -194,16 +205,22 @@ func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFu
 				continue
 			}
 
-			wg.Add(1)
-			// stop the old Resource
-			log.Debug("Stopping the old instance")
-			stopWatch <- true
-			// and start the new Resource
-			log.Debug("Starting the new instance")
-			go func() {
-				defer wg.Done()
-				newConf.watch(stopWatch)
-			}()
+			if newConf.hash != c.hash {
+				log.Info("Configuration has changed - reload remco")
+				wg.Add(1)
+				// stop the old Resource
+				log.Debug("Stopping the old instance")
+				stopWatch <- true
+				// and start the new Resource
+				log.Debug("Starting the new instance")
+				go func() {
+					defer wg.Done()
+					newConf.watch(stopWatch)
+				}()
+				c.hash = newConf.hash
+			} else {
+				log.Debug("config is unchanged")
+			}
 		case <-done:
 			return
 		}
