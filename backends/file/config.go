@@ -9,6 +9,7 @@
 package file
 
 import (
+	"github.com/HeavyHorst/easyKV/file"
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
@@ -32,7 +33,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		"filepath": c.Filepath,
 	}).Info("Set filepath")
 
-	client, err := NewFileClient(c.Filepath)
+	client, err := file.NewFileClient(c.Filepath)
 	if err != nil {
 		return c.Backend, err
 	}

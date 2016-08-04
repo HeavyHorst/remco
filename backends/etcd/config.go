@@ -9,9 +9,9 @@
 package etcd
 
 import (
+	"github.com/HeavyHorst/easyKV"
+	"github.com/HeavyHorst/easyKV/etcd"
 	"github.com/HeavyHorst/remco/backends"
-	"github.com/HeavyHorst/remco/backends/etcd/etcdv2"
-	"github.com/HeavyHorst/remco/backends/etcd/etcdv3"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
@@ -40,19 +40,30 @@ func (c *Config) Connect() (template.Backend, error) {
 		"backend": "etcd",
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
-	var client backends.StoreClient
+	var client easyKV.StoreClient
 	var err error
 
-	if c.Version == 3 {
-		client, err = etcdv3.NewEtcdClient(c.Nodes, c.ClientCert, c.ClientKey, c.ClientCaKeys, c.BasicAuth, c.Username, c.Password)
-		c.Backend.Name = "etcdv3"
-	} else {
-		client, err = etcdv2.NewEtcdClient(c.Nodes, c.ClientCert, c.ClientKey, c.ClientCaKeys, c.BasicAuth, c.Username, c.Password)
-		c.Backend.Name = "etcd"
-	}
+	client, err = etcd.NewEtcdClient(etcd.WithNodes(c.Nodes...),
+		etcd.WithBasicAuth(etcd.BasicAuthOptions{
+			Username:  c.Username,
+			Password:  c.Password,
+			BasicAuth: c.BasicAuth,
+		}),
+		etcd.WithTLSOptions(etcd.TLSOptions{
+			ClientCert:   c.ClientCert,
+			ClientKey:    c.ClientKey,
+			ClientCaKeys: c.ClientCaKeys,
+		}),
+		etcd.WithVersion(c.Version))
 
 	if err != nil {
 		return c.Backend, err
+	}
+
+	if c.Version == 3 {
+		c.Backend.Name = "etcdv3"
+	} else {
+		c.Backend.Name = "etcd"
 	}
 
 	c.Backend.StoreClient = client

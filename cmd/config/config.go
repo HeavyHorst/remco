@@ -18,6 +18,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/backends/consul"
 	"github.com/HeavyHorst/remco/backends/etcd"
@@ -53,7 +54,7 @@ type tomlConf struct {
 }
 
 // the default config load function - works with every StoreClient
-func defaultReload(client backends.StoreClient, config string) func() (tomlConf, error) {
+func defaultReload(client easyKV.StoreClient, config string) func() (tomlConf, error) {
 	//load the new config
 	return func() (tomlConf, error) {
 		var c tomlConf
@@ -168,7 +169,7 @@ func (c *tomlConf) watch(stop chan bool) {
 	}
 }
 
-func (c *tomlConf) configWatch(cli backends.StoreClient, prefix string, reloadFunc func() (tomlConf, error)) {
+func (c *tomlConf) configWatch(cli easyKV.StoreClient, prefix string, reloadFunc func() (tomlConf, error)) {
 	wg := &sync.WaitGroup{}
 	done := make(chan struct{})
 

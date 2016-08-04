@@ -36,11 +36,14 @@ func (c *Config) Connect() (template.Backend, error) {
 		"backend": "consul",
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
+
 	client, err := consul.New(c.Nodes, c.Scheme, c.ClientCert, c.ClientKey, c.ClientCaKeys)
 	if err != nil {
 		return c.Backend, err
 	}
+
 	c.Backend.StoreClient = client
 	c.Backend.Name = "consul"
+
 	return c.Backend, nil
 }

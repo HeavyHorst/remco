@@ -52,10 +52,12 @@ func (c *Config) Connect() (template.Backend, error) {
 		"key":      c.ClientKey,
 		"caCert":   c.ClientCaKeys,
 	}
+
 	client, err := vault.New(c.Node, c.AuthType, vaultConfig)
 	if err != nil {
 		return c.Backend, err
 	}
+
 	c.Backend.StoreClient = client
 	c.Backend.Name = "vault"
 

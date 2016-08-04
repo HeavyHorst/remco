@@ -3,6 +3,36 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "kwEvCQ3NXHQRYqtFyms5BJDeXRQ=",
+			"path": "github.com/HeavyHorst/easyKV",
+			"revision": "09a2e82b9fbd2112e54fe532d8f2b7ce83b349c0",
+			"revisionTime": "2016-08-04T17:53:05Z"
+		},
+		{
+			"checksumSHA1": "Md/YKYtV1Xv3rItqcx07E+yvoHg=",
+			"path": "github.com/HeavyHorst/easyKV/etcd",
+			"revision": "09a2e82b9fbd2112e54fe532d8f2b7ce83b349c0",
+			"revisionTime": "2016-08-04T17:53:05Z"
+		},
+		{
+			"checksumSHA1": "u70YwmeVBPFRkJ7fr4oBG6cd21c=",
+			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv2",
+			"revision": "09a2e82b9fbd2112e54fe532d8f2b7ce83b349c0",
+			"revisionTime": "2016-08-04T17:53:05Z"
+		},
+		{
+			"checksumSHA1": "v6LpkdDkliXSAe1C6K9pqMLCek4=",
+			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv3",
+			"revision": "09a2e82b9fbd2112e54fe532d8f2b7ce83b349c0",
+			"revisionTime": "2016-08-04T17:53:05Z"
+		},
+		{
+			"checksumSHA1": "10fkZFVn0kR/Te5Q8iRrYfAE8MU=",
+			"path": "github.com/HeavyHorst/easyKV/file",
+			"revision": "09a2e82b9fbd2112e54fe532d8f2b7ce83b349c0",
+			"revisionTime": "2016-08-04T17:53:05Z"
+		},
+		{
 			"checksumSHA1": "j4phj0mb1xZuk6AfvDO/Rjr7r7w=",
 			"path": "github.com/HeavyHorst/memkv",
 			"revision": "27820fee66f82b2ae01bf267a0530d06c3350f52",

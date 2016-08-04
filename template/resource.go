@@ -23,8 +23,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/memkv"
-	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/Sirupsen/logrus"
@@ -39,7 +39,7 @@ type BackendConfig interface {
 
 // Backend is the representation of a template backend like etcd or consul
 type Backend struct {
-	backends.StoreClient
+	easyKV.StoreClient
 	Name     string
 	Onetime  bool
 	Watch    bool

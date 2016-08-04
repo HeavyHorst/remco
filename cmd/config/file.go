@@ -9,7 +9,7 @@
 package config
 
 import (
-	"github.com/HeavyHorst/remco/backends/file"
+	"github.com/HeavyHorst/easyKV/file"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/spf13/cobra"
 )
