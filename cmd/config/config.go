@@ -53,8 +53,8 @@ type tomlConf struct {
 	hash uint64
 }
 
-// the default config load function - works with every StoreClient
-func defaultReload(client easyKV.StoreClient, config string) func() (tomlConf, error) {
+// the default config load function - works with every ReadWatcher
+func defaultReload(client easyKV.ReadWatcher, config string) func() (tomlConf, error) {
 	//load the new config
 	return func() (tomlConf, error) {
 		var c tomlConf
@@ -169,7 +169,7 @@ func (c *tomlConf) watch(stop chan bool) {
 	}
 }
 
-func (c *tomlConf) configWatch(cli easyKV.StoreClient, prefix string, reloadFunc func() (tomlConf, error)) {
+func (c *tomlConf) configWatch(cli easyKV.ReadWatcher, prefix string, reloadFunc func() (tomlConf, error)) {
 	wg := &sync.WaitGroup{}
 	done := make(chan struct{})
 

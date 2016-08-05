@@ -58,7 +58,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		return c.Backend, err
 	}
 
-	c.Backend.StoreClient = client
+	c.Backend.ReadWatcher = client
 	c.Backend.Name = "vault"
 
 	if c.Backend.Watch {

@@ -28,13 +28,13 @@ var EtcdCmd = &cobra.Command{
 		}
 		config, _ := cmd.Flags().GetString("config")
 
-		loadConf := defaultReload(s.StoreClient, config)
+		loadConf := defaultReload(s.ReadWatcher, config)
 		// we need a working config here - exit on error
 		c, err := loadConf()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		c.configWatch(s.StoreClient, config, loadConf)
+		c.configWatch(s.ReadWatcher, config, loadConf)
 	},
 }
 

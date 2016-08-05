@@ -40,7 +40,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		"backend": "etcd",
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
-	var client easyKV.StoreClient
+	var client easyKV.ReadWatcher
 	var err error
 
 	client, err = etcd.NewEtcdClient(etcd.WithNodes(c.Nodes...),
@@ -66,6 +66,6 @@ func (c *Config) Connect() (template.Backend, error) {
 		c.Backend.Name = "etcd"
 	}
 
-	c.Backend.StoreClient = client
+	c.Backend.ReadWatcher = client
 	return c.Backend, nil
 }

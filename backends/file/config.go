@@ -37,7 +37,7 @@ func (c *Config) Connect() (template.Backend, error) {
 	if err != nil {
 		return c.Backend, err
 	}
-	c.Backend.StoreClient = client
+	c.Backend.ReadWatcher = client
 	c.Backend.Name = "file"
 	return c.Backend, nil
 }

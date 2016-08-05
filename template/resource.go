@@ -39,7 +39,7 @@ type BackendConfig interface {
 
 // Backend is the representation of a template backend like etcd or consul
 type Backend struct {
-	easyKV.StoreClient
+	easyKV.ReadWatcher
 	Name     string
 	Onetime  bool
 	Watch    bool

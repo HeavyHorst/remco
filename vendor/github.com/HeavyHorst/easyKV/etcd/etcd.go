@@ -16,11 +16,11 @@ import (
 	"github.com/HeavyHorst/easyKV/etcd/etcdv3"
 )
 
-// ErrUnknownApiLevel is returned if no valid api level is given
-var ErrUnknownApiLevel = errors.New("unknown etcd api level - must be 2 or 3")
+// ErrUnknownAPILevel is returned if no valid api level is given
+var ErrUnknownAPILevel = errors.New("unknown etcd api level - must be 2 or 3")
 
 // NewEtcdClient returns an *etcd{2,3}.Client with a connection to named machines.
-func NewEtcdClient(opts ...Option) (easyKV.StoreClient, error) {
+func NewEtcdClient(opts ...Option) (easyKV.ReadWatcher, error) {
 	var options Options
 	for _, o := range opts {
 		o(&options)
@@ -34,5 +34,5 @@ func NewEtcdClient(opts ...Option) (easyKV.StoreClient, error) {
 		return etcdv2.NewEtcdClient(options.Nodes, options.TLS.ClientCert, options.TLS.ClientKey, options.TLS.ClientCaKeys, options.Auth.BasicAuth, options.Auth.Username, options.Auth.Password)
 	}
 
-	return nil, ErrUnknownApiLevel
+	return nil, ErrUnknownAPILevel
 }
