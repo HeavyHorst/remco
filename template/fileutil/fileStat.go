@@ -16,17 +16,23 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
+	"syscall"
 )
 
-// Stat return a fileInfo describing the named file.
-func Stat(name string) (fi fileInfo, err error) {
+// stat return a fileInfo describing the named file.
+func stat(name string) (fi fileInfo, err error) {
 	if IsFileExist(name) {
 		f, err := os.Open(name)
-		defer f.Close()
 		if err != nil {
 			return fi, err
 		}
+		defer f.Close()
 		stats, _ := f.Stat()
+		if runtime.GOOS != "windows" {
+			fi.Uid = stats.Sys().(*syscall.Stat_t).Uid
+			fi.Gid = stats.Sys().(*syscall.Stat_t).Gid
+		}
 		fi.Mode = stats.Mode()
 		h := hash.New()
 		io.Copy(h, f)
