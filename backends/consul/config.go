@@ -42,6 +42,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		ClientKey:    c.ClientKey,
 		ClientCaKeys: c.ClientCaKeys,
 	}))
+
 	if err != nil {
 		return c.Backend, err
 	}

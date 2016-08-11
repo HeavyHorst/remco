@@ -23,7 +23,7 @@ import (
 	"github.com/HeavyHorst/remco/backends/consul"
 	"github.com/HeavyHorst/remco/backends/etcd"
 	"github.com/HeavyHorst/remco/backends/file"
-	//"github.com/HeavyHorst/remco/backends/vault"
+	"github.com/HeavyHorst/remco/backends/vault"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
@@ -47,7 +47,7 @@ type tomlConf struct {
 			Etcdconfig   *etcd.Config
 			Fileconfig   *file.Config
 			Consulconfig *consul.Config
-			//Vaultconfig  *vault.Config
+			Vaultconfig  *vault.Config
 		}
 	}
 	hash uint64
@@ -119,7 +119,7 @@ func (c *tomlConf) watch(stop chan bool) {
 			"etcd":   v.Backend.Etcdconfig,
 			"file":   v.Backend.Fileconfig,
 			"consul": v.Backend.Consulconfig,
-			//"vault":  v.Backend.Vaultconfig,
+			"vault":  v.Backend.Vaultconfig,
 		}
 
 		for name, config := range backendConfigMap {

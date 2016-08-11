@@ -9,11 +9,11 @@
 package vault
 
 import (
+	"github.com/HeavyHorst/easyKV/vault"
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
-	"github.com/kelseyhightower/confd/backends/vault"
 )
 
 // Config represents the config for the vault backend.
@@ -42,18 +42,20 @@ func (c *Config) Connect() (template.Backend, error) {
 		"nodes":   []string{c.Node},
 	}).Info("Set backend nodes")
 
-	vaultConfig := map[string]string{
-		"app-id":   c.AppID,
-		"user-id":  c.UserID,
-		"username": c.Username,
-		"password": c.Password,
-		"token":    c.AuthToken,
-		"cert":     c.ClientCert,
-		"key":      c.ClientKey,
-		"caCert":   c.ClientCaKeys,
+	tlsOps := vault.TLSOptions{
+		ClientCert:   c.ClientCert,
+		ClientKey:    c.ClientKey,
+		ClientCaKeys: c.ClientCaKeys,
 	}
 
-	client, err := vault.New(c.Node, c.AuthType, vaultConfig)
+	authOps := vault.BasicAuthOptions{
+		Username: c.Username,
+		Password: c.Password,
+	}
+
+	client, err := vault.New(c.Node, c.AuthType, vault.WithBasicAuth(authOps), vault.WithTLSOptions(tlsOps),
+		vault.WithAppID(c.AppID), vault.WithUserID(c.UserID), vault.WithToken(c.AuthToken))
+
 	if err != nil {
 		return c.Backend, err
 	}
