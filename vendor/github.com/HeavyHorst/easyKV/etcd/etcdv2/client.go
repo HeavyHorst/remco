@@ -19,6 +19,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/HeavyHorst/easyKV"
 	"github.com/coreos/etcd/client"
 	"golang.org/x/net/context"
 )
@@ -126,7 +127,12 @@ func nodeWalk(node *client.Node, vars map[string]string) error {
 }
 
 // WatchPrefix watches a specific prefix for changes.
-func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
+	var options easyKV.WatchOptions
+	for _, o := range opts {
+		o(&options)
+	}
+
 	// Setting AfterIndex to 0 (default) means that the Watcher
 	// should start watching for events starting at the current
 	// index, whatever that may be.
@@ -156,14 +162,14 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 					return 0, nil
 				}
 			}
-			return waitIndex, err
+			return options.WaitIndex, err
 		}
 
 		// Only return if we have a key prefix we care about.
 		// This is not an exact match on the key so there is a chance
 		// we will still pickup on false positives. The net win here
 		// is reducing the scope of keys that can trigger updates.
-		for _, k := range keys {
+		for _, k := range options.Keys {
 			if strings.HasPrefix(resp.Node.Key, k) {
 				return resp.Node.ModifiedIndex, err
 			}

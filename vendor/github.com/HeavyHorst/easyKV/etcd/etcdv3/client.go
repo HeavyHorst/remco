@@ -14,6 +14,7 @@ import (
 
 	"golang.org/x/net/context"
 
+	"github.com/HeavyHorst/easyKV"
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/pkg/transport"
 )
@@ -81,7 +82,12 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 }
 
 // WatchPrefix watches a specific prefix for changes.
-func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
+	var options easyKV.WatchOptions
+	for _, o := range opts {
+		o(&options)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	cancelRoutine := make(chan bool)
 	defer close(cancelRoutine)
@@ -99,14 +105,14 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 	rch := c.client.Watch(ctx, prefix, clientv3.WithPrefix())
 	for wresp := range rch {
 		if wresp.Err() != nil {
-			return waitIndex, wresp.Err()
+			return options.WaitIndex, wresp.Err()
 		}
 		for _, ev := range wresp.Events {
 			// Only return if we have a key prefix we care about.
 			// This is not an exact match on the key so there is a chance
 			// we will still pickup on false positives. The net win here
 			// is reducing the scope of keys that can trigger updates.
-			for _, k := range keys {
+			for _, k := range options.Keys {
 				if strings.HasPrefix(string(ev.Kv.Key), k) {
 					return uint64(ev.Kv.Version), err
 				}

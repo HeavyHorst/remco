@@ -10,10 +10,34 @@
 
 package easyKV
 
+// WatchOptions represents options for watch operations
+type WatchOptions struct {
+	WaitIndex uint64
+	Keys      []string
+}
+
+// WatchOption configures the WatchPrefix operation
+type WatchOption func(*WatchOptions)
+
+// WithKeys reduces the scope of keys that can trigger updates to keys (not an exact match)
+func WithKeys(keys []string) WatchOption {
+	return func(o *WatchOptions) {
+		o.Keys = keys
+	}
+}
+
+// WithWaitIndex sets the WaitIndex of the watcher
+func WithWaitIndex(waitIndex uint64) WatchOption {
+	return func(o *WatchOptions) {
+		o.WaitIndex = waitIndex
+	}
+}
+
 // A ReadWatcher - can get values and watch a prefix for changes
 type ReadWatcher interface {
 	GetValues(keys []string) (map[string]string, error)
-	WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error)
+	//WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error)
+	WatchPrefix(prefix string, stopChan chan bool, opts ...WatchOption) (uint64, error)
 }
 
 // TODO - create more interfaces - ReadWriter?

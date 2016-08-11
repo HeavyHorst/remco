@@ -33,13 +33,6 @@ type BasicAuthOptions struct {
 // Option configures the etcd client
 type Option func(*Options)
 
-// WithNodes sets the etcd backend nodes
-func WithNodes(nodes ...string) Option {
-	return func(o *Options) {
-		o.Nodes = nodes
-	}
-}
-
 // WithTLSOptions sets the TLSOptions
 func WithTLSOptions(tls TLSOptions) Option {
 	return func(o *Options) {

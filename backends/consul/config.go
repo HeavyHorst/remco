@@ -9,11 +9,11 @@
 package consul
 
 import (
+	"github.com/HeavyHorst/easyKV/consul"
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
-	"github.com/kelseyhightower/confd/backends/consul"
 )
 
 // Config represents the config for the consul backend.
@@ -37,7 +37,11 @@ func (c *Config) Connect() (template.Backend, error) {
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
 
-	client, err := consul.New(c.Nodes, c.Scheme, c.ClientCert, c.ClientKey, c.ClientCaKeys)
+	client, err := consul.New(c.Nodes, consul.WithScheme(c.Scheme), consul.WithTLSOptions(consul.TLSOptions{
+		ClientCert:   c.ClientCert,
+		ClientKey:    c.ClientKey,
+		ClientCaKeys: c.ClientCaKeys,
+	}))
 	if err != nil {
 		return c.Backend, err
 	}

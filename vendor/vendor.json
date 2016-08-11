@@ -3,34 +3,46 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "flezgMSOVjbrKcPJ1YgFyG0Qh94=",
+			"checksumSHA1": "puMY+TwRhPpW5+L3hdb5TB77C8k=",
 			"path": "github.com/HeavyHorst/easyKV",
-			"revision": "acfa650c0b08c24026ef279d9799be4b8a62c082",
-			"revisionTime": "2016-08-05T17:28:31Z"
+			"revision": "4dd8e8c665d82a9aaf7c2c76ff85e9435e11c684",
+			"revisionTime": "2016-08-11T09:11:51Z"
 		},
 		{
-			"checksumSHA1": "IYMsU/dZYKM+CELwI3E7EEcRHvE=",
+			"checksumSHA1": "uuLwBPG63zYS6+S+2/+saHH5HOA=",
+			"path": "github.com/HeavyHorst/easyKV/consul",
+			"revision": "b3e5ef28d91b2f6844eada9d205c8434ea169b49",
+			"revisionTime": "2016-08-11T09:39:56Z"
+		},
+		{
+			"checksumSHA1": "5M1D6VCazQI7SO4pnYgD971mmPI=",
 			"path": "github.com/HeavyHorst/easyKV/etcd",
-			"revision": "acfa650c0b08c24026ef279d9799be4b8a62c082",
-			"revisionTime": "2016-08-05T17:28:31Z"
+			"revision": "4dd8e8c665d82a9aaf7c2c76ff85e9435e11c684",
+			"revisionTime": "2016-08-11T09:11:51Z"
 		},
 		{
-			"checksumSHA1": "u70YwmeVBPFRkJ7fr4oBG6cd21c=",
+			"checksumSHA1": "RZEZhXBn07cFj6+fispALF7tfM0=",
 			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv2",
-			"revision": "acfa650c0b08c24026ef279d9799be4b8a62c082",
-			"revisionTime": "2016-08-05T17:28:31Z"
+			"revision": "4dd8e8c665d82a9aaf7c2c76ff85e9435e11c684",
+			"revisionTime": "2016-08-11T09:11:51Z"
 		},
 		{
-			"checksumSHA1": "v6LpkdDkliXSAe1C6K9pqMLCek4=",
+			"checksumSHA1": "Nc5XaIrDwWufUe6Ujc7yd5u5Sus=",
 			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv3",
-			"revision": "acfa650c0b08c24026ef279d9799be4b8a62c082",
-			"revisionTime": "2016-08-05T17:28:31Z"
+			"revision": "4dd8e8c665d82a9aaf7c2c76ff85e9435e11c684",
+			"revisionTime": "2016-08-11T09:11:51Z"
 		},
 		{
-			"checksumSHA1": "10fkZFVn0kR/Te5Q8iRrYfAE8MU=",
+			"checksumSHA1": "K5LU4KDyhoT+ykbIUPMd2c5bL1Q=",
 			"path": "github.com/HeavyHorst/easyKV/file",
-			"revision": "acfa650c0b08c24026ef279d9799be4b8a62c082",
-			"revisionTime": "2016-08-05T17:28:31Z"
+			"revision": "4dd8e8c665d82a9aaf7c2c76ff85e9435e11c684",
+			"revisionTime": "2016-08-11T09:11:51Z"
+		},
+		{
+			"checksumSHA1": "OO7O72KkY1ruzTKQQRVFEL0AZEA=",
+			"path": "github.com/HeavyHorst/easyKV/redis",
+			"revision": "4dd8e8c665d82a9aaf7c2c76ff85e9435e11c684",
+			"revisionTime": "2016-08-11T09:11:51Z"
 		},
 		{
 			"checksumSHA1": "j4phj0mb1xZuk6AfvDO/Rjr7r7w=",
@@ -146,6 +158,18 @@
 			"path": "github.com/fsnotify/fsnotify",
 			"revision": "a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb",
 			"revisionTime": "2016-06-29T01:11:04Z"
+		},
+		{
+			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
+			"path": "github.com/garyburd/redigo/internal",
+			"revision": "b8dc90050f24c1a73a52f107f3f575be67b21b7c",
+			"revisionTime": "2016-05-25T16:57:06Z"
+		},
+		{
+			"checksumSHA1": "507OiSqTxfGCje7xDT5eq9CCaNQ=",
+			"path": "github.com/garyburd/redigo/redis",
+			"revision": "b8dc90050f24c1a73a52f107f3f575be67b21b7c",
+			"revisionTime": "2016-05-25T16:57:06Z"
 		},
 		{
 			"checksumSHA1": "l2w6jertyAzSdcdKIXnHm02X8Jk=",

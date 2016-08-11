@@ -11,6 +11,7 @@ package file
 import (
 	"io/ioutil"
 
+	"github.com/HeavyHorst/easyKV"
 	"github.com/fsnotify/fsnotify"
 	"gopkg.in/yaml.v2"
 )
@@ -70,7 +71,7 @@ func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]stri
 
 // WatchPrefix watches the file for changes with fsnotify.
 // Prefix, keys and waitIndex are only here to implement the StoreClient interface.
-func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return 0, err
