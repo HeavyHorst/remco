@@ -73,6 +73,23 @@ func defaultReload(client easyKV.ReadWatcher, config string) func() (tomlConf, e
 	}
 }
 
+func defaultConfigRunCMD(config template.BackendConfig) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
+		s, err := config.Connect()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		config, _ := cmd.Flags().GetString("config")
+		loadConf := defaultReload(s.ReadWatcher, config)
+		// we need a working config here - exit on error
+		c, err := loadConf()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		c.configWatch(s.ReadWatcher, config, loadConf)
+	}
+}
+
 func (c *tomlConf) getHash() uint64 {
 	hash, err := hashstructure.Hash(c, nil)
 	if err != nil {
@@ -185,7 +202,6 @@ func (c *tomlConf) configWatch(cli easyKV.ReadWatcher, prefix string, reloadFunc
 		var lastIndex uint64
 		stop := make(chan bool)
 		for {
-			//index, err := cli.WatchPrefix(prefix, []string{""}, lastIndex, stop)
 			index, err := cli.WatchPrefix(prefix, stop, easyKV.WithWaitIndex(lastIndex), easyKV.WithKeys([]string{""}))
 			if err != nil {
 				log.Error(err)

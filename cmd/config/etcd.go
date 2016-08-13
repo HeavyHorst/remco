@@ -9,8 +9,6 @@
 package config
 
 import (
-	"github.com/HeavyHorst/remco/log"
-
 	"github.com/HeavyHorst/remco/backends/etcd"
 	"github.com/spf13/cobra"
 )
@@ -21,21 +19,7 @@ var etcdConfig = &etcd.Config{}
 var EtcdCmd = &cobra.Command{
 	Use:   "etcd",
 	Short: "load a config file from etcd",
-	Run: func(cmd *cobra.Command, args []string) {
-		s, err := etcdConfig.Connect()
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		config, _ := cmd.Flags().GetString("config")
-
-		loadConf := defaultReload(s.ReadWatcher, config)
-		// we need a working config here - exit on error
-		c, err := loadConf()
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		c.configWatch(s.ReadWatcher, config, loadConf)
-	},
+	Run:   defaultConfigRunCMD(etcdConfig),
 }
 
 func init() {

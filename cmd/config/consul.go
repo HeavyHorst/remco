@@ -9,8 +9,6 @@
 package config
 
 import (
-	"github.com/HeavyHorst/remco/log"
-
 	"github.com/HeavyHorst/remco/backends/consul"
 	"github.com/spf13/cobra"
 )
@@ -21,22 +19,7 @@ var consulConfig = &consul.Config{}
 var ConsulCmd = &cobra.Command{
 	Use:   "consul",
 	Short: "load a config file from consul",
-	Run: func(cmd *cobra.Command, args []string) {
-		s, err := consulConfig.Connect()
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-
-		config, _ := cmd.Flags().GetString("config")
-
-		loadConf := defaultReload(s.ReadWatcher, config)
-		// we need a working config here - exit on error
-		c, err := loadConf()
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		c.configWatch(s.ReadWatcher, config, loadConf)
-	},
+	Run:   defaultConfigRunCMD(consulConfig),
 }
 
 func init() {
