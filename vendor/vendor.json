@@ -39,6 +39,12 @@
 			"revisionTime": "2016-08-11T09:11:51Z"
 		},
 		{
+			"checksumSHA1": "OO7O72KkY1ruzTKQQRVFEL0AZEA=",
+			"path": "github.com/HeavyHorst/easyKV/redis",
+			"revision": "64f72326a11a8ca0434f5d0810a070e5f113788e",
+			"revisionTime": "2016-08-11T10:35:10Z"
+		},
+		{
 			"checksumSHA1": "jyuXDhj0IgY56zwXtsHAje1B8RU=",
 			"path": "github.com/HeavyHorst/easyKV/vault",
 			"revision": "64f72326a11a8ca0434f5d0810a070e5f113788e",
@@ -158,6 +164,18 @@
 			"path": "github.com/fsnotify/fsnotify",
 			"revision": "a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb",
 			"revisionTime": "2016-06-29T01:11:04Z"
+		},
+		{
+			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
+			"path": "github.com/garyburd/redigo/internal",
+			"revision": "b8dc90050f24c1a73a52f107f3f575be67b21b7c",
+			"revisionTime": "2016-05-25T16:57:06Z"
+		},
+		{
+			"checksumSHA1": "507OiSqTxfGCje7xDT5eq9CCaNQ=",
+			"path": "github.com/garyburd/redigo/redis",
+			"revision": "b8dc90050f24c1a73a52f107f3f575be67b21b7c",
+			"revisionTime": "2016-05-25T16:57:06Z"
 		},
 		{
 			"checksumSHA1": "l2w6jertyAzSdcdKIXnHm02X8Jk=",
