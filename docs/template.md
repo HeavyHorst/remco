@@ -128,10 +128,10 @@ Alias for the [strings.Split](https://golang.org/pkg/strings/#Split) function.
 {% endfor %}
 ```
 
-### parseJson
+### parseJSON
 Returns an map[string]interface{} of the json value.
 
-### parseJsonArray
+### parseJSONArray
 Returns a []interface{} from a json array.
 
 ### toJSON
