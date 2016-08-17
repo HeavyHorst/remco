@@ -134,16 +134,22 @@ Returns an map[string]interface{} of the json value.
 ### parseJsonArray
 Returns a []interface{} from a json array.
 
-### toJson
+### toJSON
 Converts data, for example the result of gets or lsdir, into an JSON object.
 ```
 {{ gets("/myapp/database/*") | toJson}}
 ```
 
-### toPrettyJson
+### toPrettyJSON
 Converts data, for example the result of gets or lsdir, into an pretty-printed JSON object, indented by four spaces.
 ```
 {{ gets("/myapp/database/*") | toPrettyJson}}
+```
+
+### toYAML
+Converts data, for example the result of gets or lsdir, into a YAML string.
+```
+{{ gets("/myapp/database/*") | toJson}}
 ```
 
 ### sortByLength

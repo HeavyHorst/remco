@@ -67,7 +67,7 @@ func (s *FilterSuite) TestFilterSplit(t *C) {
 	t.Check(res.Interface().([]string), DeepEquals, []string{"foo", "bar"})
 }
 
-func (s *FilterSuite) TestFilterToPrettyJson(t *C) {
+func (s *FilterSuite) TestFilterToPrettyJSON(t *C) {
 	expected := `{
     "test": "bla",
     "test2": 1,
@@ -78,7 +78,7 @@ func (s *FilterSuite) TestFilterToPrettyJson(t *C) {
 		"test2": 1,
 		"test3": 2.5,
 	})
-	res, err := filterToPrettyJson(in, nil)
+	res, err := filterToPrettyJSON(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
@@ -86,14 +86,32 @@ func (s *FilterSuite) TestFilterToPrettyJson(t *C) {
 	t.Check(res.String(), Equals, expected)
 }
 
-func (s *FilterSuite) TestFilterToJson(t *C) {
+func (s *FilterSuite) TestFilterToJSON(t *C) {
 	expected := `{"test":"bla","test2":1,"test3":2.5}`
 	in := pongo2.AsValue(map[string]interface{}{
 		"test":  "bla",
 		"test2": 1,
 		"test3": 2.5,
 	})
-	res, err := filterToJson(in, nil)
+	res, err := filterToJSON(in, nil)
+	if err != nil {
+		t.Error(err.ErrorMsg)
+	}
+
+	t.Check(res.String(), Equals, expected)
+}
+
+func (s *FilterSuite) TestFilterToYAML(t *C) {
+	expected := `test: bla
+test2: 1
+test3: 2.5
+`
+	in := pongo2.AsValue(map[string]interface{}{
+		"test":  "bla",
+		"test2": 1,
+		"test3": 2.5,
+	})
+	res, err := filterToYAML(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}

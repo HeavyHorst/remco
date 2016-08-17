@@ -17,6 +17,8 @@ import (
 	"sort"
 	"strings"
 
+	"gopkg.in/yaml.v2"
+
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/HeavyHorst/memkv"
@@ -30,8 +32,9 @@ func init() {
 	pongo2.RegisterFilter("split", filterSplit)
 	pongo2.RegisterFilter("parseJson", filterUnmarshalJSONObject)
 	pongo2.RegisterFilter("parseJsonArray", filterUnmarshalJSONArray)
-	pongo2.RegisterFilter("toJson", filterToJson)
-	pongo2.RegisterFilter("toPrettyJson", filterToPrettyJson)
+	pongo2.RegisterFilter("toJson", filterToJSON)
+	pongo2.RegisterFilter("toPrettyJson", filterToPrettyJSON)
+	pongo2.RegisterFilter("toYAML", filterToYAML)
 	pongo2.RegisterFilter("dir", filterDir)
 	pongo2.RegisterFilter("base", filterBase)
 	pongo2.RegisterFilter("base64", filterBase64)
@@ -67,7 +70,7 @@ func filterSplit(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.
 	return pongo2.AsValue(strings.Split(in.String(), param.String())), nil
 }
 
-func filterToPrettyJson(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+func filterToPrettyJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	b, err := json.MarshalIndent(in.Interface(), "", "    ")
 	if err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
@@ -75,8 +78,16 @@ func filterToPrettyJson(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *
 	return pongo2.AsSafeValue(string(b)), nil
 }
 
-func filterToJson(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	b, err := json.Marshal(in.Interface())
+	if err != nil {
+		return nil, &pongo2.Error{ErrorMsg: err.Error()}
+	}
+	return pongo2.AsSafeValue(string(b)), nil
+}
+
+func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	b, err := yaml.Marshal(in.Interface())
 	if err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
