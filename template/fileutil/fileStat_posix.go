@@ -1,3 +1,5 @@
+// +build !windows
+
 /*
  * This file is part of remco.
  * Based on code from confd. https://github.com/kelseyhightower/confd
@@ -16,7 +18,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"runtime"
 	"syscall"
 )
 
@@ -29,10 +30,8 @@ func stat(name string) (fi fileInfo, err error) {
 		}
 		defer f.Close()
 		stats, _ := f.Stat()
-		if runtime.GOOS != "windows" {
-			fi.Uid = stats.Sys().(*syscall.Stat_t).Uid
-			fi.Gid = stats.Sys().(*syscall.Stat_t).Gid
-		}
+		fi.Uid = stats.Sys().(*syscall.Stat_t).Uid
+		fi.Gid = stats.Sys().(*syscall.Stat_t).Gid
 		fi.Mode = stats.Mode()
 		h := hash.New()
 		io.Copy(h, f)
