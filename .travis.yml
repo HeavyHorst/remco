@@ -19,7 +19,7 @@ before_install:
   - vault server -dev &
 
 go:
-  - 1.6
+  - 1.7
   - tip
 
 env:
