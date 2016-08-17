@@ -71,6 +71,12 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
  - **filepath(string):**
    - The filepath to a yaml or json file containing the key-value pairs.
 
+###redis
+ - **nodes([]string):**
+   - List of backend nodes.
+ - **password(string, optional):**
+   - The redis password.
+
 ###vault
  - **node(string):**
     - The backend node.
