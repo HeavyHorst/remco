@@ -1,0 +1,23 @@
+#remco.toml
+################################################################
+# Global configuration
+################################################################
+log_level = "debug"
+log_format = "text"
+
+
+################################################################
+# Resource configuration
+################################################################
+[[resource]]
+  [[resource.template]]
+    src = "./integration/templates/basic.conf.tmpl"
+    dst = "/tmp/remco-basic-test.conf"
+
+  [resource.backend]
+    [resource.backend.redisconfig]
+      nodes = ["127.0.0.1:6379"]
+      prefix = "/appdata"
+      onetime = true
+      interval = 1
+      keys = ["/"]

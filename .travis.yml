@@ -31,3 +31,4 @@ script:
   - bash integration/etcd/test.sh
   - bash integration/file/test.sh
   - bash integration/vault/test.sh
+  - bash integration/redis/test.sh
