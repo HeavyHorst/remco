@@ -207,10 +207,15 @@ func (c *tomlConf) configWatch(cli easyKV.ReadWatcher, prefix string, reloadFunc
 		for {
 			index, err := cli.WatchPrefix(prefix, stop, easyKV.WithWaitIndex(lastIndex), easyKV.WithKeys([]string{""}))
 			if err != nil {
-				log.Error(err)
-				// Prevent backend errors from consuming all resources.
-				time.Sleep(time.Second * 2)
-				continue
+				if err == easyKV.ErrWatchNotSupported {
+					// Just wait some time - then reread the config
+					time.Sleep(time.Second * 30)
+				} else {
+					log.Error(err)
+					// Prevent backend errors from consuming all resources.
+					time.Sleep(time.Second * 2)
+					continue
+				}
 			}
 			lastIndex = index
 			watchConfChan <- struct{}{}
@@ -247,8 +252,6 @@ func (c *tomlConf) configWatch(cli easyKV.ReadWatcher, prefix string, reloadFunc
 					newConf.watch(stopWatch)
 				}()
 				c.hash = newConf.hash
-			} else {
-				log.Debug("config is unchanged")
 			}
 		case <-done:
 			return
