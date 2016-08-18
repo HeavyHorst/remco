@@ -25,6 +25,9 @@ go:
 env:
   - VAULT_ADDR='http://127.0.0.1:8200'
 
+services:
+  - redis
+
 script:
   - ./test
   - bash integration/consul/test.sh
