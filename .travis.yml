@@ -31,7 +31,8 @@ services:
 script:
   - ./test
   - bash integration/consul/test.sh
-  - bash integration/etcd/test.sh
+  - bash integration/etcdv2/test.sh
+  - bash integration/etcdv3/test.sh
   - bash integration/file/test.sh
   - bash integration/vault/test.sh
   - bash integration/redis/test.sh

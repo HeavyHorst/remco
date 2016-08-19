@@ -21,16 +21,3 @@ log_format = "text"
       version = 3
       onetime = true
       keys = ["/"]
-
-[[resource]]
-  [[resource.template]]
-    src = "./integration/templates/basic.conf.tmpl"
-    dst = "/tmp/remco-basic-test-etcdv2.conf"
-
-  [resource.backend]
-    [resource.backend.etcdconfig]
-      nodes = ["http://127.0.0.1:2379"]
-      prefix = "/appdata"
-      version = 2
-      onetime = true
-      keys = ["/"]
