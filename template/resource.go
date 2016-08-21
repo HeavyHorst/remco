@@ -334,7 +334,7 @@ func (t *Resource) Monitor(stopChan chan bool) {
 	wg := &sync.WaitGroup{}
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
-	done := make(chan bool)
+	done := make(chan struct{})
 	stopIntervalWatch := make(chan bool)
 	processChan := make(chan Backend)
 

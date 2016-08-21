@@ -79,12 +79,14 @@ func defaultConfigRunCMD(config template.BackendConfig, reloadFunc ...func() (to
 	return func(cmd *cobra.Command, args []string) {
 		signalChan := make(chan os.Signal, 1)
 		signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+		done := make(chan struct{})
 		var loadConf func() (tomlConf, error)
 
 		s, err := config.Connect()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+
 		config, _ := cmd.Flags().GetString("config")
 
 		if len(reloadFunc) > 0 {
@@ -100,12 +102,16 @@ func defaultConfigRunCMD(config template.BackendConfig, reloadFunc ...func() (to
 		}
 
 		wg := &sync.WaitGroup{}
+		waitAndExit := &sync.WaitGroup{}
 		stopWatch := make(chan bool)
-
 		startWatch := func(c tomlConf) {
 			wg.Add(1)
+			waitAndExit.Add(1)
 			go func() {
-				defer wg.Done()
+				defer func() {
+					wg.Done()
+					waitAndExit.Done()
+				}()
 				c.watch(stopWatch)
 			}()
 		}
@@ -115,11 +121,20 @@ func defaultConfigRunCMD(config template.BackendConfig, reloadFunc ...func() (to
 		go func() {
 			for {
 				newConf := c.watchConfig(s.ReadWatcher, config, stopWatch, loadConf)
+				waitAndExit.Add(1)
 				stopWatch <- true
 				wg.Wait()
 				startWatch(newConf)
+				waitAndExit.Done()
 				c = newConf
 			}
+		}()
+
+		go func() {
+			// If there is no goroutine left - quit
+			// this is needed for the onetime mode
+			waitAndExit.Wait()
+			close(done)
 		}()
 
 		for {
@@ -128,6 +143,8 @@ func defaultConfigRunCMD(config template.BackendConfig, reloadFunc ...func() (to
 				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
 				close(stopWatch)
 				wg.Wait()
+				return
+			case <-done:
 				return
 			}
 		}
