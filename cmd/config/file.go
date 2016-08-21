@@ -9,39 +9,32 @@
 package config
 
 import (
-	"github.com/HeavyHorst/easyKV/file"
-	"github.com/HeavyHorst/remco/log"
+	"github.com/HeavyHorst/remco/backends/file"
 	"github.com/spf13/cobra"
 )
+
+var fileConfig = &file.Config{}
+
+func fileConfigRunCMD() func(cmd *cobra.Command, args []string) {
+	loadConf := func() (tomlConf, error) {
+		var c tomlConf
+		err := c.fromFile(fileConfig.Filepath)
+		if err != nil {
+			return c, err
+		}
+		return c, nil
+	}
+	return defaultConfigRunCMD(fileConfig, loadConf)
+}
 
 // FileCmd represents the file command
 var FileCmd = &cobra.Command{
 	Use:   "file",
 	Short: "load a config file from a file",
-	Run: func(cmd *cobra.Command, args []string) {
-		cfg, _ := cmd.Flags().GetString("config")
-		f, _ := file.NewFileClient(cfg)
-
-		loadConf := func() (tomlConf, error) {
-			//load the new config
-			var c tomlConf
-			err := c.fromFile(cfg)
-			if err != nil {
-				return c, err
-			}
-			return c, nil
-		}
-
-		// we need a working config here - exit on error
-		c, err := loadConf()
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		c.configWatch(f, "", loadConf)
-	},
+	Run:   fileConfigRunCMD(),
 }
 
 func init() {
-	FileCmd.Flags().StringP("config", "c", "", "Relative path to the config file")
+	FileCmd.Flags().StringVarP(&fileConfig.Filepath, "config", "c", "", "Relative path to the config file")
 	CfgCmd.AddCommand(FileCmd)
 }

@@ -75,20 +75,62 @@ func defaultReload(client easyKV.ReadWatcher, config string) func() (tomlConf, e
 	}
 }
 
-func defaultConfigRunCMD(config template.BackendConfig) func(cmd *cobra.Command, args []string) {
+func defaultConfigRunCMD(config template.BackendConfig, reloadFunc ...func() (tomlConf, error)) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+		var loadConf func() (tomlConf, error)
+
 		s, err := config.Connect()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
 		config, _ := cmd.Flags().GetString("config")
-		loadConf := defaultReload(s.ReadWatcher, config)
+
+		if len(reloadFunc) > 0 {
+			loadConf = reloadFunc[0]
+		} else {
+			loadConf = defaultReload(s.ReadWatcher, config)
+		}
+
 		// we need a working config here - exit on error
 		c, err := loadConf()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		c.configWatch(s.ReadWatcher, config, loadConf)
+
+		wg := &sync.WaitGroup{}
+		stopWatch := make(chan bool)
+
+		startWatch := func(c tomlConf) {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				c.watch(stopWatch)
+			}()
+		}
+
+		startWatch(c)
+
+		go func() {
+			for {
+				newConf := c.watchConfig(s.ReadWatcher, config, stopWatch, loadConf)
+				stopWatch <- true
+				wg.Wait()
+				startWatch(newConf)
+				c = newConf
+			}
+		}()
+
+		for {
+			select {
+			case s := <-signalChan:
+				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
+				close(stopWatch)
+				wg.Wait()
+				return
+			}
+		}
 	}
 }
 
@@ -115,8 +157,6 @@ func (c *tomlConf) fromFile(cfg string) error {
 }
 
 func (c *tomlConf) watch(stop chan bool) {
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	stopChan := make(chan bool)
 	done := make(chan struct{})
 
@@ -174,11 +214,6 @@ func (c *tomlConf) watch(stop chan bool) {
 
 	for {
 		select {
-		case s := <-signalChan:
-			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			close(stopChan)
-			wait.Wait()
-			return
 		case <-stop:
 			close(stopChan)
 			wait.Wait()
@@ -189,22 +224,14 @@ func (c *tomlConf) watch(stop chan bool) {
 	}
 }
 
-func (c *tomlConf) configWatch(cli easyKV.ReadWatcher, prefix string, reloadFunc func() (tomlConf, error)) {
-	wg := &sync.WaitGroup{}
-	done := make(chan struct{})
+func (c *tomlConf) watchConfig(cli easyKV.ReadWatcher, prefix string, stop chan bool, reloadFunc func() (tomlConf, error)) tomlConf {
+	var lastIndex uint64
 
-	wg.Add(1)
-	stopWatch := make(chan bool)
-	go func() {
-		defer wg.Done()
-		c.watch(stopWatch)
-	}()
-
-	watchConfChan := make(chan struct{})
-	go func() {
-		var lastIndex uint64
-		stop := make(chan bool)
-		for {
+	for {
+		select {
+		case <-stop:
+			return tomlConf{}
+		default:
 			index, err := cli.WatchPrefix(prefix, stop, easyKV.WithWaitIndex(lastIndex), easyKV.WithKeys([]string{""}))
 			if err != nil {
 				if err == easyKV.ErrWatchNotSupported {
@@ -217,20 +244,8 @@ func (c *tomlConf) configWatch(cli easyKV.ReadWatcher, prefix string, reloadFunc
 					continue
 				}
 			}
+
 			lastIndex = index
-			watchConfChan <- struct{}{}
-		}
-	}()
-
-	go func() {
-		// If there is no goroutine left - quit
-		wg.Wait()
-		close(done)
-	}()
-
-	for {
-		select {
-		case <-watchConfChan:
 			time.Sleep(1 * time.Second)
 
 			newConf, err := reloadFunc()
@@ -240,21 +255,8 @@ func (c *tomlConf) configWatch(cli easyKV.ReadWatcher, prefix string, reloadFunc
 			}
 
 			if newConf.hash != c.hash {
-				log.Info("Configuration has changed - reload remco")
-				wg.Add(1)
-				// stop the old Resource
-				log.Debug("Stopping the old instance")
-				stopWatch <- true
-				// and start the new Resource
-				log.Debug("Starting the new instance")
-				go func() {
-					defer wg.Done()
-					newConf.watch(stopWatch)
-				}()
-				c.hash = newConf.hash
+				return newConf
 			}
-		case <-done:
-			return
 		}
 	}
 }
