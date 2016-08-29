@@ -33,4 +33,5 @@ func Execute() {
 
 func init() {
 	RootCmd.AddCommand(config.CfgCmd)
+	RootCmd.AddCommand(VersionCmd)
 }
