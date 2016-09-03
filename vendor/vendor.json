@@ -3,16 +3,22 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "puMY+TwRhPpW5+L3hdb5TB77C8k=",
+			"checksumSHA1": "ziVYF4qsU/fSEEKkbqpaDzHvu28=",
 			"path": "github.com/HeavyHorst/easyKV",
-			"revision": "64f72326a11a8ca0434f5d0810a070e5f113788e",
-			"revisionTime": "2016-08-11T10:35:10Z"
+			"revision": "059296b6d56b14f4278cc3a45f5b377491cc5528",
+			"revisionTime": "2016-09-03T14:34:40Z"
 		},
 		{
 			"checksumSHA1": "uuLwBPG63zYS6+S+2/+saHH5HOA=",
 			"path": "github.com/HeavyHorst/easyKV/consul",
 			"revision": "b3e5ef28d91b2f6844eada9d205c8434ea169b49",
 			"revisionTime": "2016-08-11T09:39:56Z"
+		},
+		{
+			"checksumSHA1": "Bx9gWUf4RjQyNQ4L5sWVY2gm398=",
+			"path": "github.com/HeavyHorst/easyKV/env",
+			"revision": "059296b6d56b14f4278cc3a45f5b377491cc5528",
+			"revisionTime": "2016-09-03T14:34:40Z"
 		},
 		{
 			"checksumSHA1": "5M1D6VCazQI7SO4pnYgD971mmPI=",

@@ -36,3 +36,4 @@ script:
   - bash integration/file/test.sh
   - bash integration/vault/test.sh
   - bash integration/redis/test.sh
+  - bash integration/env/test.sh

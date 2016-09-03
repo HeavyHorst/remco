@@ -16,6 +16,7 @@ import (
 
 	"github.com/HeavyHorst/remco/backends"
 	"github.com/HeavyHorst/remco/backends/consul"
+	"github.com/HeavyHorst/remco/backends/env"
 	"github.com/HeavyHorst/remco/backends/etcd"
 	"github.com/HeavyHorst/remco/backends/file"
 	"github.com/HeavyHorst/remco/backends/redis"
@@ -35,6 +36,7 @@ type tomlConf struct {
 		Backend  struct {
 			Etcdconfig   *etcd.Config
 			Fileconfig   *file.Config
+			Envconfig    *env.Config
 			Consulconfig *consul.Config
 			Vaultconfig  *vault.Config
 			Redisconfig  *redis.Config
@@ -96,6 +98,7 @@ func (c *tomlConf) watch(stop chan bool) {
 		backendConfigMap := map[string]template.BackendConfig{
 			"etcd":   v.Backend.Etcdconfig,
 			"file":   v.Backend.Fileconfig,
+			"env":    v.Backend.Envconfig,
 			"consul": v.Backend.Consulconfig,
 			"vault":  v.Backend.Vaultconfig,
 			"redis":  v.Backend.Redisconfig,
