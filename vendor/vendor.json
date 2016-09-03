@@ -311,12 +311,6 @@
 			"revisionTime": "2016-05-10T14:18:56Z"
 		},
 		{
-			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
-			"path": "github.com/inconshreveable/mousetrap",
-			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
-			"revisionTime": "2014-10-17T20:07:13Z"
-		},
-		{
 			"checksumSHA1": "hBgLmZ/4mCxmnH88mqFKBkpJFUY=",
 			"path": "github.com/mgutz/ansi",
 			"revision": "c286dcecd19ff979eeb73ea444e479b903f2cfcb",
@@ -352,18 +346,6 @@
 			"path": "github.com/naoina/toml/ast",
 			"revision": "751171607256bb66e64c9f0220c00662420c38e9",
 			"revisionTime": "2015-07-27T12:48:37Z"
-		},
-		{
-			"checksumSHA1": "zZcyPnQjboWV0mMCbF+G5vl26C0=",
-			"path": "github.com/spf13/cobra",
-			"revision": "b24564e919247d7c870fe0ed3738c98d8741aca4",
-			"revisionTime": "2016-07-15T23:55:49Z"
-		},
-		{
-			"checksumSHA1": "45OZzM/Hyc8mwjG2zn38n6bKZws=",
-			"path": "github.com/spf13/pflag",
-			"revision": "367864438f1b1a3c7db4da06a2f55b144e6784e0",
-			"revisionTime": "2016-06-10T19:09:02Z"
 		},
 		{
 			"checksumSHA1": "UADS3X1kxl+/qqeGcmTo0rBiXlQ=",
