@@ -11,14 +11,14 @@ package log
 import (
 	"fmt"
 	"os"
-	"sync"
+	"runtime"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 var logger *log.Entry
-var lock sync.RWMutex
 
 func init() {
 	host, _ := os.Hostname()
@@ -32,8 +32,6 @@ func init() {
 
 // SetFormatter sets the formatter. Valid formatters are json and text.
 func SetFormatter(format string) {
-	lock.Lock()
-	defer lock.Unlock()
 	switch format {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
@@ -42,10 +40,21 @@ func SetFormatter(format string) {
 	}
 }
 
+func withSource(l *log.Entry) *log.Entry {
+	_, file, line, ok := runtime.Caller(2)
+	if !ok {
+		file = "<???>"
+		line = 1
+	} else {
+		slash := strings.LastIndex(file, "/")
+		file = file[slash+1:]
+	}
+	logger := l.WithField("source", fmt.Sprintf("%s:%d", file, line))
+	return logger
+}
+
 // SetLevel sets the log level. Valid levels are panic, fatal, error, warn, info and debug.
 func SetLevel(level string) error {
-	lock.Lock()
-	defer lock.Unlock()
 	lvl, err := log.ParseLevel(level)
 	if err != nil {
 		return err
@@ -56,40 +65,30 @@ func SetLevel(level string) error {
 
 // Debug logs a message with severity DEBUG.
 func Debug(v ...interface{}) {
-	lock.Lock()
-	logger.Debug(v)
-	lock.Unlock()
+	withSource(logger).Debug(v)
 }
 
 // Error logs a message with severity ERROR.
 func Error(v ...interface{}) {
-	lock.Lock()
-	logger.Error(v)
-	lock.Unlock()
+	withSource(logger).Error(v)
 }
 
 // Fatal logs a message with severity ERROR followed by a call to os.Exit().
 func Fatal(v ...interface{}) {
-	lock.Lock()
-	logger.Fatal(v)
-	lock.Unlock()
+	withSource(logger).Fatal(v)
 }
 
 // Info logs a message with severity INFO.
 func Info(v ...interface{}) {
-	lock.Lock()
-	logger.Info(v)
-	lock.Unlock()
+	withSource(logger).Info(v)
 }
 
 // Warning logs a message with severity WARNING.
 func Warning(v ...interface{}) {
-	lock.Lock()
-	logger.Warning(v)
-	lock.Unlock()
+	withSource(logger).Warning(v)
 }
 
 // WithFields is a Wrapper for logrus.WithFields
 func WithFields(fields log.Fields) *log.Entry {
-	return logger.WithFields(fields)
+	return withSource(logger).WithFields(fields)
 }
