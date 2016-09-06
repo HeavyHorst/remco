@@ -13,11 +13,8 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
-	"time"
 
-	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/remco/backends/file"
 	"github.com/HeavyHorst/remco/log"
 )
@@ -50,108 +47,25 @@ func run() {
 		log.Fatal(err.Error())
 	}
 
-	waitAndExit := &sync.WaitGroup{}
-	newCfgChan := make(chan tomlConf)
-	stopped := make(chan struct{})
-	stopWatch := make(chan bool)
-	stopWatchConf := make(chan bool)
-	startWatch := func(c tomlConf) {
-		waitAndExit.Add(1)
-		go func() {
-			defer func() {
-				waitAndExit.Done()
-				stopped <- struct{}{}
-			}()
-			c.watch(stopWatch)
-		}()
-	}
-
-	// reload the config
-	reload := func() {
-		newConf, err := NewConf(fileConfig.Filepath)
-		if err != nil {
-			log.Error(err)
-			return
-		}
-		if newConf.hash != c.hash {
-			newCfgChan <- newConf
-		}
-		c = newConf
-	}
-
-	startWatch(c)
-
-	go func() {
-		// watch the config for changes
-		var lastIndex uint64
-		isWatcher := true
-		ticker := time.NewTicker(30 * time.Second)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case <-ticker.C:
-				if !isWatcher {
-					reload()
-				}
-			case <-stopWatchConf:
-				stopped <- struct{}{}
-				return
-			default:
-				index, err := s.ReadWatcher.WatchPrefix("", stopWatchConf, easyKV.WithWaitIndex(lastIndex), easyKV.WithKeys([]string{""}))
-				if err != nil {
-					if err == easyKV.ErrWatchNotSupported {
-						isWatcher = false
-					} else {
-						log.Error(err)
-						time.Sleep(2 * time.Second)
-					}
-					continue
-				}
-				lastIndex = index
-				time.Sleep(1 * time.Second)
-				reload()
-			}
-		}
-	}()
+	cfgWatcher := newConfigWatcher(fileConfig.Filepath, s.ReadWatcher, c)
+	defer cfgWatcher.stop()
 
 	done := make(chan struct{})
 	go func() {
 		// If there is no goroutine left - quit
 		// this is needed for the onetime mode
-		waitAndExit.Wait()
+		cfgWatcher.waitAndExit.Wait()
 		close(done)
 	}()
 
-	exit := func() {
-		// we need to drain the newCfgChan
-		go func() {
-			for range newCfgChan {
-			}
-		}()
-		close(stopWatch)
-		close(stopWatchConf)
-		<-stopped
-		<-stopped
-	}
-
 	for {
 		select {
-		case cfg := <-newCfgChan:
-			// waitAndExit is temporally increased by 1, so that the program don't terminate after stopWatch
-			waitAndExit.Add(1)
-			// stop the old watcher and wait until it has stopped
-			stopWatch <- true
-			<-stopped
-			// start a new watcher
-			startWatch(cfg)
-			waitAndExit.Done()
 		case s := <-signalChan:
 			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			exit()
+			//cfgWatcher.stop()
 			return
 		case <-done:
-			exit()
+			//cfgWatcher.stop()
 			return
 		}
 	}
