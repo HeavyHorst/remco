@@ -9,6 +9,7 @@
 package main
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -52,8 +53,7 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, oldConf tomlC
 			// we may try to send on the closed channel w.stopWatch
 			// we need to recover from this panic
 			if r := recover(); r != nil {
-				err := r.(error)
-				if err.Error() != "send on closed channel" {
+				if fmt.Sprintf("%v", r) != "send on closed channel" {
 					panic(r)
 				}
 			}

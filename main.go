@@ -62,10 +62,8 @@ func run() {
 		select {
 		case s := <-signalChan:
 			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			//cfgWatcher.stop()
 			return
 		case <-done:
-			//cfgWatcher.stop()
 			return
 		}
 	}
