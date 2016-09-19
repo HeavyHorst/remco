@@ -26,8 +26,46 @@ type configWatcher struct {
 	filePath      string
 }
 
-func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, oldConf tomlConf) *configWatcher {
-	c := oldConf
+func (w *configWatcher) startWatch(c tomlConf) {
+	w.waitAndExit.Add(1)
+	go func() {
+		defer func() {
+			w.waitAndExit.Done()
+			w.stopped <- struct{}{}
+		}()
+		c.watch(w.stopWatch)
+	}()
+}
+
+// reload stops the old watcher and starts a new one
+// this function blocks forever if startWatch was never called before
+func (w *configWatcher) reload() {
+	defer func() {
+		// we may try to send on the closed channel w.stopWatch
+		// we need to recover from this panic
+		if r := recover(); r != nil {
+			if fmt.Sprintf("%v", r) != "send on closed channel" {
+				panic(r)
+			}
+		}
+	}()
+
+	newConf, err := NewConf(w.filePath)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	// waitAndExit is temporally increased by 1, so that the program don't terminate after stopWatch
+	w.waitAndExit.Add(1)
+	// stop the old watcher and wait until it has stopped
+	w.stopWatch <- true
+	<-w.stopped
+	// start a new watcher
+	w.startWatch(newConf)
+	w.waitAndExit.Done()
+}
+
+func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlConf) *configWatcher {
 	w := &configWatcher{
 		waitAndExit:   &sync.WaitGroup{},
 		stopped:       make(chan struct{}),
@@ -36,47 +74,7 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, oldConf tomlC
 		filePath:      filepath,
 	}
 
-	startWatch := func(c tomlConf) {
-		w.waitAndExit.Add(1)
-		go func() {
-			defer func() {
-				w.waitAndExit.Done()
-				w.stopped <- struct{}{}
-			}()
-			c.watch(w.stopWatch)
-		}()
-	}
-
-	// reload the config
-	reload := func() {
-		defer func() {
-			// we may try to send on the closed channel w.stopWatch
-			// we need to recover from this panic
-			if r := recover(); r != nil {
-				if fmt.Sprintf("%v", r) != "send on closed channel" {
-					panic(r)
-				}
-			}
-		}()
-
-		newConf, err := NewConf(w.filePath)
-		if err != nil {
-			log.Error(err)
-			return
-		}
-		// waitAndExit is temporally increased by 1, so that the program don't terminate after stopWatch
-		w.waitAndExit.Add(1)
-		// stop the old watcher and wait until it has stopped
-		w.stopWatch <- true
-		<-w.stopped
-		// start a new watcher
-		startWatch(newConf)
-		w.waitAndExit.Done()
-
-		c = newConf
-	}
-
-	startWatch(c)
+	w.startWatch(config)
 
 	go func() {
 		// watch the config for changes
@@ -93,7 +91,7 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, oldConf tomlC
 					continue
 				}
 				time.Sleep(1 * time.Second)
-				reload()
+				w.reload()
 			}
 		}
 	}()
