@@ -1,4 +1,4 @@
 #!/bin/bash
 
 remco --config integration/file/file.toml
-cmp /tmp/remco-basic-test.conf ./integration/config/test.config || cat /tmp/remco-basic-test.conf
+cat /tmp/remco-basic-test.conf

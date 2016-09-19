@@ -15,4 +15,4 @@ vault write upstream/app1 value=10.0.1.10:8080
 vault write upstream/app2 value=10.0.1.11:8080
 
 remco --config integration/vault/vault.toml
-cmp /tmp/remco-basic-test.conf ./integration/config/test.config || cat /tmp/remco-basic-test.conf
+cat /tmp/remco-basic-test.conf
