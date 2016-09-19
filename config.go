@@ -24,7 +24,6 @@ import (
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
-	"github.com/mitchellh/hashstructure"
 	"github.com/naoina/toml"
 )
 
@@ -42,7 +41,6 @@ type tomlConf struct {
 			Redisconfig  *redis.Config
 		}
 	}
-	hash uint64
 }
 
 func NewConf(path string) (tomlConf, error) {
@@ -52,15 +50,6 @@ func NewConf(path string) (tomlConf, error) {
 		return c, err
 	}
 	return c, nil
-}
-
-// getHash is a helper function to calculate the hash of the current configuration
-func (c *tomlConf) getHash() uint64 {
-	hash, err := hashstructure.Hash(c, nil)
-	if err != nil {
-		return 0
-	}
-	return hash
 }
 
 // load a config from file
@@ -73,7 +62,6 @@ func (c *tomlConf) fromFile(cfg string) error {
 	if err := toml.Unmarshal(buf, c); err != nil {
 		return err
 	}
-	c.hash = c.getHash()
 	return nil
 }
 
