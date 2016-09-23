@@ -65,20 +65,23 @@ func (c *tomlConf) fromFile(cfg string) error {
 	return nil
 }
 
-func (c *tomlConf) run(stop chan bool) {
-	stopChan := make(chan bool)
-	done := make(chan struct{})
-
+func (c *tomlConf) loadGlobals() {
 	if c.LogLevel != "" {
 		err := log.SetLevel(c.LogLevel)
 		if err != nil {
 			log.Error(err)
 		}
 	}
-
 	if c.LogFormat != "" {
 		log.SetFormatter(c.LogFormat)
 	}
+}
+
+func (c *tomlConf) run(stop chan bool) {
+	stopChan := make(chan bool)
+	done := make(chan struct{})
+
+	c.loadGlobals()
 
 	wait := &sync.WaitGroup{}
 	for _, v := range c.Resource {

@@ -36,13 +36,14 @@ func run() {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
-	s, err := fileConfig.Connect()
+	// we need a working config here - exit on error
+	c, err := NewConf(fileConfig.Filepath)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	c.loadGlobals()
 
-	// we need a working config here - exit on error
-	c, err := NewConf(fileConfig.Filepath)
+	s, err := fileConfig.Connect()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
