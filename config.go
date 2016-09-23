@@ -65,7 +65,7 @@ func (c *tomlConf) fromFile(cfg string) error {
 	return nil
 }
 
-func (c *tomlConf) watch(stop chan bool) {
+func (c *tomlConf) run(stop chan bool) {
 	stopChan := make(chan bool)
 	done := make(chan struct{})
 

@@ -33,7 +33,7 @@ func (w *configWatcher) startWatch(c tomlConf) {
 			w.waitAndExit.Done()
 			w.stopped <- struct{}{}
 		}()
-		c.watch(w.stopWatch)
+		c.run(w.stopWatch)
 	}()
 }
 
