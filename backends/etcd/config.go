@@ -43,7 +43,7 @@ func (c *Config) Connect() (template.Backend, error) {
 	var client easyKV.ReadWatcher
 	var err error
 
-	client, err = etcd.NewEtcdClient(c.Nodes,
+	client, err = etcd.New(c.Nodes,
 		etcd.WithBasicAuth(etcd.BasicAuthOptions{
 			Username:  c.Username,
 			Password:  c.Password,

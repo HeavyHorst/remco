@@ -19,8 +19,8 @@ import (
 // ErrUnknownAPILevel is returned if no valid api level is given
 var ErrUnknownAPILevel = errors.New("unknown etcd api level - must be 2 or 3")
 
-// NewEtcdClient returns an *etcd{2,3}.Client with a connection to named machines.
-func NewEtcdClient(machines []string, opts ...Option) (easyKV.ReadWatcher, error) {
+// New returns an *etcd{2,3}.Client with a connection to named machines.
+func New(machines []string, opts ...Option) (easyKV.ReadWatcher, error) {
 	var options Options
 	for _, o := range opts {
 		o(&options)

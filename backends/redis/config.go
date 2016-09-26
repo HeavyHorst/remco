@@ -34,7 +34,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
 
-	client, err := redis.NewRedisClient(c.Nodes, redis.WithPassword(c.Password))
+	client, err := redis.New(c.Nodes, redis.WithPassword(c.Password))
 
 	if err != nil {
 		return c.Backend, err

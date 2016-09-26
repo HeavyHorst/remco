@@ -82,9 +82,9 @@ func (c *Client) connectedClient() (redis.Conn, error) {
 	return c.client, nil
 }
 
-// NewRedisClient returns an *redis.Client with a connection to named machines.
+// New returns an *redis.Client with a connection to named machines.
 // It returns an error if a connection to the cluster cannot be made.
-func NewRedisClient(machines []string, opts ...Option) (*Client, error) {
+func New(machines []string, opts ...Option) (*Client, error) {
 	var err error
 	var c Client
 	for _, o := range opts {

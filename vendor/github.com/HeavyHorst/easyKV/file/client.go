@@ -21,8 +21,8 @@ type Client struct {
 	filepath string
 }
 
-// NewFileClient returns a new FileClient
-func NewFileClient(filepath string) (*Client, error) {
+// New returns a new FileClient
+func New(filepath string) (*Client, error) {
 	return &Client{filepath}, nil
 }
 

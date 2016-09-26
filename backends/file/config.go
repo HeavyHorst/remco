@@ -33,7 +33,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		"filepath": c.Filepath,
 	}).Info("Set filepath")
 
-	client, err := file.NewFileClient(c.Filepath)
+	client, err := file.New(c.Filepath)
 	if err != nil {
 		return c.Backend, err
 	}
