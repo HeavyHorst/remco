@@ -81,9 +81,13 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
  - **node(string):**
     - The backend node.
  - **auth_type(string):**
-   - The vault authentication type. (token, app-id, userpass)
+   - The vault authentication type. (token, approle, app-id, userpass, github)
  - **auth_token(string):**
-   - The vault authentication token. Only used with auth_type=token.
+   - The vault authentication token. Only used with auth_type=token or github.
+ - **app_role(string):**
+   - The vault app role. Only used with auth_type=approle.
+ - **secret_id(string):**
+   - The vault secret id. Only used with auth_type=approle.
  - **app_id(string):**
    - The vault app ID. Only used with auth_type=app-id.
  - **user_id(string):**

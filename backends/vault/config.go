@@ -22,6 +22,8 @@ type Config struct {
 	AuthType     string `toml:"auth_type"`
 	AppID        string `toml:"app_id"`
 	UserID       string `toml:"user_id"`
+	RoleID       string `toml:"role_id"`
+	SecretID     string `toml:"secret_id"`
 	Username     string
 	Password     string
 	AuthToken    string `toml:"auth_token"`
@@ -53,8 +55,14 @@ func (c *Config) Connect() (template.Backend, error) {
 		Password: c.Password,
 	}
 
-	client, err := vault.New(c.Node, c.AuthType, vault.WithBasicAuth(authOps), vault.WithTLSOptions(tlsOps),
-		vault.WithAppID(c.AppID), vault.WithUserID(c.UserID), vault.WithToken(c.AuthToken))
+	client, err := vault.New(c.Node, c.AuthType,
+		vault.WithBasicAuth(authOps),
+		vault.WithTLSOptions(tlsOps),
+		vault.WithAppID(c.AppID),
+		vault.WithUserID(c.UserID),
+		vault.WithRoleID(c.RoleID),
+		vault.WithSecretID(c.SecretID),
+		vault.WithToken(c.AuthToken))
 
 	if err != nil {
 		return c.Backend, err
