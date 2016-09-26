@@ -10,11 +10,13 @@ package vault
 
 // Options contains all values that are needed to connect to vault
 type Options struct {
-	AppID  string
-	UserID string
-	Token  string
-	TLS    TLSOptions
-	Auth   BasicAuthOptions
+	RoleID   string
+	SecretID string
+	AppID    string
+	UserID   string
+	Token    string
+	TLS      TLSOptions
+	Auth     BasicAuthOptions
 }
 
 // BasicAuthOptions contains options regarding to basic authentication
@@ -33,21 +35,35 @@ type TLSOptions struct {
 // Option configures the vault client
 type Option func(*Options)
 
-// WithAppID sets the AppID
+// WithAppID sets the AppID (app-id auth method)
 func WithAppID(id string) Option {
 	return func(o *Options) {
 		o.AppID = id
 	}
 }
 
-// WithUserID sets the UserID
+// WithUserID sets the UserID (app-id auth method)
 func WithUserID(id string) Option {
 	return func(o *Options) {
 		o.UserID = id
 	}
 }
 
-// WithToken sets the token
+// WithRoleID sets the RoleID (approle auth method)
+func WithRoleID(id string) Option {
+	return func(o *Options) {
+		o.RoleID = id
+	}
+}
+
+// WithSecretID sets the ScretID (approle auth method)
+func WithSecretID(id string) Option {
+	return func(o *Options) {
+		o.SecretID = id
+	}
+}
+
+// WithToken sets the token (toke auth method)
 func WithToken(token string) Option {
 	return func(o *Options) {
 		o.Token = token

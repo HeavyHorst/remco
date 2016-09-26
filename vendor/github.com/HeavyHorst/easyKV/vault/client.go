@@ -29,7 +29,7 @@ type Client struct {
 	client *vaultapi.Client
 }
 
-// get a
+// get a parameter from a map, panics if no value was found
 func getParameter(key string, parameters map[string]string) string {
 	value := parameters[key]
 	if value == "" {
@@ -62,6 +62,11 @@ func authenticate(c *vaultapi.Client, authType string, params map[string]string)
 	defer panicToError(&err)
 
 	switch authType {
+	case "approle":
+		secret, err = c.Logical().Write("/auth/approle/login", map[string]interface{}{
+			"role_id":   getParameter("role-id", params),
+			"secret_id": getParameter("secret-id", params),
+		})
 	case "app-id":
 		secret, err = c.Logical().Write("/auth/app-id/login", map[string]interface{}{
 			"app_id":  getParameter("app-id", params),
@@ -129,21 +134,23 @@ func getConfig(address, cert, key, caCert string) (*vaultapi.Config, error) {
 
 // New returns an *vault.Client with a connection to named machines.
 // It returns an error if a connection to the cluster cannot be made.
-func New(address, authType string, opts ...Option /*params map[string]string*/) (*Client, error) {
+func New(address, authType string, opts ...Option) (*Client, error) {
 	var options Options
 	for _, o := range opts {
 		o(&options)
 	}
 
 	params := map[string]string{
-		"app-id":   options.AppID,
-		"user-id":  options.UserID,
-		"username": options.Auth.Username,
-		"password": options.Auth.Password,
-		"token":    options.Token,
-		"cert":     options.TLS.ClientCert,
-		"key":      options.TLS.ClientKey,
-		"caCert":   options.TLS.ClientCaKeys,
+		"role-id":   options.RoleID,
+		"secret-id": options.SecretID,
+		"app-id":    options.AppID,
+		"user-id":   options.UserID,
+		"username":  options.Auth.Username,
+		"password":  options.Auth.Password,
+		"token":     options.Token,
+		"cert":      options.TLS.ClientCert,
+		"key":       options.TLS.ClientKey,
+		"caCert":    options.TLS.ClientCaKeys,
 	}
 
 	if authType == "" {
