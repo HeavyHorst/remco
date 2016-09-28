@@ -43,6 +43,11 @@ func (c *Config) Connect() (template.Backend, error) {
 	var client easyKV.ReadWatcher
 	var err error
 
+	// use api version 2 if no version is specified
+	if c.Version == 0 {
+		c.Version = 2
+	}
+
 	client, err = etcd.New(c.Nodes,
 		etcd.WithBasicAuth(etcd.BasicAuthOptions{
 			Username:  c.Username,
