@@ -55,7 +55,7 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
  - **version(uint, optional):**
    - The etcd api-level to use (2 or 3). Default is 2.
 
-##configmap (kubernetes)
+###configmap (kubernetes)
  - **kubeConfig(string, optional):**
    - Absolute path to the kubeconfig file
  - **name(string):**
