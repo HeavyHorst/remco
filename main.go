@@ -30,6 +30,14 @@ func init() {
 	)
 	flag.StringVar(&fileConfig.Filepath, "config", defaultConfig, "path to the configuration file")
 	flag.BoolVar(&printVersionAndExit, "version", false, "print version and exit")
+
+	// glog(used in the kubernetes-client) registers some flags that we don't want to show
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [options]\n", os.Args[0])
+		fmt.Fprintln(os.Stderr, "Parameters:")
+		fmt.Fprintln(os.Stderr, "  -config string\n\tpath to the configuration file (default \"/etc/remco/config\")")
+		fmt.Fprintln(os.Stderr, "  -version\n\tprint version and exit")
+	}
 }
 
 func run() {
