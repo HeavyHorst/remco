@@ -55,6 +55,14 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
  - **version(uint, optional):**
    - The etcd api-level to use (2 or 3). Default is 2.
 
+##configmap (kubernetes)
+ - **kubeConfig(string, optional):**
+   - Absolute path to the kubeconfig file
+ - **name(string):**
+   - The name of the kubernetes configMap
+ - **namespace(string):**
+   - The kubernetes namespace
+
 ###consul
  - **nodes([]string):**
     - List of backend nodes.
@@ -116,14 +124,14 @@ log_format = "text"
     reloadCmd = ""
     mode = "0644"
     
-    [resource.backend.etcdconfig]
+    [resource.backend.etcd]
       nodes = ["127.0.0.1:2379"]
       version = 3
       watch = true
       prefix = "/production"
       keys = ["/some_key"]
       
-    [resource.backend.vaultconfig]
+    [resource.backend.vault]
       node = "http://127.0.0.1:8200"
       auth_type = "token"
       auth_token = "vault_token"

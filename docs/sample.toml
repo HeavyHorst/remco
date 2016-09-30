@@ -18,7 +18,7 @@ log_format = "text"
     mode = "0644"
 
   [resource.backend]
-    [resource.backend.etcdconfig]
+    [resource.backend.etcd]
       nodes = ["127.0.0.1:2379"]
       client_cert = "/path/to/client_cert"
       client_key = "/path/to/client_key"
@@ -35,17 +35,17 @@ log_format = "text"
       interval = 1
       keys = ["/"]
 
-    [resource.backend.fileconfig]
+    [resource.backend.file]
       filepath = "/etc/remco/test.yml"
 
-    [resource.backend.consulconfig]
+    [resource.backend.consul]
       nodes = ["127.0.0.1:8500"]
       scheme = "http" #{http/https}
       client_cert = "/path/to/client_cert"
       client_key = "/path/to/client_key"
       client_ca_keys = "/path/to/client_ca_keys"
     
-    [resource.backend.vaultconfig]
+    [resource.backend.vault]
       node = "http://127.0.0.1:8200"
 	    ## Token based auth backend
       auth_type = "token"
