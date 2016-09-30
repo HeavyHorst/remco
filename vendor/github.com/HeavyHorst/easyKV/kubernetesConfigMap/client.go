@@ -11,6 +11,9 @@ package kubernetesConfigMap
 import (
 	"github.com/HeavyHorst/easyKV"
 	"k8s.io/client-go/1.4/kubernetes"
+	"k8s.io/client-go/1.4/pkg/api"
+	"k8s.io/client-go/1.4/pkg/api/v1"
+	"k8s.io/client-go/1.4/pkg/watch"
 	"k8s.io/client-go/1.4/rest"
 	"k8s.io/client-go/1.4/tools/clientcmd"
 )
@@ -63,7 +66,25 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	return cm.Data, nil
 }
 
-// WatchPrefix - not implemented at the moment
+// WatchPrefix - watch a kubernetes namespace for changes
 func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
-	return 0, easyKV.ErrWatchNotSupported
+	w, err := c.client.Core().ConfigMaps(c.namespace).Watch(api.ListOptions{})
+	if err != nil {
+		return 0, err
+	}
+	defer w.Stop()
+
+	for {
+		select {
+		case <-stopChan:
+			return 0, nil
+		case event := <-w.ResultChan():
+			if event.Type == watch.Modified {
+				d := event.Object.(*v1.ConfigMap)
+				if d.ObjectMeta.Name == c.configName {
+					return 0, nil
+				}
+			}
+		}
+	}
 }

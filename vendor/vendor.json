@@ -45,10 +45,10 @@
 			"revisionTime": "2016-09-30T17:02:40Z"
 		},
 		{
-			"checksumSHA1": "+xHdvsqyRUaE+sA9Z9IXwsbyL9I=",
+			"checksumSHA1": "L71smCMO7pOUFAgB+UDBL+eQNUU=",
 			"path": "github.com/HeavyHorst/easyKV/kubernetesConfigMap",
-			"revision": "f0991bd3be57b094e0db9d51929a0ac8cc145fb0",
-			"revisionTime": "2016-09-30T17:13:41Z"
+			"revision": "9beb1e1439edc67bcba98dd3221e9b0100e41dc1",
+			"revisionTime": "2016-09-30T19:01:17Z"
 		},
 		{
 			"checksumSHA1": "RkKnurB+Q+2qpiBDd/T/DwJvTQQ=",

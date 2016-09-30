@@ -43,12 +43,5 @@ func (c *Config) Connect() (template.Backend, error) {
 	c.Backend.ReadWatcher = client
 	c.Backend.Name = "configMap"
 
-	if c.Backend.Watch {
-		log.WithFields(logrus.Fields{
-			"backend": "configMap",
-		}).Warn("Watch is not supported, using interval instead")
-		c.Backend.Watch = false
-	}
-
 	return c.Backend, nil
 }
