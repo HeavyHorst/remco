@@ -15,7 +15,7 @@ log_format = "text"
     dst = "/tmp/remco-basic-test-etcdv3.conf"
 
   [resource.backend]
-    [resource.backend.etcdconfig]
+    [resource.backend.etcd]
       nodes = ["127.0.0.1:2379"]
       prefix = "/appdata"
       version = 3

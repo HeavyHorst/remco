@@ -15,7 +15,7 @@ log_format = "text"
     dst = "/tmp/remco-basic-test.conf"
 
   [resource.backend]
-    [resource.backend.vaultconfig]
+    [resource.backend.vault]
       onetime = true
       auth_type = "token"
       auth_token = "§§token§§"

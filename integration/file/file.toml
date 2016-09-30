@@ -15,7 +15,7 @@ log_format = "text"
     dst = "/tmp/remco-basic-test.conf"
 
   [resource.backend]
-    [resource.backend.fileconfig]
+    [resource.backend.file]
       onetime = true
       filepath = "./integration/file/config.yml"
       keys = ["/"]

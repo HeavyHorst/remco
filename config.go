@@ -15,6 +15,7 @@ import (
 	"sync"
 
 	"github.com/HeavyHorst/remco/backends"
+	"github.com/HeavyHorst/remco/backends/configmap"
 	"github.com/HeavyHorst/remco/backends/consul"
 	"github.com/HeavyHorst/remco/backends/env"
 	"github.com/HeavyHorst/remco/backends/etcd"
@@ -33,12 +34,13 @@ type tomlConf struct {
 	Resource  []struct {
 		Template []*template.ProcessConfig
 		Backend  struct {
-			Etcdconfig   *etcd.Config
-			Fileconfig   *file.Config
-			Envconfig    *env.Config
-			Consulconfig *consul.Config
-			Vaultconfig  *vault.Config
-			Redisconfig  *redis.Config
+			Etcd      *etcd.Config
+			File      *file.Config
+			Env       *env.Config
+			Consul    *consul.Config
+			Vault     *vault.Config
+			Redis     *redis.Config
+			Configmap *configmap.Config
 		}
 	}
 }
@@ -87,12 +89,13 @@ func (c *tomlConf) run(stop chan bool) {
 	for _, v := range c.Resource {
 		var backendList []template.Backend
 		backendConfigMap := map[string]template.BackendConfig{
-			"etcd":   v.Backend.Etcdconfig,
-			"file":   v.Backend.Fileconfig,
-			"env":    v.Backend.Envconfig,
-			"consul": v.Backend.Consulconfig,
-			"vault":  v.Backend.Vaultconfig,
-			"redis":  v.Backend.Redisconfig,
+			"etcd":      v.Backend.Etcd,
+			"file":      v.Backend.File,
+			"env":       v.Backend.Env,
+			"consul":    v.Backend.Consul,
+			"vault":     v.Backend.Vault,
+			"redis":     v.Backend.Redis,
+			"configmap": v.Backend.Configmap,
 		}
 
 		for name, config := range backendConfigMap {

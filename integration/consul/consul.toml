@@ -15,7 +15,7 @@ log_format = "text"
     dst = "/tmp/remco-basic-test.conf"
 
   [resource.backend]
-    [resource.backend.consulconfig]
+    [resource.backend.consul]
       nodes = ["127.0.0.1:8500"]
       prefix = "/appdata"
       onetime = true

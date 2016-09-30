@@ -8,7 +8,7 @@
 
 package redis
 
-// Option configures the etcd client
+// Option configures the redis client
 type Option func(*Client)
 
 // WithPassword sets the redis password
