@@ -9,6 +9,8 @@
 package kubernetesConfigMap
 
 import (
+	"strings"
+
 	"github.com/HeavyHorst/easyKV"
 	"k8s.io/client-go/1.4/kubernetes"
 	"k8s.io/client-go/1.4/pkg/api"
@@ -63,7 +65,17 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return cm.Data, nil
+	vars := make(map[string]string)
+	for _, key := range keys {
+		k := strings.Replace(strings.TrimPrefix(key, "/"), "/", ".", -1)
+		for cmKey, cmValue := range cm.Data {
+			if strings.HasPrefix(cmKey, k) {
+				vars["/"+strings.Replace(cmKey, ".", "/", -1)] = cmValue
+			}
+		}
+	}
+
+	return vars, nil
 }
 
 // WatchPrefix - watch a kubernetes namespace for changes
