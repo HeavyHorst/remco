@@ -37,6 +37,7 @@ func WithWaitIndex(waitIndex uint64) WatchOption {
 type ReadWatcher interface {
 	GetValues(keys []string) (map[string]string, error)
 	WatchPrefix(prefix string, stopChan chan bool, opts ...WatchOption) (uint64, error)
+	Close()
 }
 
 // TODO - create more interfaces - ReadWriter?

@@ -28,6 +28,11 @@ func New() (*Client, error) {
 	return &Client{}, nil
 }
 
+// Close closes the client connection
+func (c *Client) Close() {
+	return
+}
+
 // GetValues queries the environment for keys
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	allEnvVars := os.Environ()

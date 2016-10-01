@@ -173,6 +173,11 @@ func New(address, authType string, opts ...Option) (*Client, error) {
 	return &Client{c}, nil
 }
 
+// Close closes the client connection
+func (c *Client) Close() {
+	return
+}
+
 // GetValues queries etcd for keys prefixed by prefix.
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	vars := make(map[string]string)

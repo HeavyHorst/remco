@@ -71,6 +71,11 @@ func New(nodes []string, opts ...Option) (*Client, error) {
 	return &Client{client.KV()}, nil
 }
 
+// Close closes the client connection
+func (c *Client) Close() {
+	return
+}
+
 // GetValues queries Consul for keys
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	vars := make(map[string]string)

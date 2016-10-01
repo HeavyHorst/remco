@@ -45,6 +45,11 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	return vars, nil
 }
 
+// Close closes the client connection
+func (c *Client) Close() {
+	return
+}
+
 // nodeWalk recursively descends nodes, updating vars.
 func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]string) error {
 	for k, v := range node {

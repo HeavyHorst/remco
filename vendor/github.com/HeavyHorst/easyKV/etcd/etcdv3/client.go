@@ -64,6 +64,11 @@ func NewEtcdClient(machines []string, cert, key, caCert string, basicAuth bool, 
 	return &Client{cli}, nil
 }
 
+// Close closes the client connection
+func (c *Client) Close() {
+	c.client.Close()
+}
+
 // GetValues queries etcd for keys prefixed by prefix.
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	vars := make(map[string]string)

@@ -59,6 +59,11 @@ func New(namespace, name string, opts ...Option) (easyKV.ReadWatcher, error) {
 	}, nil
 }
 
+// Close closes the client connection
+func (c *Client) Close() {
+	return
+}
+
 // GetValues returns all key-value pairs from the config-map
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	cm, err := c.client.Core().ConfigMaps(c.namespace).Get(c.configName)

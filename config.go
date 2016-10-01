@@ -117,7 +117,16 @@ func (c *tomlConf) run(stop chan bool) {
 
 		wait.Add(1)
 		go func() {
-			defer wait.Done()
+			defer func() {
+				// close all client connections
+				for _, v := range backendList {
+					log.WithFields(logrus.Fields{
+						"backend": v.Name,
+					}).Debug("Closing client connection")
+					v.ReadWatcher.Close()
+				}
+				wait.Done()
+			}()
 			t.Monitor(stopChan)
 		}()
 	}

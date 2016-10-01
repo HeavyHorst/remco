@@ -3,73 +3,85 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "ziVYF4qsU/fSEEKkbqpaDzHvu28=",
+			"checksumSHA1": "wq4PII3qFEbYO1R2y2UpFcCDHJU=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV",
 			"path": "github.com/HeavyHorst/easyKV",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
-			"checksumSHA1": "uuLwBPG63zYS6+S+2/+saHH5HOA=",
+			"checksumSHA1": "HB7KPp+/WrEL5TmV5tTNzCp03mg=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/consul",
 			"path": "github.com/HeavyHorst/easyKV/consul",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
-			"checksumSHA1": "Bx9gWUf4RjQyNQ4L5sWVY2gm398=",
+			"checksumSHA1": "WbtameMILRMLhqB+h3ADBFBoJGM=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/env",
 			"path": "github.com/HeavyHorst/easyKV/env",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
 			"checksumSHA1": "FQfagzelDWm6GWBplwTVvUl6LMA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/etcd",
 			"path": "github.com/HeavyHorst/easyKV/etcd",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
-			"checksumSHA1": "RZEZhXBn07cFj6+fispALF7tfM0=",
+			"checksumSHA1": "X0OV+gXeXeWnPoYJ/Y6wcb/HR/s=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/etcd/etcdv2",
 			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv2",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
-			"checksumSHA1": "Nc5XaIrDwWufUe6Ujc7yd5u5Sus=",
+			"checksumSHA1": "FJ1FzZpyTZ58St529WSqDfmMhnU=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/etcd/etcdv3",
 			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv3",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
-			"checksumSHA1": "ZU1ERkC9EUq7kUFSqOLnJWK4zvY=",
+			"checksumSHA1": "kNtMNm+9nmnHoPGhVBZVnUQL9/4=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/file",
 			"path": "github.com/HeavyHorst/easyKV/file",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
-			"checksumSHA1": "B1JSU4bTVoPRTodQpqOUac0gCSk=",
+			"checksumSHA1": "FSiFwP1eta04OBnvHq0FK+bF5yw=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/kubernetesConfigMap",
 			"path": "github.com/HeavyHorst/easyKV/kubernetesConfigMap",
-			"revision": "87b5d1fb6755af9bce5be94f5fa0450e2cd0e570",
-			"revisionTime": "2016-10-01T09:57:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
-			"checksumSHA1": "RkKnurB+Q+2qpiBDd/T/DwJvTQQ=",
+			"checksumSHA1": "+6G++DmodKHz7DNBRBWnt7CzJac=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/redis",
 			"path": "github.com/HeavyHorst/easyKV/redis",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
-			"checksumSHA1": "iIGRAefJwjncwiiUMMUYnP9sjhA=",
+			"checksumSHA1": "d5FWIf/HRZBjshratAeKUu2mDW0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/easyKV/vault",
 			"path": "github.com/HeavyHorst/easyKV/vault",
-			"revision": "d9bf46796e7efd9de22b49edb9e272fbf101cfef",
-			"revisionTime": "2016-09-30T17:02:40Z"
+			"revision": "fc66e285b79a02b217971944ec2c8e0a35c686f0",
+			"revisionTime": "2016-10-01T10:35:50Z"
 		},
 		{
 			"checksumSHA1": "j4phj0mb1xZuk6AfvDO/Rjr7r7w=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/HeavyHorst/memkv",
 			"path": "github.com/HeavyHorst/memkv",
 			"revision": "27820fee66f82b2ae01bf267a0530d06c3350f52",
 			"revisionTime": "2016-07-26T09:07:38Z"
 		},
 		{
 			"checksumSHA1": "yXrS4e4yxaRBu/MX+39X3cS4kbg=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/Sirupsen/logrus",
 			"path": "github.com/Sirupsen/logrus",
 			"revision": "a283a10442df8dc09befd873fab202bf8a253d6a",
 			"revisionTime": "2016-07-16T02:56:31Z"
@@ -83,84 +95,98 @@
 		},
 		{
 			"checksumSHA1": "r1CX8/M/ipvntOfH0rT9jOQ6fdM=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/cloudfoundry-incubator/candiedyaml",
 			"path": "github.com/cloudfoundry-incubator/candiedyaml",
 			"revision": "99c3df83b51532e3615f851d8c2dbb638f5313bf",
 			"revisionTime": "2016-04-29T08:01:25Z"
 		},
 		{
 			"checksumSHA1": "eKcMeYAH5qHLs9bY8DbWelEAn0s=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/auth/authpb",
 			"path": "github.com/coreos/etcd/auth/authpb",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "wWY6CCkwUvbCiE1s7ti/pm8eefY=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/client",
 			"path": "github.com/coreos/etcd/client",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "/gyjOipUg2AUwW5FdxFc1+csXaQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/clientv3",
 			"path": "github.com/coreos/etcd/clientv3",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "xHonAEntUvloKNCZ6iEq+32zBaQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/etcdserver/api/v3rpc/rpctypes",
 			"path": "github.com/coreos/etcd/etcdserver/api/v3rpc/rpctypes",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "UcjiSdY1tGzv/PHrd1Wv+BYXGbQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/etcdserver/etcdserverpb",
 			"path": "github.com/coreos/etcd/etcdserver/etcdserverpb",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "hJ62GmDa06T20pehuh5kdqgYge4=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/mvcc/mvccpb",
 			"path": "github.com/coreos/etcd/mvcc/mvccpb",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "fccky1+ET4RE4M3n1RmChhL5dHY=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/pkg/fileutil",
 			"path": "github.com/coreos/etcd/pkg/fileutil",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "mKIXx1kDwmVmdIpZ3pJtRBuUKso=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/pkg/pathutil",
 			"path": "github.com/coreos/etcd/pkg/pathutil",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "rMyIh9PsSvPs6Yd+YgKITQzQJx8=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/pkg/tlsutil",
 			"path": "github.com/coreos/etcd/pkg/tlsutil",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "pS+Oqds+j6Yzw/14P5gUfBSmvu4=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/pkg/transport",
 			"path": "github.com/coreos/etcd/pkg/transport",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "gx1gJIMU6T0UNQ0bPZ/drQ8cpCI=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/etcd/pkg/types",
 			"path": "github.com/coreos/etcd/pkg/types",
 			"revision": "331ec82400fe46df670615f94c78b4ca3a50d4d1",
 			"revisionTime": "2016-07-16T03:19:33Z"
 		},
 		{
 			"checksumSHA1": "d50/+u/LFlXvEV10HiEoXB9OsGg=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/go-systemd/journal",
 			"path": "github.com/coreos/go-systemd/journal",
 			"revision": "d4039021cfc2d0ea21d34afda21631314e83f75a",
 			"revisionTime": "2016-07-13T10:32:18Z"
 		},
 		{
 			"checksumSHA1": "XOoETj0U8GXE7B51aYwBBde6XaM=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/coreos/pkg/capnslog",
 			"path": "github.com/coreos/pkg/capnslog",
 			"revision": "a48e304ff9331be6d5df352b6b47bd1395ab5dd7",
 			"revisionTime": "2016-06-23T18:35:23Z"
@@ -216,36 +242,42 @@
 		},
 		{
 			"checksumSHA1": "B0do18F5umcGJfIj6emr7RuQVsg=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/flosch/pongo2",
 			"path": "github.com/flosch/pongo2",
 			"revision": "5e20832cab69d8dc4453e2403804e451a26d1277",
 			"revisionTime": "2016-07-17T14:14:43Z"
 		},
 		{
 			"checksumSHA1": "xgjI2W3RGiQwNlxsOW2V9fJ9kaM=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/fsnotify/fsnotify",
 			"path": "github.com/fsnotify/fsnotify",
 			"revision": "a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb",
 			"revisionTime": "2016-06-29T01:11:04Z"
 		},
 		{
 			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/garyburd/redigo/internal",
 			"path": "github.com/garyburd/redigo/internal",
 			"revision": "b8dc90050f24c1a73a52f107f3f575be67b21b7c",
 			"revisionTime": "2016-05-25T16:57:06Z"
 		},
 		{
 			"checksumSHA1": "507OiSqTxfGCje7xDT5eq9CCaNQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/garyburd/redigo/redis",
 			"path": "github.com/garyburd/redigo/redis",
 			"revision": "b8dc90050f24c1a73a52f107f3f575be67b21b7c",
 			"revisionTime": "2016-05-25T16:57:06Z"
 		},
 		{
 			"checksumSHA1": "l2w6jertyAzSdcdKIXnHm02X8Jk=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/ghodss/yaml",
 			"path": "github.com/ghodss/yaml",
 			"revision": "aa0c862057666179de291b67d9f093d12b5a8473",
 			"revisionTime": "2016-06-04T00:29:25Z"
 		},
 		{
 			"checksumSHA1": "iZVulPMFFGC70xeLZJafiKzTn18=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/gogo/protobuf/proto",
 			"path": "github.com/gogo/protobuf/proto",
 			"revision": "2752d97bbd91927dd1c43296dbf8700e50e2708c",
 			"revisionTime": "2016-06-17T09:13:52Z"
@@ -266,12 +298,14 @@
 		},
 		{
 			"checksumSHA1": "NgOgDwqQnfQhahsECFCsSPEenE0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/golang/protobuf/jsonpb",
 			"path": "github.com/golang/protobuf/jsonpb",
 			"revision": "874264fbbb43f4d91e999fecb4b40143ed611400",
 			"revisionTime": "2016-07-11T13:55:00Z"
 		},
 		{
 			"checksumSHA1": "piwYMQqpsfAur670v6rFg6gqk/c=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/golang/protobuf/proto",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "874264fbbb43f4d91e999fecb4b40143ed611400",
 			"revisionTime": "2016-07-11T13:55:00Z"
@@ -285,18 +319,21 @@
 		},
 		{
 			"checksumSHA1": "m1ZcuEjYXGa1TVwnZBUdnL3kzhQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/grpc-ecosystem/grpc-gateway/runtime",
 			"path": "github.com/grpc-ecosystem/grpc-gateway/runtime",
 			"revision": "f52d055dc48aec25854ed7d31862f78913cf17d1",
 			"revisionTime": "2016-07-15T01:37:42Z"
 		},
 		{
 			"checksumSHA1": "GN9lH15GbtcX7xx70TjRYXi23Uk=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal",
 			"path": "github.com/grpc-ecosystem/grpc-gateway/runtime/internal",
 			"revision": "f52d055dc48aec25854ed7d31862f78913cf17d1",
 			"revisionTime": "2016-07-15T01:37:42Z"
 		},
 		{
 			"checksumSHA1": "vqiK5r5dntV7JNZ+ZsGlD0Samos=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/grpc-ecosystem/grpc-gateway/utilities",
 			"path": "github.com/grpc-ecosystem/grpc-gateway/utilities",
 			"revision": "f52d055dc48aec25854ed7d31862f78913cf17d1",
 			"revisionTime": "2016-07-15T01:37:42Z"
@@ -408,6 +445,7 @@
 		},
 		{
 			"checksumSHA1": "hBgLmZ/4mCxmnH88mqFKBkpJFUY=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/mgutz/ansi",
 			"path": "github.com/mgutz/ansi",
 			"revision": "c286dcecd19ff979eeb73ea444e479b903f2cfcb",
 			"revisionTime": "2015-09-14T16:22:38Z"
@@ -421,18 +459,21 @@
 		},
 		{
 			"checksumSHA1": "A6nZdZ1/lTOVINhIndyw2ZWN9JU=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/naoina/go-stringutil",
 			"path": "github.com/naoina/go-stringutil",
 			"revision": "6b638e95a32d0c1131db0e7fe83775cbea4a0d0b",
 			"revisionTime": "2015-11-18T23:44:43Z"
 		},
 		{
 			"checksumSHA1": "MUYxtCY95dt/b/5cmzP0x1b9d/E=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/naoina/toml",
 			"path": "github.com/naoina/toml",
 			"revision": "751171607256bb66e64c9f0220c00662420c38e9",
 			"revisionTime": "2015-07-27T12:48:37Z"
 		},
 		{
 			"checksumSHA1": "6Sd81okp0F1ByCD/xCP9L1+v4Xs=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/naoina/toml/ast",
 			"path": "github.com/naoina/toml/ast",
 			"revision": "751171607256bb66e64c9f0220c00662420c38e9",
 			"revisionTime": "2015-07-27T12:48:37Z"
@@ -453,156 +494,182 @@
 		},
 		{
 			"checksumSHA1": "UADS3X1kxl+/qqeGcmTo0rBiXlQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/ugorji/go/codec",
 			"path": "github.com/ugorji/go/codec",
 			"revision": "b94837a2404ab90efe9289e77a70694c355739cb",
 			"revisionTime": "2016-05-31T12:29:44Z"
 		},
 		{
 			"checksumSHA1": "78ZklhBVMCDjf6qLiyQp3mTbGXo=",
+			"origin": "github.com/HeavyHorst/remco/vendor/github.com/x-cray/logrus-prefixed-formatter",
 			"path": "github.com/x-cray/logrus-prefixed-formatter",
 			"revision": "78e945f7d6bfe5a81ce6121d92d8118e44303e58",
 			"revisionTime": "2016-06-25T16:39:23Z"
 		},
 		{
 			"checksumSHA1": "TT1rac6kpQp2vz24m5yDGUNQ/QQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/crypto/cast5",
 			"path": "golang.org/x/crypto/cast5",
 			"revision": "10c26747e67d76ad4fafe6087c6f4073c3b22942",
 			"revisionTime": "2016-07-08T18:32:35Z"
 		},
 		{
 			"checksumSHA1": "N+Xd7xy/cpHaodLtnUYIj3UIDHA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/crypto/openpgp",
 			"path": "golang.org/x/crypto/openpgp",
 			"revision": "10c26747e67d76ad4fafe6087c6f4073c3b22942",
 			"revisionTime": "2016-07-08T18:32:35Z"
 		},
 		{
 			"checksumSHA1": "olOKkhrdkYQHZ0lf1orrFQPQrv4=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/crypto/openpgp/armor",
 			"path": "golang.org/x/crypto/openpgp/armor",
 			"revision": "10c26747e67d76ad4fafe6087c6f4073c3b22942",
 			"revisionTime": "2016-07-08T18:32:35Z"
 		},
 		{
 			"checksumSHA1": "eo/KtdjieJQXH7Qy+faXFcF70ME=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/crypto/openpgp/elgamal",
 			"path": "golang.org/x/crypto/openpgp/elgamal",
 			"revision": "10c26747e67d76ad4fafe6087c6f4073c3b22942",
 			"revisionTime": "2016-07-08T18:32:35Z"
 		},
 		{
 			"checksumSHA1": "rlxVSaGgqdAgwblsErxTxIfuGfg=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/crypto/openpgp/errors",
 			"path": "golang.org/x/crypto/openpgp/errors",
 			"revision": "10c26747e67d76ad4fafe6087c6f4073c3b22942",
 			"revisionTime": "2016-07-08T18:32:35Z"
 		},
 		{
 			"checksumSHA1": "IjQVXdetvKXlSW2yZHDd2m1TSoo=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/crypto/openpgp/packet",
 			"path": "golang.org/x/crypto/openpgp/packet",
 			"revision": "10c26747e67d76ad4fafe6087c6f4073c3b22942",
 			"revisionTime": "2016-07-08T18:32:35Z"
 		},
 		{
 			"checksumSHA1": "s2qT4UwvzBSkzXuiuMkowif1Olw=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/crypto/openpgp/s2k",
 			"path": "golang.org/x/crypto/openpgp/s2k",
 			"revision": "10c26747e67d76ad4fafe6087c6f4073c3b22942",
 			"revisionTime": "2016-07-08T18:32:35Z"
 		},
 		{
 			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/net/context",
 			"path": "golang.org/x/net/context",
 			"revision": "e90d6d0afc4c315a0d87a568ae68577cc15149a0",
 			"revisionTime": "2016-07-15T16:59:30Z"
 		},
 		{
 			"checksumSHA1": "SPYGC6DQrH9jICccUsOfbvvhB4g=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/net/http2",
 			"path": "golang.org/x/net/http2",
 			"revision": "e90d6d0afc4c315a0d87a568ae68577cc15149a0",
 			"revisionTime": "2016-07-15T16:59:30Z"
 		},
 		{
 			"checksumSHA1": "EYNaHp7XdLWRydUCE0amEkKAtgk=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/net/http2/hpack",
 			"path": "golang.org/x/net/http2/hpack",
 			"revision": "e90d6d0afc4c315a0d87a568ae68577cc15149a0",
 			"revisionTime": "2016-07-15T16:59:30Z"
 		},
 		{
 			"checksumSHA1": "/k7k6eJDkxXx6K9Zpo/OwNm58XM=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/net/internal/timeseries",
 			"path": "golang.org/x/net/internal/timeseries",
 			"revision": "e90d6d0afc4c315a0d87a568ae68577cc15149a0",
 			"revisionTime": "2016-07-15T16:59:30Z"
 		},
 		{
 			"checksumSHA1": "yhndhWXMs/VSEDLks4dNyFMQStA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/net/lex/httplex",
 			"path": "golang.org/x/net/lex/httplex",
 			"revision": "e90d6d0afc4c315a0d87a568ae68577cc15149a0",
 			"revisionTime": "2016-07-15T16:59:30Z"
 		},
 		{
 			"checksumSHA1": "WpST9lFOHvWrjDVy0GJNqHe+R3E=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/net/trace",
 			"path": "golang.org/x/net/trace",
 			"revision": "e90d6d0afc4c315a0d87a568ae68577cc15149a0",
 			"revisionTime": "2016-07-15T16:59:30Z"
 		},
 		{
 			"checksumSHA1": "8fD/im5Kwvy3JgmxulDTambmE8w=",
+			"origin": "github.com/HeavyHorst/remco/vendor/golang.org/x/sys/unix",
 			"path": "golang.org/x/sys/unix",
 			"revision": "b518c298ac9dc94b6ac0757394f50d10c5dfa25a",
 			"revisionTime": "2016-07-12T07:09:20Z"
 		},
 		{
 			"checksumSHA1": "5JDxT2VpNg4BsvEl5o51ASzOsFU=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc",
 			"path": "google.golang.org/grpc",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "08icuA15HRkdYCt6H+Cs90RPQsY=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc/codes",
 			"path": "google.golang.org/grpc/codes",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "KsjTDtH6zG7tlOVYHIch8aEzTX8=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc/credentials",
 			"path": "google.golang.org/grpc/credentials",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "3Lt5hNAG8qJAYSsNghR5uA1zQns=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc/grpclog",
 			"path": "google.golang.org/grpc/grpclog",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "T3Q0p8kzvXFnRkMaK/G8mCv6mc0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc/internal",
 			"path": "google.golang.org/grpc/internal",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "IlzBp7dylW8F4D7eINj8xHt/jMk=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc/metadata",
 			"path": "google.golang.org/grpc/metadata",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "4GSUFhOQ0kdFlBH4D5OTeKy78z0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc/naming",
 			"path": "google.golang.org/grpc/naming",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "3RRoLeH6X2//7tVClOVzxW2bY+E=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc/peer",
 			"path": "google.golang.org/grpc/peer",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "K0UBghitbn3HpjnLplF4A0F9P0A=",
+			"origin": "github.com/HeavyHorst/remco/vendor/google.golang.org/grpc/transport",
 			"path": "google.golang.org/grpc/transport",
 			"revision": "02fca896ff5f50c6bbbee0860345a49344b37a03",
 			"revisionTime": "2016-07-14T22:09:51Z"
 		},
 		{
 			"checksumSHA1": "I2d7Kn572Fz02mnnlcI4MHXCu0c=",
+			"origin": "github.com/HeavyHorst/remco/vendor/gopkg.in/check.v1",
 			"path": "gopkg.in/check.v1",
 			"revision": "4f90aeace3a26ad7021961c297b22c42160c7b25",
 			"revisionTime": "2016-01-05T16:49:36Z"
@@ -616,558 +683,651 @@
 		},
 		{
 			"checksumSHA1": "yV+2de12Q/t09hBGYGKEOFr1/zc=",
+			"origin": "github.com/HeavyHorst/remco/vendor/gopkg.in/yaml.v2",
 			"path": "gopkg.in/yaml.v2",
 			"revision": "e4d366fc3c7938e2958e662b4258c7a89e1f0e3e",
 			"revisionTime": "2016-07-15T03:37:55Z"
 		},
 		{
 			"checksumSHA1": "Y1zb7gJhSxNdNKCCSOjFFkaQMso=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/discovery",
 			"path": "k8s.io/client-go/1.4/discovery",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "LHEnQDTPkHXiwuX4O+LUtVGO16U=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/kubernetes",
 			"path": "k8s.io/client-go/1.4/kubernetes",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "YJ5q8Yjcrar5DiBqPZ7zIALjmBs=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/kubernetes/typed/authorization/v1beta1",
 			"path": "k8s.io/client-go/1.4/kubernetes/typed/authorization/v1beta1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "T/mJok0nYog1B+XW/HDw3qWnuRY=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/kubernetes/typed/autoscaling/v1",
 			"path": "k8s.io/client-go/1.4/kubernetes/typed/autoscaling/v1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "qyKWDN5HScO/E5u4gcbNh067UCc=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/kubernetes/typed/batch/v1",
 			"path": "k8s.io/client-go/1.4/kubernetes/typed/batch/v1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "lCuWEEdmSLuZyFm3d++0nk5jsWk=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/kubernetes/typed/core/v1",
 			"path": "k8s.io/client-go/1.4/kubernetes/typed/core/v1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "E4mRmLxUTWUFWluR7vjYiL4niJ0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/kubernetes/typed/extensions/v1beta1",
 			"path": "k8s.io/client-go/1.4/kubernetes/typed/extensions/v1beta1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "6K9ulOeiLqY0WZcBEXecbJLl5JE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/kubernetes/typed/policy/v1alpha1",
 			"path": "k8s.io/client-go/1.4/kubernetes/typed/policy/v1alpha1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "Be3e1If1BP9ifh6aJ1I4Hv8bqrI=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api",
 			"path": "k8s.io/client-go/1.4/pkg/api",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "6whIXnnUL2Rwc1nbjlFmXWpW9H8=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/endpoints",
 			"path": "k8s.io/client-go/1.4/pkg/api/endpoints",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "UTSvwPGnPorqeFnfpIoH0wOtv2Q=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/errors",
 			"path": "k8s.io/client-go/1.4/pkg/api/errors",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "bRgvPT9o0l0VrheobLZujxUWdBQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/install",
 			"path": "k8s.io/client-go/1.4/pkg/api/install",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "E/qSJk55vUWHYE+wSEztfA/mKJY=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/meta",
 			"path": "k8s.io/client-go/1.4/pkg/api/meta",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "mkmTzS9JgobXl5uUnhxlHeqz8yo=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/meta/metatypes",
 			"path": "k8s.io/client-go/1.4/pkg/api/meta/metatypes",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "k/Rd2pFvJAks60Newgfif4oECXU=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/pod",
 			"path": "k8s.io/client-go/1.4/pkg/api/pod",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "C3eVzDdMP5HfkgmBBOEJ3XYRadQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/resource",
 			"path": "k8s.io/client-go/1.4/pkg/api/resource",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "tKbC92KOB/P1ZMfNf0S6q64S1G4=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/service",
 			"path": "k8s.io/client-go/1.4/pkg/api/service",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "GecSyt628xX/Rr4n/dXO6dgbADc=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/unversioned",
 			"path": "k8s.io/client-go/1.4/pkg/api/unversioned",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "VFWvcdBVutOMS9FAOIy+rfxlxA4=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/unversioned/validation",
 			"path": "k8s.io/client-go/1.4/pkg/api/unversioned/validation",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "gM61gRVSIlPCsce5L72HqnFvVdQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/util",
 			"path": "k8s.io/client-go/1.4/pkg/api/util",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "GVirpPqXXNsBniN4qMKlg9IsS48=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/v1",
 			"path": "k8s.io/client-go/1.4/pkg/api/v1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "nZ/eA3JoN9ULK2AT0lA51+fGPzo=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/api/validation",
 			"path": "k8s.io/client-go/1.4/pkg/api/validation",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "sHp3hinCdFt9HvxriPoTFmXuVn0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apimachinery",
 			"path": "k8s.io/client-go/1.4/pkg/apimachinery",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "R/1RJ6+gJMRjDqc4lrgu4PfolWA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apimachinery/registered",
 			"path": "k8s.io/client-go/1.4/pkg/apimachinery/registered",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "LFWZYAeIDjHDsIcqwcm9ENM9DPY=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/authorization",
 			"path": "k8s.io/client-go/1.4/pkg/apis/authorization",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "sFjZyEYFUPKdGXubr0xsAwRVqvw=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/authorization/install",
 			"path": "k8s.io/client-go/1.4/pkg/apis/authorization/install",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "IDQxLkJa0vtksV2R69p0Cv+qVqE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/authorization/v1beta1",
 			"path": "k8s.io/client-go/1.4/pkg/apis/authorization/v1beta1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "xthoFmzT2V/sb0suWfPBb/LUoRE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/autoscaling",
 			"path": "k8s.io/client-go/1.4/pkg/apis/autoscaling",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "87MKv+HO03fv46Po2OODzqMT+lI=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/autoscaling/install",
 			"path": "k8s.io/client-go/1.4/pkg/apis/autoscaling/install",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "7mdWT+UC93tDmVYjYL2caubpttM=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/autoscaling/v1",
 			"path": "k8s.io/client-go/1.4/pkg/apis/autoscaling/v1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "0ZdGRxuciuCU0u8qZ58HNZt9fXs=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/batch",
 			"path": "k8s.io/client-go/1.4/pkg/apis/batch",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "nIQwZu6dj9L/TQw7txJ64u0i05M=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/batch/install",
 			"path": "k8s.io/client-go/1.4/pkg/apis/batch/install",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "+eG6Be7KeT5OS22acc+R7/8P5tA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/batch/v1",
 			"path": "k8s.io/client-go/1.4/pkg/apis/batch/v1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "VVHYQ7w9pIHZeEPJ+i6oATJ/i14=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/batch/v2alpha1",
 			"path": "k8s.io/client-go/1.4/pkg/apis/batch/v2alpha1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "FKh/VnshCZbCGLv0h6xY9TgaQec=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/extensions",
 			"path": "k8s.io/client-go/1.4/pkg/apis/extensions",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "+AnVqO2QN6lTE2e47bEQJxjs+k0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/extensions/install",
 			"path": "k8s.io/client-go/1.4/pkg/apis/extensions/install",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "Uz4f3f/VHHwXVR5kYf9uh8qGN8o=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/extensions/v1beta1",
 			"path": "k8s.io/client-go/1.4/pkg/apis/extensions/v1beta1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "0cZouuqu5R21Ef49UqmX5CRpvwI=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/policy",
 			"path": "k8s.io/client-go/1.4/pkg/apis/policy",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "ymvjH5FxL8nDHWFdbTdBYBtb0IM=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/policy/install",
 			"path": "k8s.io/client-go/1.4/pkg/apis/policy/install",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "HhuRVHhGeYegDNWsI3bs2yf/dQs=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/apis/policy/v1alpha1",
 			"path": "k8s.io/client-go/1.4/pkg/apis/policy/v1alpha1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "rNuAgLiP5Ju0p9aTFJDYj6vBpfE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/auth/user",
 			"path": "k8s.io/client-go/1.4/pkg/auth/user",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "DsLfLmarj7lv0hLZt5HSHOVtKXY=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/capabilities",
 			"path": "k8s.io/client-go/1.4/pkg/capabilities",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "TNizJbOxKVDFWKQh38cx+Fnf9sE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/conversion",
 			"path": "k8s.io/client-go/1.4/pkg/conversion",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "SNkQclx4MTM+/e/ky3hjyvFhm8Q=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/conversion/queryparams",
 			"path": "k8s.io/client-go/1.4/pkg/conversion/queryparams",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "GZ99BhZpcBiWIludtXXNguR6GLg=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/fields",
 			"path": "k8s.io/client-go/1.4/pkg/fields",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "JRnfOUtjqaFXA8JGzCcn57intX8=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/labels",
 			"path": "k8s.io/client-go/1.4/pkg/labels",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "CnJ/y2qfWFMaZfhkAz5BLrMpz68=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/runtime",
 			"path": "k8s.io/client-go/1.4/pkg/runtime",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "8vlT7wE7H9OJyzAFNP/QcVPwYfA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/runtime/serializer",
 			"path": "k8s.io/client-go/1.4/pkg/runtime/serializer",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "lXfOEHe+0MAOlGfp3eIj/4iqg6k=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/runtime/serializer/json",
 			"path": "k8s.io/client-go/1.4/pkg/runtime/serializer/json",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "+2XML+TSQlfmWw+O72K5NJgNE3A=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/runtime/serializer/protobuf",
 			"path": "k8s.io/client-go/1.4/pkg/runtime/serializer/protobuf",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "ypQP3jmUO9xLRBcqOJh/AO/cSKA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/runtime/serializer/recognizer",
 			"path": "k8s.io/client-go/1.4/pkg/runtime/serializer/recognizer",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "SkxnIa/cAG99h0ITZREIkOklNwU=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/runtime/serializer/streaming",
 			"path": "k8s.io/client-go/1.4/pkg/runtime/serializer/streaming",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "e9lUnKa5JP9k9ZmI2sPuJobZwuQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/runtime/serializer/versioning",
 			"path": "k8s.io/client-go/1.4/pkg/runtime/serializer/versioning",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "xe4xYwtwa+K6Pjza0LQlTok6pME=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/security/apparmor",
 			"path": "k8s.io/client-go/1.4/pkg/security/apparmor",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "NgGPhzlFczyH2AavM6RfnLrQZpU=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/selection",
 			"path": "k8s.io/client-go/1.4/pkg/selection",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "Yx4b42jVgPLSLD7579Rqg5nVJ3k=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/third_party/forked/golang/reflect",
 			"path": "k8s.io/client-go/1.4/pkg/third_party/forked/golang/reflect",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "nRPLcmzuzSAdGO+wqU5lX6l/oec=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/types",
 			"path": "k8s.io/client-go/1.4/pkg/types",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "mphuZJD+1GuJYTJdDr6+zWbODAs=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util",
 			"path": "k8s.io/client-go/1.4/pkg/util",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "+wnCbOQUq2I9R5dL5Qxc7uqrLoc=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/clock",
 			"path": "k8s.io/client-go/1.4/pkg/util/clock",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "v5pSTVOmbBzxH0nilub+R0IroNE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/config",
 			"path": "k8s.io/client-go/1.4/pkg/util/config",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "byQihmJdoztClrAbZKOvajvNpic=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/crypto",
 			"path": "k8s.io/client-go/1.4/pkg/util/crypto",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "TYNAYmnp2L8NOFV9VsecyXl/HrI=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/errors",
 			"path": "k8s.io/client-go/1.4/pkg/util/errors",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "JDz2qo5AH/UimnnbPSTjzGGX4LI=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/flowcontrol",
 			"path": "k8s.io/client-go/1.4/pkg/util/flowcontrol",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "1rkDcU7L1cna1uxrek21U5awEJg=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/framer",
 			"path": "k8s.io/client-go/1.4/pkg/util/framer",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "WUK0YkoM2uoDAhhEZ0+lWcRmCSs=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/hash",
 			"path": "k8s.io/client-go/1.4/pkg/util/hash",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "dLvmFVHXD0oEzEhXQjuAaPqIeeM=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/homedir",
 			"path": "k8s.io/client-go/1.4/pkg/util/homedir",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "p1Ayc8z1eYs9Ak4pacMytQI0TvE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/integer",
 			"path": "k8s.io/client-go/1.4/pkg/util/integer",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "5WJdMGFWdXa0Wa/MsGnrpePUl+U=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/intstr",
 			"path": "k8s.io/client-go/1.4/pkg/util/intstr",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "5eJzfiDmuUN5XIntjPhZyjAaSAQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/json",
 			"path": "k8s.io/client-go/1.4/pkg/util/json",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "BW8SzA/2mC9XCziS3UX5aryLHSs=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/labels",
 			"path": "k8s.io/client-go/1.4/pkg/util/labels",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "bLm6QaGC144QfXbjCOkXF6ll198=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/net",
 			"path": "k8s.io/client-go/1.4/pkg/util/net",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "nc9HZDnHc7XgrYaPcuMNdbHMtwE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/net/sets",
 			"path": "k8s.io/client-go/1.4/pkg/util/net/sets",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "AxA+jaHPck3rVqXA9+rpxSKF6ig=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/parsers",
 			"path": "k8s.io/client-go/1.4/pkg/util/parsers",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "xYfseBN9hky3NMc/fYu1Bca25z4=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/rand",
 			"path": "k8s.io/client-go/1.4/pkg/util/rand",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "T/fREIF2lo/iCc0gUtZxRdEIUOA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/runtime",
 			"path": "k8s.io/client-go/1.4/pkg/util/runtime",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "CMlEQHtXcO+Wqp0eGlmhgsfDCP0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/sets",
 			"path": "k8s.io/client-go/1.4/pkg/util/sets",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "eQb23MSjdK//6Yb82YB30j0MLw8=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/uuid",
 			"path": "k8s.io/client-go/1.4/pkg/util/uuid",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "YH1XX914MKo71yRxNPM4aOcTGgA=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/validation",
 			"path": "k8s.io/client-go/1.4/pkg/util/validation",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "/jqBMkr4ezyXJDSOFXI3qdMLI1A=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/validation/field",
 			"path": "k8s.io/client-go/1.4/pkg/util/validation/field",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "x8UOJEn3tOx2vLxtzvoo4a5Htqg=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/wait",
 			"path": "k8s.io/client-go/1.4/pkg/util/wait",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "NzftvrCMFBa/NEuw+vR4l5S9OQ0=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/util/yaml",
 			"path": "k8s.io/client-go/1.4/pkg/util/yaml",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "SMoX2/yP+9uWj63zi59fFCyI4v8=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/version",
 			"path": "k8s.io/client-go/1.4/pkg/version",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "caihJivdOizvv2ILuicWntsQ4Rc=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/watch",
 			"path": "k8s.io/client-go/1.4/pkg/watch",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "JInZpHc05yCvUJJ7C++V70c9vjo=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/pkg/watch/versioned",
 			"path": "k8s.io/client-go/1.4/pkg/watch/versioned",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "drHb9JbtevPiO4Q6X0rxwV3r0aE=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/rest",
 			"path": "k8s.io/client-go/1.4/rest",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "Jh5aRWjUgTleFOWX53lpbMIvHOQ=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/tools/auth",
 			"path": "k8s.io/client-go/1.4/tools/auth",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "HNta+C6pGjDyIJ6oytoTQ/ZA7Ss=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/tools/clientcmd",
 			"path": "k8s.io/client-go/1.4/tools/clientcmd",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "vgy7QYY5VMe2zCcQkHJe45Z/8ic=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/tools/clientcmd/api",
 			"path": "k8s.io/client-go/1.4/tools/clientcmd/api",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "QERmUdXk/vlvx2dAw+RgW3UY8lo=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/tools/clientcmd/api/latest",
 			"path": "k8s.io/client-go/1.4/tools/clientcmd/api/latest",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "biYigSMVVT9ipIWcf+hENnDasIw=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/tools/clientcmd/api/v1",
 			"path": "k8s.io/client-go/1.4/tools/clientcmd/api/v1",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "Krb+RRSWBlRPCyJrJMjKwQFB4EU=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/tools/metrics",
 			"path": "k8s.io/client-go/1.4/tools/metrics",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
 		},
 		{
 			"checksumSHA1": "ttP6BUoLQB9Ny16ywbEMuFtX4FI=",
+			"origin": "github.com/HeavyHorst/remco/vendor/k8s.io/client-go/1.4/transport",
 			"path": "k8s.io/client-go/1.4/transport",
 			"revision": "c589d0c9f0d81640c518354c7bcae77d99820aa3",
 			"revisionTime": "2016-09-30T00:14:02Z"
