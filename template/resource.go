@@ -84,7 +84,7 @@ func NewResource(backends []Backend, sources []*ProcessConfig) (*Resource, error
 		store := memkv.New()
 		tr.backends[i].store = &store
 
-		if tr.backends[i].Interval <= 0 && tr.backends[i].Onetime == false {
+		if tr.backends[i].Interval <= 0 && tr.backends[i].Onetime == false && tr.backends[i].Watch == false {
 			log.Warning("Interval needs to be > 0: setting interval to 60")
 			tr.backends[i].Interval = 60
 		}
