@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=0.2.1-dev
+version=0.3.0
 date=`date -u '+%Y-%m-%d %H:%M:%S'`
 commit=`git rev-parse HEAD`
 
