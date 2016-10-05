@@ -12,9 +12,7 @@ Remcos main purposes are (like confd's):
    - remco can be remotely configured over etcd, consul, file etc..
    - [pongo2](https://github.com/flosch/pongo2) template engine instead of go's text/template
 
-## Documentation
-### [Configuration](https://github.com/HeavyHorst/remco/blob/master/docs/config.md)
-### [Template](http://documentup.com/HeavyHorst/remco/docs/template)
+## [Documentation](https://heavyhorst.github.io/remco/)
 
 ## Project Status
 Remco is at an early stage and under active development. We do not recommend its use in production, but we encourage you to try out Remco and provide feedback via issues and pull requests.
