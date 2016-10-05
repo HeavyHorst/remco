@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Config-rsses on Remco Docs</title>
+    <link>https://heavyhorst.github.io/remco/config/index.xml</link>
+    <description>Recent content in Config-rsses on Remco Docs</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Released under the MIT license</copyright>
+    <lastBuildDate>Wed, 05 Oct 2016 17:24:57 +0200</lastBuildDate>
+    <atom:link href="https://heavyhorst.github.io/remco/config/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Configuring remco</title>
+      <link>https://heavyhorst.github.io/remco/config/</link>
+      <pubDate>Wed, 05 Oct 2016 17:24:57 +0200</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/config/</guid>
+      <description>
+
+&lt;p&gt;The configuration file is in TOML format.&lt;br&gt;
+TOML looks very similar to INI configuration formats, but with slightly more rich data structures and nesting support.&lt;/p&gt;
+
+&lt;h2 id=&#34;using-environment-variables&#34;&gt;Using Environment Variables&lt;/h2&gt;
+
+&lt;p&gt;If you wish to use environmental variables in your config files as a way
+to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and the text will be replaced with the value of the environmental variable VARIABLE_NAME.&lt;/p&gt;
+
+&lt;h2 id=&#34;global-configuration-options&#34;&gt;Global configuration options&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;log_level(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Valid levels are panic, fatal, error, warn, info and debug. Default is info.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;log_format(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The format of the log messages. Valid formats are &lt;em&gt;text&lt;/em&gt; and &lt;em&gt;json&lt;/em&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;template-configuration-options&#34;&gt;Template configuration options&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;src(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The path of the template that will be used to render the application&amp;rsquo;s configuration file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;dst(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The location to place the rendered configuration file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;checkCmd(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The command to check config. Use {{.src}} to reference the rendered source template.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;reloadCmd(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The command to reload config.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;mode(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The permission mode of the file. Default is &amp;ldquo;0644&amp;rdquo;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;backend-configuration-options&#34;&gt;Backend configuration options&lt;/h2&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;valid in every backend&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;watch(bool, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Enable watch support. Default is false.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;prefix(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Key path prefix. Default is &amp;ldquo;&amp;rdquo;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;interval(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The backend polling interval. Only used when watch mode is disabled.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;onetime(bool, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Render the config file and quit. Only used when watch mode is disabled. Default is false.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;keys([]string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The backend keys that the template requires to be rendered correctly. The child keys are also loaded.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;etcd&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;nodes([]string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;List of backend nodes.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_cert(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client cert file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_key(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client key file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_ca_keys(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client CA key file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;basic_auth(bool, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Use Basic Auth to authenticate. Default is false.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;username(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The username for the basic_auth authentication.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;password(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The password for the basic_auth authentication.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;version(uint, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The etcd api-level to use (2 or 3). Default is 2.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;configmap (kubernetes)&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;kubeConfig(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Absolute path to the kubeconfig file&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;name(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The name of the kubernetes configMap&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;namespace(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The kubernetes namespace
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;consul&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;nodes([]string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;List of backend nodes.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;scheme(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;the backend URI scheme (http or https).&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_cert(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client cert file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_key(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client key file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_ca_keys(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client CA key file.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;file&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;filepath(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The filepath to a yaml or json file containing the key-value pairs.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;redis&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;nodes([]string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;List of backend nodes.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;password(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The redis password.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;vault&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;node(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The backend node.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;auth_type(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The vault authentication type. (token, approle, app-id, userpass, github)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;auth_token(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The vault authentication token. Only used with auth_type=token or github.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;app_role(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The vault app role. Only used with auth_type=approle.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;secret_id(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The vault secret id. Only used with auth_type=approle.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;app_id(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The vault app ID. Only used with auth_type=app-id.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;user_id(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The vault user ID. Only used with auth_type=app-id.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;username(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The username for the userpass authentication.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;password(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The password for the userpass authentication.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_cert(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client cert file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_key(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client key file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client_ca_keys(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The client CA key file.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Sample configuration file</title>
+      <link>https://heavyhorst.github.io/remco/config/sample/</link>
+      <pubDate>Wed, 05 Oct 2016 17:24:57 +0200</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/config/sample/</guid>
+      <description>&lt;pre&gt;&lt;code&gt;#remco.toml
+################################################################
+# Global configuration
+################################################################
+log_level = &amp;quot;debug&amp;quot;
+log_format = &amp;quot;text&amp;quot;
+
+
+################################################################
+# Resource configuration
+################################################################
+[[resource]]
+  [[resource.template]]
+    src = &amp;quot;/etc/confd/templates/test.cfg&amp;quot;
+    dst = &amp;quot;/home/rkaufmann/haproxy.cfg&amp;quot;
+    checkCmd = &amp;quot;&amp;quot;
+    reloadCmd = &amp;quot;&amp;quot;
+    mode = &amp;quot;0644&amp;quot;
+
+  [resource.backend]
+    [resource.backend.etcd]
+      nodes = [&amp;quot;127.0.0.1:2379&amp;quot;]
+      client_cert = &amp;quot;/path/to/client_cert&amp;quot;
+      client_key = &amp;quot;/path/to/client_key&amp;quot;
+      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
+      basic_auth = false
+      username = &amp;quot;admin&amp;quot;
+      password = &amp;quot;p@SsWord&amp;quot;
+      version = 3
+
+      # These values are valid in every backend
+      watch = true
+      prefix = &amp;quot;/&amp;quot;
+      onetime = true
+      interval = 1
+      keys = [&amp;quot;/&amp;quot;]
+
+    [resource.backend.file]
+      filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
+
+    [resource.backend.consul]
+      nodes = [&amp;quot;127.0.0.1:8500&amp;quot;]
+      scheme = &amp;quot;http&amp;quot; #{http/https}
+      client_cert = &amp;quot;/path/to/client_cert&amp;quot;
+      client_key = &amp;quot;/path/to/client_key&amp;quot;
+      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
+    
+    [resource.backend.vault]
+      node = &amp;quot;http://127.0.0.1:8200&amp;quot;
+	    ## Token based auth backend
+      auth_type = &amp;quot;token&amp;quot;
+      auth_token = &amp;quot;vault_token&amp;quot;
+      ## AppID based auth backend
+      # auth_type = &amp;quot;app-id&amp;quot;
+      # app_id = &amp;quot;vault_app_id&amp;quot;
+      # user_id = &amp;quot;vault_user_id&amp;quot;
+      ## userpass based auth backend
+      # auth_type = &amp;quot;userpass&amp;quot;
+      # username = &amp;quot;username&amp;quot;
+      # password = &amp;quot;password&amp;quot;
+      client_cert = &amp;quot;/path/to/client_cert&amp;quot;
+      client_key = &amp;quot;/path/to/client_key&amp;quot;
+      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

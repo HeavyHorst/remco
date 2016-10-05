@@ -1,17 +1,23 @@
-#Configuring remco
-The configuration file is in TOML format. TOML looks very similar to INI configuration formats, but with slightly more rich data structures and nesting support.
+---
+date: 2016-10-05T17:24:57+02:00
+type: index
+title: Configuring remco
+---
 
-##Using Environment Variables
+The configuration file is in TOML format.<br>
+TOML looks very similar to INI configuration formats, but with slightly more rich data structures and nesting support.
+
+## Using Environment Variables
 If you wish to use environmental variables in your config files as a way
 to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and the text will be replaced with the value of the environmental variable VARIABLE_NAME.
 
-##Global configuration options
+## Global configuration options
  - **log_level(string):** 
    - Valid levels are panic, fatal, error, warn, info and debug. Default is info.
  - **log_format(string):** 
    - The format of the log messages. Valid formats are *text* and *json*.
 
-##Template configuration options
+## Template configuration options
  - **src(string):**
     - The path of the template that will be used to render the application's configuration file.
  - **dst(string):**
@@ -23,9 +29,11 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
  - **mode(string, optional):**
     - The permission mode of the file. Default is "0644".
 
-##Backend configuration options
+## Backend configuration options
 
-###valid in every backend
+<details>
+<summary> **valid in every backend** </summary>
+
  - **watch(bool, optional):**
    - Enable watch support. Default is false.
  - **prefix(string):**
@@ -36,8 +44,11 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - Render the config file and quit. Only used when watch mode is disabled. Default is false.
  - **keys([]string):**
    - The backend keys that the template requires to be rendered correctly. The child keys are also loaded.
+</details>
 
-###etcd
+<details>
+<summary> **etcd** </summary>
+
  - **nodes([]string):**
    - List of backend nodes.
  - **client_cert(string, optional):**
@@ -54,16 +65,22 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - The password for the basic_auth authentication.
  - **version(uint, optional):**
    - The etcd api-level to use (2 or 3). Default is 2.
+</details>
 
-###configmap (kubernetes)
+<details>
+<summary> **configmap (kubernetes)** </summary>
+
  - **kubeConfig(string, optional):**
    - Absolute path to the kubeconfig file
  - **name(string):**
    - The name of the kubernetes configMap
  - **namespace(string):**
    - The kubernetes namespace
+</details>
 
-###consul
+<details>
+<summary> **consul** </summary>
+
  - **nodes([]string):**
     - List of backend nodes.
  - **scheme(string):**
@@ -74,18 +91,27 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - The client key file.
  - **client_ca_keys(string, optional):**
    - The client CA key file.
+</details>
 
-###file
+<details>
+<summary> **file** </summary>
+
  - **filepath(string):**
    - The filepath to a yaml or json file containing the key-value pairs.
+</details>
 
-###redis
+<details>
+<summary> **redis** </summary>
+
  - **nodes([]string):**
    - List of backend nodes.
  - **password(string, optional):**
    - The redis password.
+</details>
 
-###vault
+<details>
+<summary> **vault** </summary>
+
  - **node(string):**
     - The backend node.
  - **auth_type(string):**
@@ -110,35 +136,4 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - The client key file.
  - **client_ca_keys(string, optional):**
    - The client CA key file.
-
-#Example
-```TOML
-log_level = "debug"
-log_format = "text"
-
-[[resource]]
-  [[resource.template]]
-    src = "/path/to/template"
-    dst = "/path/to/destionation/file"
-    checkCmd = ""
-    reloadCmd = ""
-    mode = "0644"
-    
-    [resource.backend.etcd]
-      nodes = ["127.0.0.1:2379"]
-      version = 3
-      watch = true
-      prefix = "/production"
-      keys = ["/some_key"]
-      
-    [resource.backend.vault]
-      node = "http://127.0.0.1:8200"
-      auth_type = "token"
-      auth_token = "vault_token"
-      client_cert = "/path/to/client_cert"
-      client_key = "/path/to/client_key"
-      client_ca_keys = "/path/to/client_ca_keys"
-      interval = 60
-      prefix = "/production"
-      keys = ["/some_secret_key"]
-```
+</details>

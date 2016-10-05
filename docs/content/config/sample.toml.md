@@ -1,3 +1,10 @@
+---
+date: 2016-10-05T17:24:57+02:00
+title: Sample configuration file
+---
+
+
+```
 #remco.toml
 ################################################################
 # Global configuration
@@ -62,5 +69,4 @@ log_format = "text"
       client_key = "/path/to/client_key"
       client_ca_keys = "/path/to/client_ca_keys"
 
-
-      
+```      

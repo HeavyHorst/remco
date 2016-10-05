@@ -1,0 +1,72 @@
+baseurl = "https://heavyhorst.github.io/remco"
+languageCode = "en-us"
+title = "Remco Docs"
+theme = "hugo-material-docs"
+metadataformat = "yaml"
+canonifyurls = true
+# Enable Google Analytics by entering your tracking id
+googleAnalytics = ""
+
+[params]
+	# General information
+	author = "The remco authors"
+	description = "remco is a lightweight configuration management tool"
+	copyright = "Released under the MIT license"
+
+	# Repository
+	provider = "GitHub"
+	repo_url = "https://github.com/HeavyHorst/remco"
+
+	version = "0.3.0"
+	logo = "images/logo.png"
+	favicon = ""
+
+	permalink = "#"
+
+	# Custom assets
+	custom_css = []
+	custom_js  = []
+
+	# Syntax highlighting theme
+	highlight_css  = ""
+
+	[params.palette]
+    	primary = "red"
+    	accent  = "teal"
+
+    [params.font]
+    	text = "Ubuntu"
+    	code = "Ubuntu Mono"
+
+
+[social]
+	twitter = ""
+	github  = "heavyhorst"
+
+[[menu.main]]
+	name   = "Configuring remco"
+	url    = "config/"
+	weight = 10
+
+
+[[menu.main]]
+	name   = "Sample configuration"
+	url    = "config/sample"
+	weight = 20
+
+[[menu.main]]
+	name   = "Template"
+	url    = "template/"
+	weight = 30
+
+[[menu.main]]
+	name   = "License"
+	url    = "license/"
+	weight = 40
+
+
+[blackfriday]
+	smartypants	= true
+	fractions = true
+	smartDashes = true
+	plainIDAnchors = true
