@@ -1,11 +1,9 @@
-baseurl = "https://heavyhorst.github.io/remco"
+baseurl = "https://heavyhorst.github.io/remco/"
 languageCode = "en-us"
 title = "Remco Docs"
 theme = "hugo-material-docs"
 metadataformat = "yaml"
 canonifyurls = true
-# Enable Google Analytics by entering your tracking id
-googleAnalytics = ""
 
 [params]
 	# General information
