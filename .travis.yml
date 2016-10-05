@@ -1,0 +1,39 @@
+language: go
+
+before_install:
+  # install consul
+  - wget https://releases.hashicorp.com/consul/0.7.0/consul_0.7.0_linux_amd64.zip
+  - unzip consul_0.7.0_linux_amd64.zip
+  - sudo mv consul /bin/
+  - consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul &
+  # install etcd
+  - curl -L https://github.com/coreos/etcd/releases/download/v3.0.9/etcd-v3.0.9-linux-amd64.tar.gz -o etcd-v3.0.9-linux-amd64.tar.gz
+  - tar xzf etcd-v3.0.9-linux-amd64.tar.gz
+  - sudo mv etcd-v3.0.9-linux-amd64/etcd /bin/
+  - sudo mv etcd-v3.0.9-linux-amd64/etcdctl /bin/
+  - etcd &
+  # Install vault
+  - wget https://releases.hashicorp.com/vault/0.6.1/vault_0.6.1_linux_amd64.zip
+  - unzip vault_0.6.1_linux_amd64.zip
+  - sudo mv vault /bin/
+  - vault server -dev &
+
+go:
+  - 1.6
+  - 1.7
+
+env:
+  - VAULT_ADDR='http://127.0.0.1:8200'
+
+services:
+  - redis
+
+script:
+  - ./test
+  - bash integration/consul/test.sh
+  - bash integration/etcdv2/test.sh
+  - bash integration/etcdv3/test.sh
+  - bash integration/file/test.sh
+  - bash integration/vault/test.sh
+  - bash integration/redis/test.sh
+  - bash integration/env/test.sh

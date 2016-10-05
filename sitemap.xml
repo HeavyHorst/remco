@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/</loc>
+    <lastmod>2016-10-05T17:33:14+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/template/</loc>
+    <lastmod>2016-10-05T17:33:14+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/config/</loc>
+    <lastmod>2016-10-05T17:24:57+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/config/sample/</loc>
+    <lastmod>2016-10-05T17:24:57+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/license/</loc>
+    <lastmod>2016-10-05T17:11:10+02:00</lastmod>
+  </url>
+  
+</urlset>
