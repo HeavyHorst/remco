@@ -29,8 +29,8 @@ canonifyurls = true
 	highlight_css  = ""
 
 	[params.palette]
-    	primary = "red"
-    	accent  = "teal"
+    	primary = "teal"
+    	accent  = "green"
 
     [params.font]
     	text = "Ubuntu"
