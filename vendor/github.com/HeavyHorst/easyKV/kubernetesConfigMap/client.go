@@ -10,6 +10,7 @@ package kubernetesConfigMap
 
 import (
 	"strings"
+	"time"
 
 	"github.com/HeavyHorst/easyKV"
 	"k8s.io/client-go/1.4/kubernetes"
@@ -51,6 +52,8 @@ func New(namespace, name string, opts ...Option) (easyKV.ReadWatcher, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	clientset.CoreClient.Client.Timeout = 5 * time.Second
 
 	return &Client{
 		client:     clientset,

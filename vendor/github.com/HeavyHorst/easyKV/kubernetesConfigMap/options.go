@@ -16,6 +16,9 @@ type Options struct {
 // Option configures the kubernetes client
 type Option func(*Options)
 
+// WithConfig configures the kubernetes client with the given kubeconfig.
+// For example ~/.kube/config
+// This is only needed if remco is running outside of an kubernetes pod.
 func WithConfig(c string) Option {
 	return func(o *Options) {
 		o.Config = c
