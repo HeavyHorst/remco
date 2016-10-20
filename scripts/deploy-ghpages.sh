@@ -28,11 +28,12 @@ rm -rf out/**/* || exit 0
 # Install hugo
 wget https://github.com/spf13/hugo/releases/download/v0.17/hugo_0.17_Linux-64bit.tar.gz
 tar -xf hugo_0.17_Linux-64bit.tar.gz
-mv hugo_0.17_linux_amd64/hugo_0.17_linux_amd64 /bin/hugo
+mv hugo_0.17_linux_amd64/hugo_0.17_linux_amd64 hugo
+chmod +x hugo
 
 # Build the page
 cd docs
-hugo
+../hugo
 cd ..
 mv docs/public/* out/
 
