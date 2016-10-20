@@ -13,5 +13,5 @@ do
             -X 'main.buildDate=$date' 
 			-X 'main.commit=$commit'"
 
-    zip -r bin/remco_${version}_${os}_amd64.zip bin/remco_${os}
+    cd bin && zip -r remco_${version}_${os}_amd64.zip remco_${os} && cd ..
 done
