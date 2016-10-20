@@ -398,28 +398,6 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;configmap (kubernetes)&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;kubeConfig(string, optional):&lt;/strong&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Absolute path to the kubeconfig file&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;name(string):&lt;/strong&gt;
-
-&lt;ul&gt;
-&lt;li&gt;The name of the kubernetes configMap&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;namespace(string):&lt;/strong&gt;
-
-&lt;ul&gt;
-&lt;li&gt;The kubernetes namespace
-&lt;/details&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;consul&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
 
 &lt;ul&gt;
