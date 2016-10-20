@@ -303,10 +303,12 @@ func (s Backend) watch(stopChan chan bool, processChan chan Backend) {
 		default:
 			index, err := s.WatchPrefix(s.Prefix, stopChan, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
 			if err != nil {
-				log.Error(err)
-				// Prevent backend errors from consuming all resources.
-				time.Sleep(time.Second * 2)
+				if err != easyKV.ErrWatchCanceled {
+					log.Error(err)
+					time.Sleep(2 * time.Second)
+				}
 				continue
+
 			}
 			processChan <- s
 			lastIndex = index

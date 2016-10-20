@@ -25,19 +25,9 @@ var (
 )
 
 func init() {
-	const (
-		defaultConfig = "/etc/remco/config"
-	)
+	const defaultConfig = "/etc/remco/config"
 	flag.StringVar(&fileConfig.Filepath, "config", defaultConfig, "path to the configuration file")
 	flag.BoolVar(&printVersionAndExit, "version", false, "print version and exit")
-
-	// glog(used in the kubernetes-client) registers some flags that we don't want to show
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s [options]\n", os.Args[0])
-		fmt.Fprintln(os.Stderr, "Parameters:")
-		fmt.Fprintln(os.Stderr, "  -config string\n\tpath to the configuration file (default \"/etc/remco/config\")")
-		fmt.Fprintln(os.Stderr, "  -version\n\tprint version and exit")
-	}
 }
 
 func run() {
@@ -56,16 +46,9 @@ func run() {
 		log.Fatal(err.Error())
 	}
 
-	cfgWatcher := newConfigWatcher(fileConfig.Filepath, s.ReadWatcher, c)
-	defer cfgWatcher.stop()
-
 	done := make(chan struct{})
-	go func() {
-		// If there is no goroutine left - quit
-		// this is needed for the onetime mode
-		cfgWatcher.waitAndExit.Wait()
-		close(done)
-	}()
+	cfgWatcher := newConfigWatcher(fileConfig.Filepath, s.ReadWatcher, c, done)
+	defer cfgWatcher.stop()
 
 	for {
 		select {

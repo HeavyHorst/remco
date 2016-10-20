@@ -10,7 +10,6 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/HeavyHorst/easyKV"
@@ -19,19 +18,17 @@ import (
 
 // the configWatcher watches the config file for changes
 type configWatcher struct {
-	waitAndExit   *sync.WaitGroup
-	stopped       chan struct{}
+	stoppedCW     chan struct{}
+	stoppedW      chan struct{}
 	stopWatchConf chan bool
 	stopWatch     chan bool
 	filePath      string
 }
 
 func (w *configWatcher) startWatch(c tomlConf) {
-	w.waitAndExit.Add(1)
 	go func() {
 		defer func() {
-			w.waitAndExit.Done()
-			w.stopped <- struct{}{}
+			w.stoppedW <- struct{}{}
 		}()
 		c.run(w.stopWatch)
 	}()
@@ -55,20 +52,17 @@ func (w *configWatcher) reload() {
 		log.Error(err)
 		return
 	}
-	// waitAndExit is temporally increased by 1, so that the program don't terminate after stopWatch
-	w.waitAndExit.Add(1)
 	// stop the old watcher and wait until it has stopped
 	w.stopWatch <- true
-	<-w.stopped
+	<-w.stoppedW
 	// start a new watcher
 	w.startWatch(newConf)
-	w.waitAndExit.Done()
 }
 
-func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlConf) *configWatcher {
+func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlConf, done chan struct{}) *configWatcher {
 	w := &configWatcher{
-		waitAndExit:   &sync.WaitGroup{},
-		stopped:       make(chan struct{}),
+		stoppedW:      make(chan struct{}),
+		stoppedCW:     make(chan struct{}),
 		stopWatchConf: make(chan bool),
 		stopWatch:     make(chan bool),
 		filePath:      filepath,
@@ -76,22 +70,40 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlCo
 
 	w.startWatch(config)
 
+	reload := make(chan struct{})
 	go func() {
 		// watch the config for changes
 		for {
 			select {
 			case <-w.stopWatchConf:
-				w.stopped <- struct{}{}
+				w.stoppedCW <- struct{}{}
 				return
 			default:
 				_, err := watcher.WatchPrefix("", w.stopWatchConf, easyKV.WithKeys([]string{""}))
 				if err != nil {
-					log.Error(err)
-					time.Sleep(2 * time.Second)
+					if err != easyKV.ErrWatchCanceled {
+						log.Error(err)
+						time.Sleep(2 * time.Second)
+					}
 					continue
 				}
 				time.Sleep(1 * time.Second)
+				//w.reload()
+				reload <- struct{}{}
+			}
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case <-reload:
 				w.reload()
+			case <-w.stoppedW:
+				close(done)
+				// there is no runnign startWatch function which can answer to the stop method
+				// we need to send to the w.stoppedW channel so that we not block
+				w.stoppedW <- struct{}{}
 			}
 		}
 	}()
@@ -102,6 +114,6 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlCo
 func (w *configWatcher) stop() {
 	close(w.stopWatchConf)
 	close(w.stopWatch)
-	<-w.stopped
-	<-w.stopped
+	<-w.stoppedW
+	<-w.stoppedCW
 }
