@@ -119,7 +119,7 @@ func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.W
 	for {
 		select {
 		case <-stopChan:
-			return options.WaitIndex, nil
+			return options.WaitIndex, easyKV.ErrWatchCanceled
 		case r := <-respChan:
 			return r.waitIndex, r.err
 		}

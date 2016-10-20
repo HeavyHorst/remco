@@ -97,7 +97,7 @@ func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.W
 		case err := <-watcher.Errors:
 			return 0, err
 		case <-stopChan:
-			return 0, nil
+			return 0, easyKV.ErrWatchCanceled
 		}
 	}
 }

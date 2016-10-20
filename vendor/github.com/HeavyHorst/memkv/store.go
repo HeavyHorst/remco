@@ -1,32 +1,24 @@
-// Copyright 2014 Kelsey Hightower. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license found in the LICENSE file.
-
-// Package memkv implements an in-memory key/value store.
 package memkv
 
 import (
-	"errors"
 	"path"
 	"sort"
 	"strings"
 	"sync"
-)
 
-var ErrNotExist = errors.New("key does not exist")
-var ErrNoMatch = errors.New("no keys match")
+	"github.com/derekparker/trie"
+)
 
 // A Store represents an in-memory key-value store safe for
 // concurrent access.
 type Store struct {
 	FuncMap map[string]interface{}
 	sync.RWMutex
-	m map[string]KVPair
+	t *trie.Trie
 }
 
-// New creates and initializes a new Store.
 func New() Store {
-	s := Store{m: make(map[string]KVPair)}
+	s := Store{t: trie.New()}
 	s.FuncMap = map[string]interface{}{
 		"exists":    s.Exists,
 		"ls":        s.List,
@@ -43,26 +35,27 @@ func New() Store {
 // Delete deletes the KVPair associated with key.
 func (s Store) Del(key string) {
 	s.Lock()
-	delete(s.m, key)
+	s.t.Remove(key)
 	s.Unlock()
 }
 
 // Exists checks for the existence of key in the store.
 func (s Store) Exists(key string) bool {
-	kv := s.Get(key)
-	if kv.Value == "" {
-		return false
-	}
-	return true
+	s.RLock()
+	_, ok := s.t.Find(key)
+	s.RUnlock()
+	return ok
 }
 
 // Get gets the KVPair associated with key. If there is no KVPair
 // associated with key, Get returns KVPair{}.
 func (s Store) Get(key string) KVPair {
 	s.RLock()
-	kv := s.m[key]
-	s.RUnlock()
-	return kv
+	node, ok := s.t.Find(key)
+	if !ok {
+		return KVPair{}
+	}
+	return node.Meta().(KVPair)
 }
 
 // GetAll returns a KVPair for all nodes with keys matching pattern.
@@ -71,11 +64,12 @@ func (s Store) GetAll(pattern string) KVPairs {
 	ks := make(KVPairs, 0)
 	s.RLock()
 	defer s.RUnlock()
-	for _, kv := range s.m {
-		m, err := path.Match(pattern, kv.Key)
+	for _, k := range s.t.Keys() {
+		m, err := path.Match(pattern, k)
 		if err != nil {
 			return nil
 		}
+		kv := s.Get(k)
 		if m {
 			ks = append(ks, kv)
 		}
@@ -87,13 +81,22 @@ func (s Store) GetAll(pattern string) KVPairs {
 	return ks
 }
 
+func (s Store) GetAllValues(pattern string) []string {
+	vs := make([]string, 0)
+	for _, kv := range s.GetAll(pattern) {
+		vs = append(vs, kv.Value)
+	}
+	sort.Strings(vs)
+	return vs
+}
+
 // GetAllKVs returns all KV-Pairs
 func (s Store) GetAllKVs() KVPairs {
 	ks := make(KVPairs, 0)
 	s.RLock()
 	defer s.RUnlock()
-	for _, kv := range s.m {
-		ks = append(ks, kv)
+	for _, k := range s.t.Keys() {
+		ks = append(ks, s.Get(k))
 	}
 	sort.Sort(ks)
 	return ks
@@ -114,26 +117,18 @@ func (s Store) GetValue(key string, v ...string) string {
 	return kv.Value
 }
 
-func (s Store) GetAllValues(pattern string) []string {
-	vs := make([]string, 0)
-	for _, kv := range s.GetAll(pattern) {
-		vs = append(vs, kv.Value)
-	}
-	sort.Strings(vs)
-	return vs
-}
-
 func (s Store) List(filePath string) []string {
 	vs := make([]string, 0)
 	m := make(map[string]bool)
 	s.RLock()
 	defer s.RUnlock()
 	prefix := pathToTerms(filePath)
-	for _, kv := range s.m {
-		if kv.Key == filePath {
-			m[path.Base(kv.Key)] = true
+	for _, k := range s.t.PrefixSearch(filePath) {
+		if k == filePath {
+			m[path.Base(k)] = true
 			continue
 		}
+		kv := s.Get(k)
 		target := pathToTerms(path.Dir(kv.Key))
 		if samePrefixTerms(prefix, target) {
 			m[strings.Split(stripKey(kv.Key, filePath), "/")[0]] = true
@@ -151,14 +146,12 @@ func (s Store) ListDir(filePath string) []string {
 	m := make(map[string]bool)
 	s.RLock()
 	defer s.RUnlock()
-	for _, kv := range s.m {
-		if strings.HasPrefix(kv.Key, filePath) {
-			items := strings.Split(stripKey(kv.Key, filePath), "/")
-			if len(items) < 2 {
-				continue
-			}
-			m[items[0]] = true
+	for _, k := range s.t.PrefixSearch(filePath) {
+		items := strings.Split(stripKey(k, filePath), "/")
+		if len(items) < 2 {
+			continue
 		}
+		m[items[0]] = true
 	}
 	for k := range m {
 		vs = append(vs, k)
@@ -170,14 +163,14 @@ func (s Store) ListDir(filePath string) []string {
 // Set sets the KVPair entry associated with key to value.
 func (s Store) Set(key string, value string) {
 	s.Lock()
-	s.m[key] = KVPair{key, value}
+	s.t.Add(key, KVPair{key, value})
 	s.Unlock()
 }
 
 func (s Store) Purge() {
 	s.Lock()
-	for k := range s.m {
-		delete(s.m, k)
+	for _, k := range s.t.Keys() {
+		s.t.Remove(k)
 	}
 	s.Unlock()
 }
