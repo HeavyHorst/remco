@@ -68,17 +68,6 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 </details>
 
 <details>
-<summary> **configmap (kubernetes)** </summary>
-
- - **kubeConfig(string, optional):**
-   - Absolute path to the kubeconfig file
- - **name(string):**
-   - The name of the kubernetes configMap
- - **namespace(string):**
-   - The kubernetes namespace
-</details>
-
-<details>
 <summary> **consul** </summary>
 
  - **nodes([]string):**
