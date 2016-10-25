@@ -159,7 +159,7 @@ func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.W
 		resp, err := watcher.Next(ctx)
 		if err != nil {
 			if err == context.Canceled {
-				return 0, easyKV.ErrWatchCanceled
+				return options.WaitIndex, easyKV.ErrWatchCanceled
 			}
 			switch e := err.(type) {
 			case *client.Error:

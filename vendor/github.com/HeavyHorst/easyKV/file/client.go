@@ -10,6 +10,7 @@ package file
 
 import (
 	"io/ioutil"
+	"strings"
 
 	"github.com/HeavyHorst/easyKV"
 	"github.com/fsnotify/fsnotify"
@@ -30,6 +31,7 @@ func New(filepath string) (*Client, error) {
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	yamlMap := make(map[interface{}]interface{})
 	vars := make(map[string]string)
+	kvs := make(map[string]string)
 
 	data, err := ioutil.ReadFile(c.filepath)
 	if err != nil {
@@ -42,7 +44,15 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 
 	nodeWalk(yamlMap, "", vars)
 
-	return vars, nil
+	for _, k := range keys {
+		for key, val := range vars {
+			if strings.HasPrefix(key, k) {
+				kvs[key] = val
+			}
+		}
+	}
+
+	return kvs, nil
 }
 
 // Close closes the client connection

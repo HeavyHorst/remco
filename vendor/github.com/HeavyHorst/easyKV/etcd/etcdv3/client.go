@@ -125,7 +125,7 @@ func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.W
 		}
 	}
 	if ctx.Err() == context.Canceled {
-		return 0, easyKV.ErrWatchCanceled
+		return options.WaitIndex, easyKV.ErrWatchCanceled
 	}
 	return 0, err
 }
