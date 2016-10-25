@@ -524,6 +524,10 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;env&lt;/strong&gt; &lt;/summary&gt;
+&lt;/details&gt;&lt;/p&gt;
 </description>
     </item>
     
