@@ -99,7 +99,9 @@ func New(machines []string, opts ...Option) (*Client, error) {
 
 // Close closes the client connection
 func (c *Client) Close() {
-	c.client.Close()
+	if c.client != nil {
+		c.client.Close()
+	}
 }
 
 // GetValues queries redis for keys prefixed by prefix.
