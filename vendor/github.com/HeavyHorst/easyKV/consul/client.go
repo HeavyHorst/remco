@@ -11,6 +11,7 @@
 package consul
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
@@ -98,7 +99,7 @@ type watchResponse struct {
 }
 
 // WatchPrefix watches a specific prefix for changes.
-func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
 	var options easyKV.WatchOptions
 	for _, o := range opts {
 		o(&options)
@@ -118,7 +119,7 @@ func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.W
 	}()
 	for {
 		select {
-		case <-stopChan:
+		case <-ctx.Done():
 			return options.WaitIndex, easyKV.ErrWatchCanceled
 		case r := <-respChan:
 			return r.waitIndex, r.err

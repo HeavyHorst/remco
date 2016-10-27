@@ -19,9 +19,10 @@ import (
 	"strings"
 	"time"
 
+	"context"
+
 	"github.com/HeavyHorst/easyKV"
 	"github.com/coreos/etcd/client"
-	"golang.org/x/net/context"
 )
 
 // Client is a wrapper around the etcd client
@@ -132,7 +133,7 @@ func nodeWalk(node *client.Node, vars map[string]string) error {
 }
 
 // WatchPrefix watches a specific prefix for changes.
-func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
 	var options easyKV.WatchOptions
 	for _, o := range opts {
 		o(&options)
@@ -142,21 +143,10 @@ func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.W
 	// should start watching for events starting at the current
 	// index, whatever that may be.
 	watcher := c.client.Watcher(prefix, &client.WatcherOptions{AfterIndex: uint64(0), Recursive: true})
-	ctx, cancel := context.WithCancel(context.Background())
-	cancelRoutine := make(chan bool)
-	defer close(cancelRoutine)
-
-	go func() {
-		select {
-		case <-stopChan:
-			cancel()
-		case <-cancelRoutine:
-			return
-		}
-	}()
+	etcdctx, _ := context.WithCancel(ctx)
 
 	for {
-		resp, err := watcher.Next(ctx)
+		resp, err := watcher.Next(etcdctx)
 		if err != nil {
 			if err == context.Canceled {
 				return options.WaitIndex, easyKV.ErrWatchCanceled

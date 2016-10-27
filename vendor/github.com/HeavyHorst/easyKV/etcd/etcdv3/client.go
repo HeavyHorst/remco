@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"github.com/HeavyHorst/easyKV"
 	"github.com/coreos/etcd/clientv3"
@@ -87,27 +87,16 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 }
 
 // WatchPrefix watches a specific prefix for changes.
-func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
 	var options easyKV.WatchOptions
 	for _, o := range opts {
 		o(&options)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	cancelRoutine := make(chan bool)
-	defer close(cancelRoutine)
+	etcdctx, _ := context.WithCancel(ctx)
 	var err error
 
-	go func() {
-		select {
-		case <-stopChan:
-			cancel()
-		case <-cancelRoutine:
-			return
-		}
-	}()
-
-	rch := c.client.Watch(ctx, prefix, clientv3.WithPrefix())
+	rch := c.client.Watch(etcdctx, prefix, clientv3.WithPrefix())
 	for wresp := range rch {
 		if wresp.Err() != nil {
 			return options.WaitIndex, wresp.Err()

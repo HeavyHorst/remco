@@ -10,6 +10,7 @@ package main
 
 // tomlConf is the representation of an config file
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"sync"
@@ -78,7 +79,7 @@ func (c *tomlConf) loadGlobals() {
 }
 
 func (c *tomlConf) run(stop chan bool) {
-	stopChan := make(chan bool)
+	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan struct{})
 
 	c.loadGlobals()
@@ -124,7 +125,7 @@ func (c *tomlConf) run(stop chan bool) {
 				}
 				wait.Done()
 			}()
-			t.Monitor(stopChan)
+			t.Monitor(ctx)
 		}()
 	}
 
@@ -137,7 +138,7 @@ func (c *tomlConf) run(stop chan bool) {
 	for {
 		select {
 		case <-stop:
-			close(stopChan)
+			cancel()
 			wait.Wait()
 			return
 		case <-done:

@@ -9,6 +9,7 @@
 package file
 
 import (
+	"context"
 	"io/ioutil"
 	"strings"
 
@@ -86,7 +87,7 @@ func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]stri
 
 // WatchPrefix watches the file for changes with fsnotify.
 // Prefix, keys and waitIndex are only here to implement the StoreClient interface.
-func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return 0, err
@@ -106,7 +107,7 @@ func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.W
 			}
 		case err := <-watcher.Errors:
 			return 0, err
-		case <-stopChan:
+		case <-ctx.Done():
 			return 0, easyKV.ErrWatchCanceled
 		}
 	}

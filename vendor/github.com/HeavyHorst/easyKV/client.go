@@ -10,6 +10,8 @@
 
 package easyKV
 
+import "context"
+
 // WatchOptions represents options for watch operations
 type WatchOptions struct {
 	WaitIndex uint64
@@ -36,8 +38,6 @@ func WithWaitIndex(waitIndex uint64) WatchOption {
 // A ReadWatcher - can get values and watch a prefix for changes
 type ReadWatcher interface {
 	GetValues(keys []string) (map[string]string, error)
-	WatchPrefix(prefix string, stopChan chan bool, opts ...WatchOption) (uint64, error)
+	WatchPrefix(prefix string, ctx context.Context, opts ...WatchOption) (uint64, error)
 	Close()
 }
-
-// TODO - create more interfaces - ReadWriter?

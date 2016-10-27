@@ -11,6 +11,7 @@
 package env
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -65,6 +66,6 @@ func clean(key string) string {
 }
 
 // WatchPrefix - not implemented at the moment
-func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
 	return 0, easyKV.ErrWatchNotSupported
 }

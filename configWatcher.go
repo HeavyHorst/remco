@@ -9,6 +9,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -18,11 +19,10 @@ import (
 
 // the configWatcher watches the config file for changes
 type configWatcher struct {
-	stoppedCW     chan struct{}
-	stoppedW      chan struct{}
-	stopWatchConf chan bool
-	stopWatch     chan bool
-	filePath      string
+	stoppedW  chan struct{}
+	stopWatch chan bool
+	filePath  string
+	cancel    context.CancelFunc
 }
 
 func (w *configWatcher) startWatch(c tomlConf) {
@@ -61,25 +61,25 @@ func (w *configWatcher) reload() {
 
 func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlConf, done chan struct{}) *configWatcher {
 	w := &configWatcher{
-		stoppedW:      make(chan struct{}),
-		stoppedCW:     make(chan struct{}),
-		stopWatchConf: make(chan bool),
-		stopWatch:     make(chan bool),
-		filePath:      filepath,
+		stoppedW:  make(chan struct{}),
+		stopWatch: make(chan bool),
+		filePath:  filepath,
 	}
 
 	w.startWatch(config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	w.cancel = cancel
 
 	reload := make(chan struct{})
 	go func() {
 		// watch the config for changes
 		for {
 			select {
-			case <-w.stopWatchConf:
-				w.stoppedCW <- struct{}{}
+			case <-ctx.Done():
 				return
 			default:
-				_, err := watcher.WatchPrefix("", w.stopWatchConf, easyKV.WithKeys([]string{""}))
+				_, err := watcher.WatchPrefix("", ctx, easyKV.WithKeys([]string{""}))
 				if err != nil {
 					if err != easyKV.ErrWatchCanceled {
 						log.Error(err)
@@ -88,7 +88,6 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlCo
 					continue
 				}
 				time.Sleep(1 * time.Second)
-				//w.reload()
 				reload <- struct{}{}
 			}
 		}
@@ -102,7 +101,7 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlCo
 			case <-w.stoppedW:
 				close(done)
 				// there is no runnign startWatch function which can answer to the stop method
-				// we need to send to the w.stoppedW channel so that we not block
+				// we need to send to the w.stoppedW channel so that we don't block
 				w.stoppedW <- struct{}{}
 			}
 		}
@@ -112,8 +111,7 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlCo
 }
 
 func (w *configWatcher) stop() {
-	close(w.stopWatchConf)
+	w.cancel()
 	close(w.stopWatch)
 	<-w.stoppedW
-	<-w.stoppedCW
 }

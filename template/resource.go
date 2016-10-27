@@ -11,6 +11,7 @@
 package template
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -292,16 +293,16 @@ func (t *Resource) processAll() error {
 	return nil
 }
 
-func (s Backend) watch(stopChan chan bool, processChan chan Backend) {
+func (s Backend) watch(ctx context.Context, processChan chan Backend) {
 	var lastIndex uint64
 	keysPrefix := appendPrefix(s.Prefix, s.Keys)
 
 	for {
 		select {
-		case <-stopChan:
+		case <-ctx.Done():
 			return
 		default:
-			index, err := s.WatchPrefix(s.Prefix, stopChan, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
+			index, err := s.WatchPrefix(s.Prefix, ctx, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
 			if err != nil {
 				if err != easyKV.ErrWatchCanceled {
 					log.Error(err)
@@ -316,13 +317,13 @@ func (s Backend) watch(stopChan chan bool, processChan chan Backend) {
 	}
 }
 
-func (s Backend) interval(stopChan chan bool, processChan chan Backend) {
+func (s Backend) interval(ctx context.Context, processChan chan Backend) {
 	if s.Onetime {
 		return
 	}
 	for {
 		select {
-		case <-stopChan:
+		case <-ctx.Done():
 			return
 		case <-time.After(time.Duration(s.Interval) * time.Second):
 			processChan <- s
@@ -332,14 +333,14 @@ func (s Backend) interval(stopChan chan bool, processChan chan Backend) {
 
 // Monitor will start to monitor all given Backends for changes.
 // It will process all given tamplates on changes.
-func (t *Resource) Monitor(stopChan chan bool) {
+func (t *Resource) Monitor(ctx context.Context) {
 	wg := &sync.WaitGroup{}
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	done := make(chan struct{})
-	stopIntervalWatch := make(chan bool)
-	processChan := make(chan Backend)
+	//stopIntervalWatch := make(chan bool)
 
+	processChan := make(chan Backend)
 	defer close(processChan)
 
 	if err := t.processAll(); err != nil {
@@ -352,12 +353,12 @@ func (t *Resource) Monitor(stopChan chan bool) {
 			go func(s Backend) {
 				defer wg.Done()
 				//t.watch(s, stopChan, processChan)
-				s.watch(stopIntervalWatch, processChan)
+				s.watch(ctx, processChan)
 			}(sc)
 		} else {
 			go func(s Backend) {
 				defer wg.Done()
-				s.interval(stopIntervalWatch, processChan)
+				s.interval(ctx, processChan)
 			}(sc)
 		}
 	}
@@ -374,8 +375,7 @@ func (t *Resource) Monitor(stopChan chan bool) {
 			if err := t.process(storeClient); err != nil {
 				log.Error(err)
 			}
-		case <-stopChan:
-			close(stopIntervalWatch)
+		case <-ctx.Done():
 			go func() {
 				for range processChan {
 				}

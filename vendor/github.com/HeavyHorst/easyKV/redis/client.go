@@ -11,6 +11,7 @@
 package redis
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -154,6 +155,6 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 }
 
 // WatchPrefix is not yet implemented.
-func (c *Client) WatchPrefix(prefix string, stopChan chan bool, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
 	return 0, easyKV.ErrWatchNotSupported
 }
