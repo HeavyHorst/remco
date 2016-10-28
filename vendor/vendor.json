@@ -57,6 +57,12 @@
 			"revisionTime": "2016-10-27T20:04:33Z"
 		},
 		{
+			"checksumSHA1": "bCSYeHj3XMb/6WOa39dOivsPCt8=",
+			"path": "github.com/HeavyHorst/easyKV/zookeeper",
+			"revision": "6cd690cbc1b9066c544c89ca7b080d916becd7e5",
+			"revisionTime": "2016-10-28T15:50:38Z"
+		},
+		{
 			"checksumSHA1": "NJO5YmTADjqj9WlHBcJ9trlEgNU=",
 			"path": "github.com/HeavyHorst/memkv",
 			"revision": "78a64d7bd66c44d9757e08569e5681de67030f10",
@@ -352,6 +358,12 @@
 			"path": "github.com/naoina/toml/ast",
 			"revision": "751171607256bb66e64c9f0220c00662420c38e9",
 			"revisionTime": "2015-07-27T12:48:37Z"
+		},
+		{
+			"checksumSHA1": "egQy+ytQKjfBN1oRKQJ/pxIvjYc=",
+			"path": "github.com/samuel/go-zookeeper/zk",
+			"revision": "87e1bca4477a3cc767ca71be023ced183d74e538",
+			"revisionTime": "2016-09-02T21:22:55Z"
 		},
 		{
 			"checksumSHA1": "UADS3X1kxl+/qqeGcmTo0rBiXlQ=",
