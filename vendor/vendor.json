@@ -57,10 +57,10 @@
 			"revisionTime": "2016-10-27T20:04:33Z"
 		},
 		{
-			"checksumSHA1": "bCSYeHj3XMb/6WOa39dOivsPCt8=",
+			"checksumSHA1": "jFwOXMyuvP7lyWmI5qsiFXyHDSE=",
 			"path": "github.com/HeavyHorst/easyKV/zookeeper",
-			"revision": "6cd690cbc1b9066c544c89ca7b080d916becd7e5",
-			"revisionTime": "2016-10-28T15:50:38Z"
+			"revision": "687cf290039a77b9251b35f243dbfe81861153cf",
+			"revisionTime": "2016-10-28T16:33:28Z"
 		},
 		{
 			"checksumSHA1": "NJO5YmTADjqj9WlHBcJ9trlEgNU=",
@@ -360,10 +360,10 @@
 			"revisionTime": "2015-07-27T12:48:37Z"
 		},
 		{
-			"checksumSHA1": "egQy+ytQKjfBN1oRKQJ/pxIvjYc=",
-			"path": "github.com/samuel/go-zookeeper/zk",
-			"revision": "87e1bca4477a3cc767ca71be023ced183d74e538",
-			"revisionTime": "2016-09-02T21:22:55Z"
+			"checksumSHA1": "zhCUdA41Lov7Gat2XnzAmLHY6H4=",
+			"path": "github.com/tevino/go-zookeeper/zk",
+			"revision": "441b9d8c511d99bd5a136fd7c08170b20bdf0409",
+			"revisionTime": "2016-04-11T08:34:14Z"
 		},
 		{
 			"checksumSHA1": "UADS3X1kxl+/qqeGcmTo0rBiXlQ=",

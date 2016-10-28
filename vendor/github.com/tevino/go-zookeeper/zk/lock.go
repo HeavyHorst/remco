@@ -58,16 +58,8 @@ func (l *Lock) Lock() error {
 			parts := strings.Split(l.path, "/")
 			pth := ""
 			for _, p := range parts[1:] {
-				var exists bool
 				pth += "/" + p
-				exists, _, err = l.c.Exists(pth)
-				if err != nil {
-					return err
-				}
-				if exists == true {
-					continue
-				}
-				_, err = l.c.Create(pth, []byte{}, 0, l.acl)
+				_, err := l.c.Create(pth, []byte{}, 0, l.acl)
 				if err != nil && err != ErrNodeExists {
 					return err
 				}
@@ -116,7 +108,7 @@ func (l *Lock) Lock() error {
 		}
 
 		// Wait on the node next in line for the lock
-		_, _, ch, err := l.c.GetW(l.path + "/" + prevSeqPath)
+		_, _, w, err := l.c.GetW(l.path + "/" + prevSeqPath)
 		if err != nil && err != ErrNoNode {
 			return err
 		} else if err != nil && err == ErrNoNode {
@@ -124,7 +116,7 @@ func (l *Lock) Lock() error {
 			continue
 		}
 
-		ev := <-ch
+		ev := <-w.EvtCh
 		if ev.Err != nil {
 			return ev.Err
 		}

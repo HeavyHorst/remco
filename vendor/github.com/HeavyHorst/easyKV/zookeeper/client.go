@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/HeavyHorst/easyKV"
-	zk "github.com/samuel/go-zookeeper/zk"
+	zk "github.com/tevino/go-zookeeper/zk"
 )
 
 // Client provides a wrapper around the zookeeper client
@@ -103,27 +103,28 @@ type watchResponse struct {
 }
 
 func (c *Client) watch(key string, respChan chan watchResponse, ctx context.Context) {
-	_, _, keyEventCh, err := c.client.GetW(key)
+	_, _, keyWatcher, err := c.client.GetW(key)
 	if err != nil {
 		respChan <- watchResponse{0, err}
 	}
-	_, _, childEventCh, err := c.client.ChildrenW(key)
+	_, _, childWatcher, err := c.client.ChildrenW(key)
 	if err != nil {
 		respChan <- watchResponse{0, err}
 	}
 
 	for {
 		select {
-		case e := <-keyEventCh:
+		case e := <-keyWatcher.EvtCh:
 			if e.Type == zk.EventNodeDataChanged {
 				respChan <- watchResponse{1, e.Err}
 			}
-		case e := <-childEventCh:
+		case e := <-childWatcher.EvtCh:
 			if e.Type == zk.EventNodeChildrenChanged {
 				respChan <- watchResponse{1, e.Err}
 			}
 		case <-ctx.Done():
-			// There is no way to stop GetW/ChildrenW so just quit
+			c.client.RemoveWatcher(childWatcher)
+			c.client.RemoveWatcher(keyWatcher)
 			return
 		}
 	}
