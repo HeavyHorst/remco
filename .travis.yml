@@ -17,6 +17,14 @@ before_install:
   - unzip vault_0.6.1_linux_amd64.zip
   - sudo mv vault /bin/
   - vault server -dev &
+  # Install zookeeper
+  - wget http://www.eu.apache.org/dist/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz
+  - tar xzf zookeeper-3.4.8.tar.gz
+  - echo "tickTime=2000" > zookeeper-3.4.8/conf/zoo.cfg
+  - echo "dataDir=/tmp/zookeeper" >> zookeeper-3.4.8/conf/zoo.cfg
+  - echo "clientPort=2181" >> zookeeper-3.4.8/conf/zoo.cfg
+  - mkdir /tmp/zookeeper
+  - zookeeper-3.4.8/bin/zkServer.sh start
 
 go:
   - 1.7
@@ -36,5 +44,6 @@ script:
   - bash integration/vault/test.sh
   - bash integration/redis/test.sh
   - bash integration/env/test.sh
+  - bash integration/zookeeper/test.sh
 
 after_success: bash scripts/deploy-ghpages.sh
