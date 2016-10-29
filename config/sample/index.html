@@ -138,7 +138,7 @@
         </div>
       
       <div class="name">
-        <strong>Remco Docs <span class="version">0.3.2</span></strong>
+        <strong>Remco Docs <span class="version">master</span></strong>
         
           <br>
           HeavyHorst/remco
@@ -302,7 +302,6 @@ log_format = &quot;text&quot;
       client_cert = &quot;/path/to/client_cert&quot;
       client_key = &quot;/path/to/client_key&quot;
       client_ca_keys = &quot;/path/to/client_ca_keys&quot;
-      basic_auth = false
       username = &quot;admin&quot;
       password = &quot;p@SsWord&quot;
       version = 3
@@ -326,7 +325,7 @@ log_format = &quot;text&quot;
     
     [resource.backend.vault]
       node = &quot;http://127.0.0.1:8200&quot;
-	    ## Token based auth backend
+      ## Token based auth backend
       auth_type = &quot;token&quot;
       auth_token = &quot;vault_token&quot;
       ## AppID based auth backend

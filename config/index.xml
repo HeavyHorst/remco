@@ -129,11 +129,6 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;ul&gt;
 &lt;li&gt;The client CA key file.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;basic_auth(bool, optional):&lt;/strong&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Use Basic Auth to authenticate. Default is false.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;username(string, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
@@ -317,7 +312,6 @@ log_format = &amp;quot;text&amp;quot;
       client_cert = &amp;quot;/path/to/client_cert&amp;quot;
       client_key = &amp;quot;/path/to/client_key&amp;quot;
       client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
-      basic_auth = false
       username = &amp;quot;admin&amp;quot;
       password = &amp;quot;p@SsWord&amp;quot;
       version = 3
@@ -341,7 +335,7 @@ log_format = &amp;quot;text&amp;quot;
     
     [resource.backend.vault]
       node = &amp;quot;http://127.0.0.1:8200&amp;quot;
-	    ## Token based auth backend
+      ## Token based auth backend
       auth_type = &amp;quot;token&amp;quot;
       auth_token = &amp;quot;vault_token&amp;quot;
       ## AppID based auth backend
