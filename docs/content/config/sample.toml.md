@@ -30,7 +30,6 @@ log_format = "text"
       client_cert = "/path/to/client_cert"
       client_key = "/path/to/client_key"
       client_ca_keys = "/path/to/client_ca_keys"
-      basic_auth = false
       username = "admin"
       password = "p@SsWord"
       version = 3
@@ -54,7 +53,7 @@ log_format = "text"
     
     [resource.backend.vault]
       node = "http://127.0.0.1:8200"
-	    ## Token based auth backend
+      ## Token based auth backend
       auth_type = "token"
       auth_token = "vault_token"
       ## AppID based auth backend

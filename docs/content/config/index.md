@@ -57,8 +57,6 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - The client key file.
  - **client_ca_keys(string, optional):**
    - The client CA key file.
- - **basic_auth(bool, optional):**
-   - Use Basic Auth to authenticate. Default is false.
  - **username(string, optional):**
    - The username for the basic_auth authentication.
  - **password(string, optional):**

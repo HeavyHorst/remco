@@ -27,12 +27,17 @@ func New(machines []string, opts ...Option) (easyKV.ReadWatcher, error) {
 	}
 	options.Nodes = machines
 
+	ba := false
+	if options.Auth.Password != "" && options.Auth.Username != "" {
+		ba = true
+	}
+
 	if options.Version == 3 {
-		return etcdv3.NewEtcdClient(options.Nodes, options.TLS.ClientCert, options.TLS.ClientKey, options.TLS.ClientCaKeys, options.Auth.BasicAuth, options.Auth.Username, options.Auth.Password)
+		return etcdv3.NewEtcdClient(options.Nodes, options.TLS.ClientCert, options.TLS.ClientKey, options.TLS.ClientCaKeys, ba, options.Auth.Username, options.Auth.Password)
 	}
 
 	if options.Version == 2 {
-		return etcdv2.NewEtcdClient(options.Nodes, options.TLS.ClientCert, options.TLS.ClientKey, options.TLS.ClientCaKeys, options.Auth.BasicAuth, options.Auth.Username, options.Auth.Password)
+		return etcdv2.NewEtcdClient(options.Nodes, options.TLS.ClientCert, options.TLS.ClientKey, options.TLS.ClientCaKeys, ba, options.Auth.Username, options.Auth.Password)
 	}
 
 	return nil, ErrUnknownAPILevel

@@ -23,7 +23,6 @@ type Config struct {
 	ClientCert   string `toml:"client_cert"`
 	ClientKey    string `toml:"client_key"`
 	ClientCaKeys string `toml:"client_ca_keys"`
-	BasicAuth    bool   `toml:"basic_auth"`
 	Username     string
 	Password     string
 	Version      int
@@ -50,9 +49,8 @@ func (c *Config) Connect() (template.Backend, error) {
 
 	client, err = etcd.New(c.Nodes,
 		etcd.WithBasicAuth(etcd.BasicAuthOptions{
-			Username:  c.Username,
-			Password:  c.Password,
-			BasicAuth: c.BasicAuth,
+			Username: c.Username,
+			Password: c.Password,
 		}),
 		etcd.WithTLSOptions(etcd.TLSOptions{
 			ClientCert:   c.ClientCert,

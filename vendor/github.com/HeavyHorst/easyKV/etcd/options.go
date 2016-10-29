@@ -25,9 +25,8 @@ type TLSOptions struct {
 
 // BasicAuthOptions contains options regarding to basic authentication
 type BasicAuthOptions struct {
-	BasicAuth bool
-	Username  string
-	Password  string
+	Username string
+	Password string
 }
 
 // Option configures the etcd client
