@@ -21,12 +21,11 @@ import (
 var logger *log.Entry
 
 func init() {
-	host, _ := os.Hostname()
+	//host, _ := os.Hostname()
 	SetFormatter("text")
 	log.SetLevel(log.InfoLevel)
 	logger = log.WithFields(log.Fields{
-		"prefix":   fmt.Sprintf("%s[%d]", os.Args[0], os.Getpid()),
-		"hostname": host,
+		"prefix": fmt.Sprintf("%s[%d]", os.Args[0], os.Getpid()),
 	})
 }
 
