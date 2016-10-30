@@ -38,6 +38,10 @@ func SetFormatter(format string) {
 	}
 }
 
+// some log middleware handlers
+
+//withSource adds the field source to the logs
+//example: source=resource.go:310
 func withSource(l *log.Entry) *log.Entry {
 	_, file, line, ok := runtime.Caller(2)
 	if !ok {

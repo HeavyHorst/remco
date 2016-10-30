@@ -26,6 +26,7 @@ import (
 
 	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/memkv"
+	berr "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/Sirupsen/logrus"
@@ -263,31 +264,19 @@ func (t *Resource) setFileMode() error {
 // from the store, then we stage a candidate configuration file, and finally sync
 // things up.
 // It returns an error if any.
-func (t *Resource) process(storeClient Backend) error {
+func (t *Resource) process(storeClients []Backend) error {
 	if err := t.setFileMode(); err != nil {
 		return err
 	}
-	if err := t.setVars(storeClient); err != nil {
-		return err
-	}
-	if err := t.createStageFileAndSync(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (t *Resource) processAll() error {
-	//load all KV-pairs the first time
-	var err error
-	if err = t.setFileMode(); err != nil {
-		return err
-	}
-	for _, storeClient := range t.backends {
+	for _, storeClient := range storeClients {
 		if err := t.setVars(storeClient); err != nil {
-			return err
+			return berr.BackendError{
+				Message: err.Error(),
+				Backend: storeClient.Name,
+			}
 		}
 	}
-	if err = t.createStageFileAndSync(); err != nil {
+	if err := t.createStageFileAndSync(); err != nil {
 		return err
 	}
 	return nil
@@ -305,11 +294,12 @@ func (s Backend) watch(ctx context.Context, processChan chan Backend) {
 			index, err := s.WatchPrefix(s.Prefix, ctx, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
 			if err != nil {
 				if err != easyKV.ErrWatchCanceled {
-					log.Error(err)
+					log.WithFields(logrus.Fields{
+						"backend": s.Name,
+					}).Error(err)
 					time.Sleep(2 * time.Second)
 				}
 				continue
-
 			}
 			processChan <- s
 			lastIndex = index
@@ -338,13 +328,20 @@ func (t *Resource) Monitor(ctx context.Context) {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	done := make(chan struct{})
-	//stopIntervalWatch := make(chan bool)
 
 	processChan := make(chan Backend)
 	defer close(processChan)
 
-	if err := t.processAll(); err != nil {
-		log.Error(err)
+	if err := t.process(t.backends); err != nil {
+		switch err.(type) {
+		case berr.BackendError:
+			err := err.(berr.BackendError)
+			log.WithFields(logrus.Fields{
+				"backend": err.Backend,
+			}).Error(err)
+		default:
+			log.Error(err)
+		}
 	}
 
 	for _, sc := range t.backends {
@@ -352,7 +349,6 @@ func (t *Resource) Monitor(ctx context.Context) {
 		if sc.Watch {
 			go func(s Backend) {
 				defer wg.Done()
-				//t.watch(s, stopChan, processChan)
 				s.watch(ctx, processChan)
 			}(sc)
 		} else {
@@ -372,8 +368,14 @@ func (t *Resource) Monitor(ctx context.Context) {
 	for {
 		select {
 		case storeClient := <-processChan:
-			if err := t.process(storeClient); err != nil {
-				log.Error(err)
+			if err := t.process([]Backend{storeClient}); err != nil {
+				if _, ok := err.(berr.BackendError); ok {
+					log.WithFields(logrus.Fields{
+						"backend": storeClient.Name,
+					}).Error(err)
+				} else {
+					log.Error(err)
+				}
 			}
 		case <-ctx.Done():
 			go func() {
