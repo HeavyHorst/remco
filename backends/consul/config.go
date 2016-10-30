@@ -10,7 +10,7 @@ package consul
 
 import (
 	"github.com/HeavyHorst/easyKV/consul"
-	"github.com/HeavyHorst/remco/backends"
+	berr "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
@@ -29,7 +29,7 @@ type Config struct {
 // Connect creates a new consulClient and fills the underlying template.Backend with the consul-Backend specific data.
 func (c *Config) Connect() (template.Backend, error) {
 	if c == nil {
-		return template.Backend{}, backends.ErrNilConfig
+		return template.Backend{}, berr.ErrNilConfig
 	}
 
 	log.WithFields(logrus.Fields{

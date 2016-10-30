@@ -8,7 +8,6 @@
 
 package main
 
-// tomlConf is the representation of an config file
 import (
 	"context"
 	"io/ioutil"
@@ -16,33 +15,20 @@ import (
 	"sync"
 
 	"github.com/HeavyHorst/remco/backends"
-	"github.com/HeavyHorst/remco/backends/consul"
-	"github.com/HeavyHorst/remco/backends/env"
-	"github.com/HeavyHorst/remco/backends/etcd"
-	"github.com/HeavyHorst/remco/backends/file"
-	"github.com/HeavyHorst/remco/backends/redis"
-	"github.com/HeavyHorst/remco/backends/vault"
-	"github.com/HeavyHorst/remco/backends/zookeeper"
+	backendErrors "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
 	"github.com/naoina/toml"
 )
 
+// tomlConf is the representation of an config file
 type tomlConf struct {
 	LogLevel  string `toml:"log_level"`
 	LogFormat string `toml:"log_format"`
 	Resource  []struct {
 		Template []*template.ProcessConfig
-		Backend  struct {
-			Etcd      *etcd.Config
-			File      *file.Config
-			Env       *env.Config
-			Consul    *consul.Config
-			Vault     *vault.Config
-			Redis     *redis.Config
-			Zookeeper *zookeeper.Config
-		}
+		Backend  backends.Config
 	}
 }
 
@@ -89,21 +75,11 @@ func (c *tomlConf) run(stop chan bool) {
 	wait := &sync.WaitGroup{}
 	for _, v := range c.Resource {
 		var backendList []template.Backend
-		backendConfigMap := map[string]template.BackendConfig{
-			"etcd":      v.Backend.Etcd,
-			"file":      v.Backend.File,
-			"env":       v.Backend.Env,
-			"consul":    v.Backend.Consul,
-			"vault":     v.Backend.Vault,
-			"redis":     v.Backend.Redis,
-			"zookeeper": v.Backend.Zookeeper,
-		}
-
-		for name, config := range backendConfigMap {
+		for name, config := range v.Backend.GetBackends() {
 			b, err := config.Connect()
 			if err == nil {
 				backendList = append(backendList, b)
-			} else if err != backends.ErrNilConfig {
+			} else if err != backendErrors.ErrNilConfig {
 				log.WithFields(logrus.Fields{
 					"backend": name,
 				}).Error(err)

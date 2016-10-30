@@ -10,7 +10,7 @@ package env
 
 import (
 	"github.com/HeavyHorst/easyKV/env"
-	"github.com/HeavyHorst/remco/backends"
+	berr "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/template"
 )
 
@@ -22,7 +22,7 @@ type Config struct {
 // Connect creates a new envClient and fills the underlying template.Backend with the file-Backend specific data.
 func (c *Config) Connect() (template.Backend, error) {
 	if c == nil {
-		return template.Backend{}, backends.ErrNilConfig
+		return template.Backend{}, berr.ErrNilConfig
 	}
 
 	client, err := env.New()

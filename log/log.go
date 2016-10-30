@@ -21,7 +21,6 @@ import (
 var logger *log.Entry
 
 func init() {
-	//host, _ := os.Hostname()
 	SetFormatter("text")
 	log.SetLevel(log.InfoLevel)
 	logger = log.WithFields(log.Fields{
