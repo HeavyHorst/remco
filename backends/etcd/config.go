@@ -9,7 +9,6 @@
 package etcd
 
 import (
-	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/easyKV/etcd"
 	berr "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/log"
@@ -51,10 +50,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
 
-	var client easyKV.ReadWatcher
-	var err error
-
-	client, err = etcd.New(c.Nodes,
+	client, err := etcd.New(c.Nodes,
 		etcd.WithBasicAuth(etcd.BasicAuthOptions{
 			Username: c.Username,
 			Password: c.Password,
