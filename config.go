@@ -75,13 +75,13 @@ func (c *tomlConf) run(stop chan bool) {
 	wait := &sync.WaitGroup{}
 	for _, v := range c.Resource {
 		var backendList []template.Backend
-		for name, config := range v.Backend.GetBackends() {
+		for _, config := range v.Backend.GetBackends() {
 			b, err := config.Connect()
 			if err == nil {
 				backendList = append(backendList, b)
 			} else if err != backendErrors.ErrNilConfig {
 				log.WithFields(logrus.Fields{
-					"backend": name,
+					"backend": b.Name,
 				}).Error(err)
 			}
 		}

@@ -31,9 +31,9 @@ func (c *Config) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}
-
+	c.Backend.Name = "consul"
 	log.WithFields(logrus.Fields{
-		"backend": "consul",
+		"backend": c.Backend.Name,
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
 
@@ -48,7 +48,6 @@ func (c *Config) Connect() (template.Backend, error) {
 	}
 
 	c.Backend.ReadWatcher = client
-	c.Backend.Name = "consul"
 
 	return c.Backend, nil
 }

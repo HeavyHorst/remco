@@ -28,19 +28,17 @@ func (c *Config) Connect() (template.Backend, error) {
 		return template.Backend{}, berr.ErrNilConfig
 	}
 
+	c.Backend.Name = "zookeeper"
 	log.WithFields(logrus.Fields{
-		"backend": "zookeeper",
+		"backend": c.Backend.Name,
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
 
 	client, err := zookeeper.New(c.Nodes)
-
 	if err != nil {
 		return c.Backend, err
 	}
 
 	c.Backend.ReadWatcher = client
-	c.Backend.Name = "zookeeper"
-
 	return c.Backend, nil
 }

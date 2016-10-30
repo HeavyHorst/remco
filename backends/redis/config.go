@@ -29,23 +29,22 @@ func (c *Config) Connect() (template.Backend, error) {
 		return template.Backend{}, berr.ErrNilConfig
 	}
 
+	c.Backend.Name = "redis"
 	log.WithFields(logrus.Fields{
-		"backend": "redis",
+		"backend": c.Backend.Name,
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
 
 	client, err := redis.New(c.Nodes, redis.WithPassword(c.Password))
-
 	if err != nil {
 		return c.Backend, err
 	}
 
 	c.Backend.ReadWatcher = client
-	c.Backend.Name = "redis"
 
 	if c.Backend.Watch {
 		log.WithFields(logrus.Fields{
-			"backend": "redis",
+			"backend": c.Backend.Name,
 		}).Warn("Watch is not supported, using interval instead")
 		c.Backend.Watch = false
 	}

@@ -28,8 +28,9 @@ func (c *Config) Connect() (template.Backend, error) {
 		return template.Backend{}, berr.ErrNilConfig
 	}
 
+	c.Backend.Name = "file"
 	log.WithFields(logrus.Fields{
-		"backend":  "file",
+		"backend":  c.Backend.Name,
 		"filepath": c.Filepath,
 	}).Info("Set filepath")
 
@@ -38,6 +39,5 @@ func (c *Config) Connect() (template.Backend, error) {
 		return c.Backend, err
 	}
 	c.Backend.ReadWatcher = client
-	c.Backend.Name = "file"
 	return c.Backend, nil
 }

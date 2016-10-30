@@ -24,12 +24,13 @@ func (c *Config) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}
+	c.Backend.Name = "env"
 
 	client, err := env.New()
 	if err != nil {
 		return c.Backend, err
 	}
+
 	c.Backend.ReadWatcher = client
-	c.Backend.Name = "env"
 	return c.Backend, nil
 }

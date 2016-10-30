@@ -39,8 +39,9 @@ func (c *Config) Connect() (template.Backend, error) {
 		return template.Backend{}, berr.ErrNilConfig
 	}
 
+	c.Backend.Name = "vault"
 	log.WithFields(logrus.Fields{
-		"backend": "vault",
+		"backend": c.Backend.Name,
 		"nodes":   []string{c.Node},
 	}).Info("Set backend nodes")
 
@@ -69,11 +70,10 @@ func (c *Config) Connect() (template.Backend, error) {
 	}
 
 	c.Backend.ReadWatcher = client
-	c.Backend.Name = "vault"
 
 	if c.Backend.Watch {
 		log.WithFields(logrus.Fields{
-			"backend": "vault",
+			"backend": c.Backend.Name,
 		}).Warn("Watch is not supported, using interval instead")
 		c.Backend.Watch = false
 	}

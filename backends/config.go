@@ -29,14 +29,14 @@ type Config struct {
 	Zookeeper *zookeeper.Config
 }
 
-func (c *Config) GetBackends() map[string]template.BackendConfig {
-	return map[string]template.BackendConfig{
-		"etcd":      c.Etcd,
-		"file":      c.File,
-		"env":       c.Env,
-		"consul":    c.Consul,
-		"vault":     c.Vault,
-		"redis":     c.Redis,
-		"zookeeper": c.Zookeeper,
+func (c *Config) GetBackends() []template.BackendConfig {
+	return []template.BackendConfig{
+		c.Etcd,
+		c.File,
+		c.Env,
+		c.Consul,
+		c.Vault,
+		c.Redis,
+		c.Zookeeper,
 	}
 }
