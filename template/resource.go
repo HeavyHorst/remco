@@ -102,7 +102,7 @@ func (t *Resource) setVars(storeClient Backend) error {
 	var err error
 
 	log.WithFields(logrus.Fields{
-		"store":      storeClient.Name,
+		"backend":    storeClient.Name,
 		"key_prefix": storeClient.Prefix,
 	}).Debug("Retrieving keys")
 
