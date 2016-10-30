@@ -35,17 +35,24 @@ func (c *Config) Connect() (template.Backend, error) {
 		return template.Backend{}, berr.ErrNilConfig
 	}
 
-	log.WithFields(logrus.Fields{
-		"backend": "etcd",
-		"nodes":   c.Nodes,
-	}).Info("Set backend nodes")
-	var client easyKV.ReadWatcher
-	var err error
-
 	// use api version 2 if no version is specified
 	if c.Version == 0 {
 		c.Version = 2
 	}
+
+	if c.Version == 3 {
+		c.Backend.Name = "etcdv3"
+	} else {
+		c.Backend.Name = "etcd"
+	}
+
+	log.WithFields(logrus.Fields{
+		"backend": c.Backend.Name,
+		"nodes":   c.Nodes,
+	}).Info("Set backend nodes")
+
+	var client easyKV.ReadWatcher
+	var err error
 
 	client, err = etcd.New(c.Nodes,
 		etcd.WithBasicAuth(etcd.BasicAuthOptions{
@@ -61,12 +68,6 @@ func (c *Config) Connect() (template.Backend, error) {
 
 	if err != nil {
 		return c.Backend, err
-	}
-
-	if c.Version == 3 {
-		c.Backend.Name = "etcdv3"
-	} else {
-		c.Backend.Name = "etcd"
 	}
 
 	c.Backend.ReadWatcher = client
