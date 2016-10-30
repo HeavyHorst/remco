@@ -202,10 +202,10 @@
 			"revisionTime": "2016-06-04T00:29:25Z"
 		},
 		{
-			"checksumSHA1": "iZVulPMFFGC70xeLZJafiKzTn18=",
+			"checksumSHA1": "2eIRbxeMUEF1ZnOanJhXmFR7pFs=",
 			"path": "github.com/gogo/protobuf/proto",
-			"revision": "2752d97bbd91927dd1c43296dbf8700e50e2708c",
-			"revisionTime": "2016-06-17T09:13:52Z"
+			"revision": "99cb9b23110011cc45571c901ecae6f6f5e65cd3",
+			"revisionTime": "2016-10-05T20:17:23Z"
 		},
 		{
 			"checksumSHA1": "NgOgDwqQnfQhahsECFCsSPEenE0=",
