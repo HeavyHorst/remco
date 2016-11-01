@@ -36,24 +36,15 @@ type tomlConf struct {
 
 func NewConf(path string) (tomlConf, error) {
 	var c tomlConf
-	err := c.fromFile(path)
+	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return c, err
 	}
-	return c, nil
-}
-
-// load a config from file
-func (c *tomlConf) fromFile(cfg string) error {
-	buf, err := ioutil.ReadFile(cfg)
-	if err != nil {
-		return err
-	}
 	buf = []byte(os.ExpandEnv(string(buf)))
-	if err := toml.Unmarshal(buf, c); err != nil {
-		return err
+	if err := toml.Unmarshal(buf, &c); err != nil {
+		return c, err
 	}
-	return nil
+	return c, nil
 }
 
 func (c *tomlConf) loadGlobals() {
