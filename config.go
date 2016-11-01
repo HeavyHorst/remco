@@ -22,14 +22,16 @@ import (
 	"github.com/naoina/toml"
 )
 
+type resource struct {
+	Template []*template.ProcessConfig
+	Backend  backends.Config
+}
+
 // tomlConf is the representation of an config file
 type tomlConf struct {
 	LogLevel  string `toml:"log_level"`
 	LogFormat string `toml:"log_format"`
-	Resource  []struct {
-		Template []*template.ProcessConfig
-		Backend  backends.Config
-	}
+	Resource  []resource
 }
 
 func NewConf(path string) (tomlConf, error) {
@@ -72,7 +74,7 @@ func (c *tomlConf) run(stop chan bool) {
 
 	c.loadGlobals()
 
-	wait := &sync.WaitGroup{}
+	wait := sync.WaitGroup{}
 	for _, v := range c.Resource {
 		var backendList []template.Backend
 		for _, config := range v.Backend.GetBackends() {

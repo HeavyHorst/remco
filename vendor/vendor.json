@@ -45,6 +45,12 @@
 			"revisionTime": "2016-10-27T20:04:33Z"
 		},
 		{
+			"checksumSHA1": "GM66wGtnH5zDSWvCaN/yuH1W0Fc=",
+			"path": "github.com/HeavyHorst/easyKV/mock",
+			"revision": "ad0b81d200c06029d0b35912be2a15834651014d",
+			"revisionTime": "2016-11-01T18:29:58Z"
+		},
+		{
 			"checksumSHA1": "nJzJVj7tHHmbkaYpWFdTGnmrQtw=",
 			"path": "github.com/HeavyHorst/easyKV/redis",
 			"revision": "842048d1a24a4607af5d326af9de7cb47ac79fe9",
