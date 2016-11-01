@@ -25,7 +25,7 @@ type configWatcher struct {
 	cancel    context.CancelFunc
 }
 
-func (w *configWatcher) startWatch(c tomlConf) {
+func (w *configWatcher) runConfig(c tomlConf) {
 	go func() {
 		defer func() {
 			w.stoppedW <- struct{}{}
@@ -34,8 +34,8 @@ func (w *configWatcher) startWatch(c tomlConf) {
 	}()
 }
 
-// reload stops the old watcher and starts a new one
-// this function blocks forever if startWatch was never called before
+// reload stops the old config and starts a new one
+// this function blocks forever if runConfig was never called before
 func (w *configWatcher) reload() {
 	defer func() {
 		// we may try to send on the closed channel w.stopWatch
@@ -56,7 +56,7 @@ func (w *configWatcher) reload() {
 	w.stopWatch <- true
 	<-w.stoppedW
 	// start a new watcher
-	w.startWatch(newConf)
+	w.runConfig(newConf)
 }
 
 func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlConf, done chan struct{}) *configWatcher {
@@ -66,7 +66,7 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlCo
 		filePath:  filepath,
 	}
 
-	w.startWatch(config)
+	w.runConfig(config)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	w.cancel = cancel
@@ -100,7 +100,7 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlCo
 				w.reload()
 			case <-w.stoppedW:
 				close(done)
-				// there is no runnign startWatch function which can answer to the stop method
+				// there is no runnign runConfig function which can answer to the stop method
 				// we need to send to the w.stoppedW channel so that we don't block
 				w.stoppedW <- struct{}{}
 			}
