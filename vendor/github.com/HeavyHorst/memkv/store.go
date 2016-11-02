@@ -113,7 +113,6 @@ func (s Store) GetValue(key string, v ...string) string {
 	if len(v) > 0 {
 		defaultValue = v[0]
 	}
-
 	kv := s.Get(key)
 	if kv.Key == "" {
 		return defaultValue
@@ -121,39 +120,19 @@ func (s Store) GetValue(key string, v ...string) string {
 	return kv.Value
 }
 
-func (s Store) List(filePath string) []string {
+func (s Store) list(filePath string, dir bool) []string {
 	vs := make([]string, 0)
 	m := make(map[string]bool)
-	s.RLock()
-	defer s.RUnlock()
-	prefix := pathToTerms(filePath)
-	for _, k := range s.t.PrefixSearch(filePath) {
-		if k == filePath {
-			m[path.Base(k)] = true
-			continue
-		}
-		kv := s.Get(k)
-		target := pathToTerms(path.Dir(kv.Key))
-		if samePrefixTerms(prefix, target) {
-			m[strings.Split(stripKey(kv.Key, filePath), "/")[0]] = true
-		}
-	}
-	for k := range m {
-		vs = append(vs, k)
-	}
-	sort.Strings(vs)
-	return vs
-}
-
-func (s Store) ListDir(filePath string) []string {
-	vs := make([]string, 0)
-	m := make(map[string]bool)
+	// The prefix search should only return dirs
+	filePath = path.Clean(filePath) + "/"
 	s.RLock()
 	defer s.RUnlock()
 	for _, k := range s.t.PrefixSearch(filePath) {
 		items := strings.Split(stripKey(k, filePath), "/")
-		if len(items) < 2 {
-			continue
+		if dir {
+			if len(items) < 2 {
+				continue
+			}
 		}
 		m[items[0]] = true
 	}
@@ -162,6 +141,14 @@ func (s Store) ListDir(filePath string) []string {
 	}
 	sort.Strings(vs)
 	return vs
+}
+
+func (s Store) List(filePath string) []string {
+	return s.list(filePath, false)
+}
+
+func (s Store) ListDir(filePath string) []string {
+	return s.list(filePath, true)
 }
 
 // Set sets the KVPair entry associated with key to value.
@@ -181,20 +168,4 @@ func (s Store) Purge() {
 
 func stripKey(key, prefix string) string {
 	return strings.TrimPrefix(strings.TrimPrefix(key, prefix), "/")
-}
-
-func pathToTerms(filePath string) []string {
-	return strings.Split(path.Clean(filePath), "/")
-}
-
-func samePrefixTerms(prefix, test []string) bool {
-	if len(test) < len(prefix) {
-		return false
-	}
-	for i := 0; i < len(prefix); i++ {
-		if prefix[i] != test[i] {
-			return false
-		}
-	}
-	return true
 }
