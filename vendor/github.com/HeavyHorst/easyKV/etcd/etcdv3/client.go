@@ -93,7 +93,8 @@ func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.
 		o(&options)
 	}
 
-	etcdctx, _ := context.WithCancel(ctx)
+	etcdctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	var err error
 
 	rch := c.client.Watch(etcdctx, prefix, clientv3.WithPrefix())

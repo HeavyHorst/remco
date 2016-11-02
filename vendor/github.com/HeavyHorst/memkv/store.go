@@ -13,12 +13,15 @@ import (
 // concurrent access.
 type Store struct {
 	FuncMap map[string]interface{}
-	sync.RWMutex
+	*sync.RWMutex
 	t *trie.Trie
 }
 
 func New() Store {
-	s := Store{t: trie.New()}
+	s := Store{
+		t:       trie.New(),
+		RWMutex: &sync.RWMutex{},
+	}
 	s.FuncMap = map[string]interface{}{
 		"exists":    s.Exists,
 		"ls":        s.List,

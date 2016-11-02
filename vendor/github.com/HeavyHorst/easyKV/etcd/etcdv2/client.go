@@ -143,7 +143,8 @@ func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.
 	// should start watching for events starting at the current
 	// index, whatever that may be.
 	watcher := c.client.Watcher(prefix, &client.WatcherOptions{AfterIndex: uint64(0), Recursive: true})
-	etcdctx, _ := context.WithCancel(ctx)
+	etcdctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	for {
 		resp, err := watcher.Next(etcdctx)

@@ -146,6 +146,7 @@ func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.
 	respChan := make(chan watchResponse)
 	wg := sync.WaitGroup{}
 	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	//watch all subfolders for changes
 	watchMap := make(map[string]string)

@@ -27,16 +27,16 @@
 			"revisionTime": "2016-10-29T09:14:51Z"
 		},
 		{
-			"checksumSHA1": "qyS4AVa7/7frUBmhQqXXKXpkzVA=",
+			"checksumSHA1": "a1vUZ+oUglqASKlkq1ktaHrdwvg=",
 			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv2",
-			"revision": "adca76520fe52de7ac553ab23948383ec270aa2a",
-			"revisionTime": "2016-10-29T09:14:51Z"
+			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
+			"revisionTime": "2016-11-02T16:29:25Z"
 		},
 		{
-			"checksumSHA1": "h1cVOl5ix6NjOZrtpdURzYwlkM0=",
+			"checksumSHA1": "g0CzWyAzy+w9NwDdZp2emvbAYV4=",
 			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv3",
-			"revision": "adca76520fe52de7ac553ab23948383ec270aa2a",
-			"revisionTime": "2016-10-29T09:14:51Z"
+			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
+			"revisionTime": "2016-11-02T16:29:25Z"
 		},
 		{
 			"checksumSHA1": "rBLway9oRJJrrq+whtZkT58LooE=",
@@ -63,13 +63,13 @@
 			"revisionTime": "2016-10-27T20:04:33Z"
 		},
 		{
-			"checksumSHA1": "jFwOXMyuvP7lyWmI5qsiFXyHDSE=",
+			"checksumSHA1": "7cd3dO7sU7pyNX13rb5rROJYYck=",
 			"path": "github.com/HeavyHorst/easyKV/zookeeper",
-			"revision": "687cf290039a77b9251b35f243dbfe81861153cf",
-			"revisionTime": "2016-10-28T16:33:28Z"
+			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
+			"revisionTime": "2016-11-02T16:29:25Z"
 		},
 		{
-			"checksumSHA1": "NJO5YmTADjqj9WlHBcJ9trlEgNU=",
+			"checksumSHA1": "Tg1JUqnK1h+xNXsR0SOuGd3dFyo=",
 			"path": "github.com/HeavyHorst/memkv",
 			"revision": "78a64d7bd66c44d9757e08569e5681de67030f10",
 			"revisionTime": "2016-10-19T20:03:58Z"

@@ -61,6 +61,7 @@ func (c *tomlConf) loadGlobals() {
 
 func (c *tomlConf) run(stop chan bool) {
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	done := make(chan struct{})
 
 	c.loadGlobals()
