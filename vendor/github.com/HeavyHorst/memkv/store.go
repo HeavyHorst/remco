@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/derekparker/trie"
+	"github.com/HeavyHorst/trie"
 )
 
 // A Store represents an in-memory key-value store safe for

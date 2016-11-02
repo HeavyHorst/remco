@@ -57,16 +57,6 @@ func (s *FilterSuite) TestFilterDir(t *C) {
 	t.Check(res.String(), Equals, "/etc/foo")
 }
 
-func (s *FilterSuite) TestFilterSplit(t *C) {
-	in := pongo2.AsValue("foo/bar")
-	res, err := filterSplit(in, pongo2.AsValue("/"))
-	if err != nil {
-		t.Error(err.ErrorMsg)
-	}
-
-	t.Check(res.Interface().([]string), DeepEquals, []string{"foo", "bar"})
-}
-
 func (s *FilterSuite) TestFilterToPrettyJSON(t *C) {
 	expected := `{
     "test": "bla",

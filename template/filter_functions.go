@@ -15,7 +15,6 @@ import (
 	"os"
 	"path"
 	"sort"
-	"strings"
 
 	"gopkg.in/yaml.v2"
 
@@ -29,7 +28,6 @@ import (
 func init() {
 	pongo2.RegisterFilter("reverse", filterReverse)
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
-	pongo2.RegisterFilter("split", filterSplit)
 	pongo2.RegisterFilter("parseJSON", filterUnmarshalJSONObject)
 	pongo2.RegisterFilter("parseJSONArray", filterUnmarshalJSONArray)
 	pongo2.RegisterFilter("toJSON", filterToJSON)
@@ -61,13 +59,6 @@ func filterDir(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Er
 		return in, nil
 	}
 	return pongo2.AsValue(path.Dir(in.String())), nil
-}
-
-func filterSplit(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	if !in.IsString() || !param.IsString() {
-		return in, nil
-	}
-	return pongo2.AsValue(strings.Split(in.String(), param.String())), nil
 }
 
 func filterToPrettyJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

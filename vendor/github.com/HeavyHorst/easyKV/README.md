@@ -21,8 +21,8 @@ type ReadWatcher interface {
 
 ## Compatibility matrix
 
-| Calls                 |   Consul   | Etcdv2 | Etcdv3  |  env  | file |   redis |  vault  |
-|-----------------------|:----------:|:------:|:-------:|:-----:|:----:|:-------:|:-------:|
-| GetValues             |     X      |   X    |      X  |    X  |  X   |     X   |   X     |
-| WatchPrefix           |     X      |   X    |      X  |       |  X   |         |         |
-| Close                 |     X      |   X    |      X  |    X  |  X   |     X   |   X     |
+| Calls                 |   Consul   | Etcdv2 | Etcdv3  |  env  | file |   redis |  vault  |  zookeeper |
+|-----------------------|:----------:|:------:|:-------:|:-----:|:----:|:-------:|:-------:|:----------:|
+| GetValues             |     X      |   X    |      X  |    X  |  X   |     X   |   X     |     X      |
+| WatchPrefix           |     X      |   X    |      X  |       |  X   |         |         |     X      |
+| Close                 |     X      |   X    |      X  |    X  |  X   |     X   |   X     |     X      |
