@@ -133,3 +133,10 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 <details>
 <summary> **env** </summary>
 </details>
+
+<details>
+<summary> **zookeeper** </summary>
+
+ - **nodes([]string):**
+   - List of backend nodes.
+</details>
