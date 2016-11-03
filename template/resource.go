@@ -16,12 +16,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/signal"
 	"path"
 	"path/filepath"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/HeavyHorst/easyKV"
@@ -162,13 +160,17 @@ func (t *Resource) createStageFileAndSync() error {
 			return err
 		}
 
+		temp.Close()
+
+		fileMode, err := s.getFileMode()
+		if err != nil {
+			return err
+		}
 		// Set the owner, group, and mode on the stage file now to make it easier to
 		// compare against the destination configuration file later.
-		os.Chmod(temp.Name(), s.fileMode)
+		os.Chmod(temp.Name(), fileMode)
 		os.Chown(temp.Name(), s.UID, s.GID)
 		s.stageFile = temp
-
-		temp.Close()
 
 		if err = t.sync(s); err != nil {
 			return err
@@ -201,39 +203,27 @@ func (t *Resource) sync(s *ProcessConfig) error {
 			"config": s.Dst,
 		}).Info("Target config out of sync")
 
-		if s.CheckCmd != "" {
-			if err := s.check(staged); err != nil {
-				return errors.New("Config check failed: " + err.Error())
-			}
+		if err := s.check(staged); err != nil {
+			return errors.New("Config check failed: " + err.Error())
 		}
+
 		log.WithFields(logrus.Fields{
 			"config": s.Dst,
 		}).Debug("Overwriting target config")
-		err := os.Rename(staged, s.Dst)
+
+		fileMode, err := s.getFileMode()
 		if err != nil {
-			if strings.Contains(err.Error(), "device or resource busy") {
-				log.Debug("Rename failed - target is likely a mount. Trying to write instead")
-				// try to open the file and write to it
-				var contents []byte
-				var rerr error
-				contents, rerr = ioutil.ReadFile(staged)
-				if rerr != nil {
-					return rerr
-				}
-				err := ioutil.WriteFile(s.Dst, contents, s.fileMode)
-				// make sure owner and group match the temp file, in case the file was created with WriteFile
-				os.Chown(s.Dst, s.UID, s.GID)
-				if err != nil {
-					return err
-				}
-			} else {
-				return err
-			}
+			return err
 		}
-		if s.ReloadCmd != "" {
-			if err := s.reload(); err != nil {
-				return err
-			}
+		if err := fileutil.ReplaceFile(staged, s.Dst, fileMode); err != nil {
+			return err
+		}
+
+		// make sure owner and group match the temp file, in case the file was created with WriteFile
+		os.Chown(s.Dst, s.UID, s.GID)
+
+		if err := s.reload(); err != nil {
+			return err
 		}
 
 		log.WithFields(logrus.Fields{
@@ -249,25 +239,12 @@ func (t *Resource) sync(s *ProcessConfig) error {
 	return nil
 }
 
-// setFileMode sets the FileMode.
-func (t *Resource) setFileMode() error {
-	for _, s := range t.sources {
-		if err := s.setFileMode(); err != nil {
-			return nil
-		}
-	}
-	return nil
-}
-
 // Process is a convenience function that wraps calls to the three main tasks
 // required to keep local configuration files in sync. First we gather vars
 // from the store, then we stage a candidate configuration file, and finally sync
 // things up.
 // It returns an error if any.
 func (t *Resource) process(storeClients []Backend) error {
-	if err := t.setFileMode(); err != nil {
-		return err
-	}
 	for _, storeClient := range storeClients {
 		if err := t.setVars(storeClient); err != nil {
 			return berr.BackendError{
@@ -325,8 +302,6 @@ func (s Backend) interval(ctx context.Context, processChan chan Backend) {
 // It will process all given tamplates on changes.
 func (t *Resource) Monitor(ctx context.Context) {
 	wg := &sync.WaitGroup{}
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	done := make(chan struct{})
 
 	processChan := make(chan Backend)

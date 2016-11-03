@@ -32,37 +32,37 @@ type ProcessConfig struct {
 	ReloadCmd string
 	CheckCmd  string
 	stageFile *os.File
-	fileMode  os.FileMode
 }
 
-func (s *ProcessConfig) setFileMode() error {
+func (s *ProcessConfig) getFileMode() (os.FileMode, error) {
 	if s.Mode == "" {
 		if !fileutil.IsFileExist(s.Dst) {
-			s.fileMode = 0644
+			return 0644, nil
 		} else {
 			fi, err := os.Stat(s.Dst)
 			if err != nil {
-				return err
+				return 0, err
 			}
-			s.fileMode = fi.Mode()
+			return fi.Mode(), nil
 		}
 	} else {
 		mode, err := strconv.ParseUint(s.Mode, 0, 32)
 		if err != nil {
-			return err
+			return 0, err
 		}
-		s.fileMode = os.FileMode(mode)
+		return os.FileMode(mode), nil
 	}
-	return nil
 }
 
 // check executes the check command to validate the staged config file. The
 // command is modified so that any references to src template are substituted
 // with a string representing the full path of the staged file. This allows the
-// check to be run on the staged file before overwriting the destination config
-// file.
+// check to be run on the staged file before overwriting the destination config file.
 // It returns nil if the check command returns 0 and there are no other errors.
 func (s *ProcessConfig) check(stageFile string) error {
+	if s.CheckCmd == "" {
+		return nil
+	}
 	var cmdBuffer bytes.Buffer
 	data := make(map[string]string)
 	data["src"] = stageFile
@@ -87,6 +87,9 @@ func (s *ProcessConfig) check(stageFile string) error {
 // reload executes the reload command.
 // It returns nil if the reload command returns 0.
 func (s *ProcessConfig) reload() error {
+	if s.ReloadCmd == "" {
+		return nil
+	}
 	log.Debug("Running " + s.ReloadCmd)
 	c := exec.Command("/bin/sh", "-c", s.ReloadCmd)
 	output, err := c.CombinedOutput()
