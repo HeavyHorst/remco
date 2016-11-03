@@ -20,7 +20,7 @@ import (
 // the configWatcher watches the config file for changes
 type configWatcher struct {
 	stoppedW  chan struct{}
-	stopWatch chan bool
+	stopWatch chan struct{}
 	filePath  string
 	cancel    context.CancelFunc
 }
@@ -53,7 +53,7 @@ func (w *configWatcher) reload() {
 		return
 	}
 	// stop the old watcher and wait until it has stopped
-	w.stopWatch <- true
+	w.stopWatch <- struct{}{}
 	<-w.stoppedW
 	// start a new watcher
 	w.runConfig(newConf)
@@ -62,7 +62,7 @@ func (w *configWatcher) reload() {
 func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config configuration, done chan struct{}) *configWatcher {
 	w := &configWatcher{
 		stoppedW:  make(chan struct{}),
-		stopWatch: make(chan bool),
+		stopWatch: make(chan struct{}),
 		filePath:  filepath,
 	}
 

@@ -68,7 +68,7 @@ func (c *configuration) loadGlobals() {
 }
 
 // run connects to all given backends and starts the template processing as defined in the config file
-func (c *configuration) run(stop chan bool) {
+func (c *configuration) run(stop chan struct{}) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan struct{})
