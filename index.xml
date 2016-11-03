@@ -533,6 +533,18 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;env&lt;/strong&gt; &lt;/summary&gt;
 &lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;zookeeper&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;nodes([]string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;List of backend nodes.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
 </description>
     </item>
     
