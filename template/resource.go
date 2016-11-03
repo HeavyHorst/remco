@@ -49,6 +49,18 @@ type Backend struct {
 	store    *memkv.Store
 }
 
+type Backends []Backend
+
+// Close is calling the close method on all backends
+func (b Backends) Close() {
+	for _, v := range b {
+		log.WithFields(logrus.Fields{
+			"backend": v.Name,
+		}).Debug("Closing client connection")
+		v.ReadWatcher.Close()
+	}
+}
+
 // Resource is the representation of a parsed template resource.
 type Resource struct {
 	backends []Backend
@@ -61,7 +73,7 @@ type Resource struct {
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(backends []Backend, sources []*ProcessConfig) (*Resource, error) {
+func NewResource(backends Backends, sources []*ProcessConfig) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}

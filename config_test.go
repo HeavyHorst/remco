@@ -59,7 +59,7 @@ var expectedBackend = backends.Config{
 	},
 }
 
-var expected = tomlConf{
+var expected = configuration{
 	LogLevel:  "debug",
 	LogFormat: "text",
 	Resource: []resource{
@@ -100,14 +100,14 @@ func (s *FilterSuite) TearDownSuite(t *C) {
 }
 
 func (s *FilterSuite) TestNewConf(t *C) {
-	cfg, err := NewConf(s.cfgPath)
+	cfg, err := newConfiguration(s.cfgPath)
 	if err != nil {
 		t.Error(err)
 	}
 	t.Check(cfg, DeepEquals, expected)
 }
 
-func runTest(cfg tomlConf, t *C) {
+func runTest(cfg configuration, t *C) {
 	wait := sync.WaitGroup{}
 	stop := make(chan bool)
 	wait.Add(1)
@@ -120,7 +120,7 @@ func runTest(cfg tomlConf, t *C) {
 }
 
 func (s *FilterSuite) TestRun(t *C) {
-	cfg, err := NewConf(s.cfgPath)
+	cfg, err := newConfiguration(s.cfgPath)
 	if err != nil {
 		t.Error(err)
 	}

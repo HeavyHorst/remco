@@ -27,15 +27,18 @@ type resource struct {
 	Backend  backends.Config
 }
 
-// tomlConf is the representation of an config file
-type tomlConf struct {
+// configuration is the representation of an config file
+type configuration struct {
 	LogLevel  string `toml:"log_level"`
 	LogFormat string `toml:"log_format"`
 	Resource  []resource
 }
 
-func NewConf(path string) (tomlConf, error) {
-	var c tomlConf
+// newConfiguration reads the file at `path`, expand the environment variables
+// and unmarshals it to a new configuration struct.
+// it returns an error if any.
+func newConfiguration(path string) (configuration, error) {
+	var c configuration
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return c, err
@@ -44,10 +47,15 @@ func NewConf(path string) (tomlConf, error) {
 	if err := toml.Unmarshal(buf, &c); err != nil {
 		return c, err
 	}
+
+	c.loadGlobals()
+
 	return c, nil
 }
 
-func (c *tomlConf) loadGlobals() {
+// loadGlobals configures remco with the global configuration options
+// for example it sets the log level and log formatting
+func (c *configuration) loadGlobals() {
 	if c.LogLevel != "" {
 		err := log.SetLevel(c.LogLevel)
 		if err != nil {
@@ -59,16 +67,19 @@ func (c *tomlConf) loadGlobals() {
 	}
 }
 
-func (c *tomlConf) run(stop chan bool) {
+// run connects to all given backends and starts the template processing as defined in the config file
+func (c *configuration) run(stop chan bool) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan struct{})
 
-	c.loadGlobals()
-
 	wait := sync.WaitGroup{}
 	for _, v := range c.Resource {
-		var backendList []template.Backend
+		var backendList template.Backends
+
+		// try to connect to all supported backends
+		// add them to the backendList on success
+		// log an error otherwise
 		for _, config := range v.Backend.GetBackends() {
 			b, err := config.Connect()
 			if err == nil {
@@ -80,6 +91,7 @@ func (c *tomlConf) run(stop chan bool) {
 			}
 		}
 
+		// create a new template resource with given backends and template processing configuration
 		t, err := template.NewResource(backendList, v.Template)
 		if err != nil {
 			log.Error(err.Error())
@@ -88,16 +100,9 @@ func (c *tomlConf) run(stop chan bool) {
 
 		wait.Add(1)
 		go func() {
-			defer func() {
-				// close all client connections
-				for _, v := range backendList {
-					log.WithFields(logrus.Fields{
-						"backend": v.Name,
-					}).Debug("Closing client connection")
-					v.ReadWatcher.Close()
-				}
-				wait.Done()
-			}()
+			defer wait.Done()
+			// make sure that all backend clients are closed cleanly
+			defer backendList.Close()
 			t.Monitor(ctx)
 		}()
 	}

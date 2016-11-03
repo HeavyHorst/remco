@@ -25,7 +25,7 @@ type configWatcher struct {
 	cancel    context.CancelFunc
 }
 
-func (w *configWatcher) runConfig(c tomlConf) {
+func (w *configWatcher) runConfig(c configuration) {
 	go func() {
 		defer func() {
 			w.stoppedW <- struct{}{}
@@ -47,7 +47,7 @@ func (w *configWatcher) reload() {
 		}
 	}()
 
-	newConf, err := NewConf(w.filePath)
+	newConf, err := newConfiguration(w.filePath)
 	if err != nil {
 		log.Error(err)
 		return
@@ -59,7 +59,7 @@ func (w *configWatcher) reload() {
 	w.runConfig(newConf)
 }
 
-func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config tomlConf, done chan struct{}) *configWatcher {
+func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config configuration, done chan struct{}) *configWatcher {
 	w := &configWatcher{
 		stoppedW:  make(chan struct{}),
 		stopWatch: make(chan bool),

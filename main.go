@@ -35,11 +35,10 @@ func run() {
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
 	// we need a working config here - exit on error
-	c, err := NewConf(fileConfig.Filepath)
+	c, err := newConfiguration(fileConfig.Filepath)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	c.loadGlobals()
 
 	s, err := fileConfig.Connect()
 	if err != nil {

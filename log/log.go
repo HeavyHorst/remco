@@ -38,6 +38,16 @@ func SetFormatter(format string) {
 	}
 }
 
+// SetLevel sets the log level. Valid levels are panic, fatal, error, warn, info and debug.
+func SetLevel(level string) error {
+	lvl, err := log.ParseLevel(level)
+	if err != nil {
+		return err
+	}
+	log.SetLevel(lvl)
+	return nil
+}
+
 // some log middleware handlers
 
 //withSource adds the field source to the logs
@@ -53,16 +63,6 @@ func withSource(l *log.Entry) *log.Entry {
 	}
 	logger := l.WithField("source", fmt.Sprintf("%s:%d", file, line))
 	return logger
-}
-
-// SetLevel sets the log level. Valid levels are panic, fatal, error, warn, info and debug.
-func SetLevel(level string) error {
-	lvl, err := log.ParseLevel(level)
-	if err != nil {
-		return err
-	}
-	log.SetLevel(lvl)
-	return nil
 }
 
 // Debug logs a message with severity DEBUG.
