@@ -69,6 +69,16 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;ul&gt;
 &lt;li&gt;The permission mode of the file. Default is &amp;ldquo;0644&amp;rdquo;.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;UID(int, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The UID that should own the file. Defaults to the effective uid.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GID(int, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The GID that should own the file. Defaults to the effective gid.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;backend-configuration-options&#34;&gt;Backend configuration options&lt;/h2&gt;
