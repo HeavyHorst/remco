@@ -28,6 +28,10 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
     - The command to reload config.
  - **mode(string, optional):**
     - The permission mode of the file. Default is "0644".
+ - **UID(int, optional):**
+    - The UID that should own the file. Defaults to the effective uid.
+ - **GID(int, optional):**
+    - The GID that should own the file. Defaults to the effective gid.
 
 ## Backend configuration options
 
