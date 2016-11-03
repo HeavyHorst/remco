@@ -13,12 +13,14 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync"
 
 	log "github.com/Sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 var logger *log.Entry
+var lock sync.RWMutex
 
 func init() {
 	SetFormatter("text")
@@ -30,6 +32,8 @@ func init() {
 
 // SetFormatter sets the formatter. Valid formatters are json and text.
 func SetFormatter(format string) {
+	lock.Lock()
+	defer lock.Unlock()
 	switch format {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
@@ -40,6 +44,8 @@ func SetFormatter(format string) {
 
 // SetLevel sets the log level. Valid levels are panic, fatal, error, warn, info and debug.
 func SetLevel(level string) error {
+	lock.Lock()
+	defer lock.Unlock()
 	lvl, err := log.ParseLevel(level)
 	if err != nil {
 		return err
@@ -67,26 +73,36 @@ func withSource(l *log.Entry) *log.Entry {
 
 // Debug logs a message with severity DEBUG.
 func Debug(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	withSource(logger).Debug(v)
 }
 
 // Error logs a message with severity ERROR.
 func Error(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	withSource(logger).Error(v)
 }
 
 // Fatal logs a message with severity ERROR followed by a call to os.Exit().
 func Fatal(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	withSource(logger).Fatal(v)
 }
 
 // Info logs a message with severity INFO.
 func Info(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	withSource(logger).Info(v)
 }
 
 // Warning logs a message with severity WARNING.
 func Warning(v ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	withSource(logger).Warning(v)
 }
 
