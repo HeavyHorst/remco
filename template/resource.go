@@ -24,11 +24,11 @@ import (
 
 	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/memkv"
+	"github.com/HeavyHorst/pongo2"
 	berr "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/Sirupsen/logrus"
-	"github.com/flosch/pongo2"
 )
 
 // A BackendConfig - Every backend implements this interface. If Connect is called a new connection to the underlaying kv-store will be established.

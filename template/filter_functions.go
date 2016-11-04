@@ -21,8 +21,8 @@ import (
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/HeavyHorst/memkv"
+	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/log"
-	"github.com/flosch/pongo2"
 )
 
 func init() {
@@ -66,7 +66,7 @@ func filterToPrettyJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *
 	if err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
-	return pongo2.AsSafeValue(string(b)), nil
+	return pongo2.AsValue(string(b)), nil
 }
 
 func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -74,7 +74,7 @@ func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	if err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
-	return pongo2.AsSafeValue(string(b)), nil
+	return pongo2.AsValue(string(b)), nil
 }
 
 func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -82,7 +82,7 @@ func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	if err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
-	return pongo2.AsSafeValue(string(b)), nil
+	return pongo2.AsValue(string(b)), nil
 }
 
 func filterUnmarshalJSONObject(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

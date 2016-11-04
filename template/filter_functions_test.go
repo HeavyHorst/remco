@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/HeavyHorst/memkv"
-	"github.com/flosch/pongo2"
+	"github.com/HeavyHorst/pongo2"
 	. "gopkg.in/check.v1"
 )
 

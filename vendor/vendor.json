@@ -75,6 +75,12 @@
 			"revisionTime": "2016-11-02T21:33:34Z"
 		},
 		{
+			"checksumSHA1": "Pautei4PXpJjwcbNqiGVIiqepS8=",
+			"path": "github.com/HeavyHorst/pongo2",
+			"revision": "e0c7d9cd7ed99866725bf853388b9d80136aabf7",
+			"revisionTime": "2016-11-04T15:42:24Z"
+		},
+		{
 			"checksumSHA1": "47aKZDpK1BL+fJxU1zFrAH9Zmlo=",
 			"path": "github.com/HeavyHorst/trie",
 			"revision": "469842d9e0c19fdbdab3c4dd3674e9583814adb6",
@@ -176,12 +182,6 @@
 			"path": "github.com/fatih/structs",
 			"revision": "7ac1091ca77699f898d17a0680e5ed22c9bcfa17",
 			"revisionTime": "2016-10-03T16:37:55Z"
-		},
-		{
-			"checksumSHA1": "WjBZSW7p3FYbAMPHQf8JT4QbBPc=",
-			"path": "github.com/flosch/pongo2",
-			"revision": "22499f94d3d56c7238591344a6902715d0b8fbbf",
-			"revisionTime": "2016-08-13T17:05:23Z"
 		},
 		{
 			"checksumSHA1": "hveFTNQ9YEyYRs6SWuXM+XU9qRI=",
