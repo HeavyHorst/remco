@@ -109,7 +109,7 @@ func (s *FilterSuite) TestNewConf(t *C) {
 
 func runTest(cfg configuration, t *C) {
 	wait := sync.WaitGroup{}
-	stop := make(chan bool)
+	stop := make(chan struct{})
 	wait.Add(1)
 	go func() {
 		defer wait.Done()
@@ -138,5 +138,5 @@ func (s *FilterSuite) TestRunWithError(t *C) {
 func (s *FilterSuite) TestRunOnetime(t *C) {
 	cfg := expected
 	cfg.Resource[0].Backend.Mock.Backend.Onetime = true
-	cfg.run(make(chan bool))
+	cfg.run(make(chan struct{}))
 }

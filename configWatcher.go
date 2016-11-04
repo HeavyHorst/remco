@@ -25,6 +25,8 @@ type configWatcher struct {
 	cancel    context.CancelFunc
 }
 
+// call c.run in its own goroutine
+// and write to the w.stoppedW chan if its done
 func (w *configWatcher) runConfig(c configuration) {
 	go func() {
 		defer func() {
