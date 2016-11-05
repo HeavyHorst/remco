@@ -9,31 +9,37 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"strings"
+	"sync"
 	"time"
 
-	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/remco/log"
+	"github.com/fsnotify/fsnotify"
 )
 
 // the configWatcher watches the config file for changes
 type configWatcher struct {
 	stoppedW  chan struct{}
 	stopWatch chan struct{}
-	filePath  string
-	cancel    context.CancelFunc
+
+	stopWatchConf    chan struct{}
+	stoppedWatchConf chan struct{}
+
+	reloadChan chan struct{}
+
+	wg sync.WaitGroup
+
+	configPath string
 }
 
 // call c.run in its own goroutine
 // and write to the w.stoppedW chan if its done
 func (w *configWatcher) runConfig(c configuration) {
-	go func() {
-		defer func() {
-			w.stoppedW <- struct{}{}
-		}()
-		c.run(w.stopWatch)
+	defer func() {
+		w.stoppedW <- struct{}{}
 	}()
+	c.run(w.stopWatch)
 }
 
 // reload stops the old config and starts a new one
@@ -49,62 +55,91 @@ func (w *configWatcher) reload() {
 		}
 	}()
 
-	newConf, err := newConfiguration(w.filePath)
+	newConf, err := newConfiguration(w.configPath)
 	if err != nil {
 		log.Error(err)
 		return
 	}
-	// stop the old watcher and wait until it has stopped
+	// stop the old config and wait until it has stopped
 	w.stopWatch <- struct{}{}
 	<-w.stoppedW
-	// start a new watcher
-	w.runConfig(newConf)
+	go w.runConfig(newConf)
+
+	// restart the fsnotify config watcher (the include_dir folder may have changed)
+	// startWatchConfig returns when calling reload
+	go w.startWatchConfig(newConf)
 }
 
-func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config configuration, done chan struct{}) *configWatcher {
-	w := &configWatcher{
-		stoppedW:  make(chan struct{}),
-		stopWatch: make(chan struct{}),
-		filePath:  filepath,
+func (w *configWatcher) startWatchConfig(config configuration) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Error(err)
 	}
-
-	w.runConfig(config)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	w.cancel = cancel
-
-	reload := make(chan struct{})
-	go func() {
-		// watch the config for changes
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				_, err := watcher.WatchPrefix("", ctx, easyKV.WithKeys([]string{""}))
-				if err != nil {
-					if err != easyKV.ErrWatchCanceled {
-						log.Error(err)
-						time.Sleep(2 * time.Second)
-					}
-					continue
-				}
-				time.Sleep(1 * time.Second)
-				reload <- struct{}{}
-			}
-		}
+	defer func() {
+		watcher.Close()
+		w.stoppedWatchConf <- struct{}{}
 	}()
 
+	// add theconfigfile to the watcher
+	err = watcher.Add(w.configPath)
+	if err != nil {
+		log.Error(err)
+	}
+
+	// add the include_dir to the watcher
+	if config.IncludeDir != "" {
+		err = watcher.Add(config.IncludeDir)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+
+	// watch the config for changes
+	for {
+		select {
+		case <-w.stopWatchConf:
+			return
+		case event := <-watcher.Events:
+			if event.Op&fsnotify.Write == fsnotify.Write ||
+				event.Op&fsnotify.Remove == fsnotify.Remove ||
+				event.Op&fsnotify.Create == fsnotify.Create {
+				// only watch .toml files
+				if strings.HasSuffix(event.Name, ".toml") {
+					time.Sleep(500 * time.Millisecond)
+					w.reloadChan <- struct{}{}
+					return
+				}
+			}
+		}
+	}
+}
+
+func newConfigWatcher(configPath string, config configuration, done chan struct{}) *configWatcher {
+	w := &configWatcher{
+		stoppedW:         make(chan struct{}),
+		stopWatch:        make(chan struct{}),
+		stopWatchConf:    make(chan struct{}),
+		stoppedWatchConf: make(chan struct{}),
+		reloadChan:       make(chan struct{}),
+		configPath:       configPath,
+	}
+
+	go w.runConfig(config)
+	go w.startWatchConfig(config)
+	w.wg.Add(1)
 	go func() {
+		defer w.wg.Done()
 		for {
 			select {
-			case <-reload:
+			case <-w.reloadChan:
 				w.reload()
 			case <-w.stoppedW:
 				close(done)
-				// there is no runnign runConfig function which can answer to the stop method
+
+				// there is no running runConfig function which can answer to the stop method
 				// we need to send to the w.stoppedW channel so that we don't block
 				w.stoppedW <- struct{}{}
+				return
 			}
 		}
 	}()
@@ -113,7 +148,9 @@ func newConfigWatcher(filepath string, watcher easyKV.ReadWatcher, config config
 }
 
 func (w *configWatcher) stop() {
-	w.cancel()
 	close(w.stopWatch)
 	<-w.stoppedW
+	close(w.stopWatchConf)
+	<-w.stoppedWatchConf
+	w.wg.Wait()
 }
