@@ -155,7 +155,8 @@ func (t *Resource) createStageFileAndSync() error {
 			"template": s.Src,
 		}).Debug("Compiling source template")
 
-		tmpl, err := pongo2.FromFile(s.Src)
+		set := pongo2.NewSet("local", &pongo2.LocalFilesystemLoader{})
+		tmpl, err := set.FromFile(s.Src)
 		if err != nil {
 			return fmt.Errorf("Unable to process template %s, %s", s.Src, err)
 		}
