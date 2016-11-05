@@ -77,6 +77,7 @@ func (s *ProcessConfig) check(stageFile string) error {
 	c := exec.Command("/bin/sh", "-c", cmdBuffer.String())
 	output, err := c.CombinedOutput()
 	if err != nil {
+		log.Error(fmt.Sprintf("%q", string(output)))
 		return err
 	}
 	log.Debug(fmt.Sprintf("%q", string(output)))
@@ -93,6 +94,7 @@ func (s *ProcessConfig) reload() error {
 	c := exec.Command("/bin/sh", "-c", s.ReloadCmd)
 	output, err := c.CombinedOutput()
 	if err != nil {
+		log.Error(fmt.Sprintf("%q", string(output)))
 		return err
 	}
 	log.Debug(fmt.Sprintf("%q", string(output)))
