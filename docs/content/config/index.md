@@ -16,6 +16,8 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - Valid levels are panic, fatal, error, warn, info and debug. Default is info.
  - **log_format(string):** 
    - The format of the log messages. Valid formats are *text* and *json*.
+ - **include_dir(string):**
+   - Specify an entire directory of resource configuration files to include.
 
 ## Template configuration options
  - **src(string):**
