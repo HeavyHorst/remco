@@ -4,6 +4,13 @@ set -e # Exit with nonzero exit code if anything fails
 SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
 
+# only deploy tagged releases
+if [ ! -n "$TRAVIS_TAG" ]; then
+    echo "Skipping deploy - no tagged release"
+    exit 0
+fi
+
+
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]; then
     echo "Skipping deploy to gh-pages"
