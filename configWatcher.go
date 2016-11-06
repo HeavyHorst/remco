@@ -9,7 +9,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -20,17 +19,15 @@ import (
 
 // the configWatcher watches the config file for changes
 type configWatcher struct {
-	stoppedW  chan struct{}
-	stopWatch chan struct{}
-
+	stoppedW         chan struct{}
+	stopWatch        chan struct{}
 	stopWatchConf    chan struct{}
 	stoppedWatchConf chan struct{}
-
-	reloadChan chan struct{}
-
-	wg sync.WaitGroup
-
-	configPath string
+	reloadChan       chan struct{}
+	wg               sync.WaitGroup
+	mu               sync.Mutex
+	canceled         bool
+	configPath       string
 }
 
 // call c.run in its own goroutine
@@ -42,45 +39,25 @@ func (w *configWatcher) runConfig(c configuration) {
 	c.run(w.stopWatch)
 }
 
-// reload stops the old config and starts a new one
-// this function blocks forever if runConfig was never called before
-func (w *configWatcher) reload() {
-	defer func() {
-		// we may try to send on the closed channel w.stopWatch
-		// we need to recover from this panic
-		if r := recover(); r != nil {
-			if fmt.Sprintf("%v", r) != "send on closed channel" {
-				panic(r)
-			}
-		}
-	}()
-
-	newConf, err := newConfiguration(w.configPath)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	// stop the old config and wait until it has stopped
-	w.stopWatch <- struct{}{}
-	<-w.stoppedW
-	go w.runConfig(newConf)
-
-	// restart the fsnotify config watcher (the include_dir folder may have changed)
-	// startWatchConfig returns when calling reload
-	go w.startWatchConfig(newConf)
+func (w *configWatcher) getCanceled() bool {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.canceled
 }
 
+// startWatchConfig starts to watch the configuration file and all files under include_dir which ends with .toml
+// if there is an event (write, remove, create) we write to w.reloadChan to trigger an relaod and return.
 func (w *configWatcher) startWatchConfig(config configuration) {
+	w.wg.Add(1)
+	defer w.wg.Done()
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Error(err)
 	}
-	defer func() {
-		watcher.Close()
-		w.stoppedWatchConf <- struct{}{}
-	}()
+	defer watcher.Close()
 
-	// add theconfigfile to the watcher
+	// add the configfile to the watcher
 	err = watcher.Add(w.configPath)
 	if err != nil {
 		log.Error(err)
@@ -104,8 +81,14 @@ func (w *configWatcher) startWatchConfig(config configuration) {
 				event.Op&fsnotify.Remove == fsnotify.Remove ||
 				event.Op&fsnotify.Create == fsnotify.Create {
 				// only watch .toml files
-				if strings.HasSuffix(event.Name, ".toml") {
+				if strings.HasSuffix(event.Name, ".toml") || event.Name == w.configPath {
 					time.Sleep(500 * time.Millisecond)
+
+					// don't try to reload if w is already canceled
+					if w.getCanceled() {
+						return
+					}
+
 					w.reloadChan <- struct{}{}
 					return
 				}
@@ -116,12 +99,11 @@ func (w *configWatcher) startWatchConfig(config configuration) {
 
 func newConfigWatcher(configPath string, config configuration, done chan struct{}) *configWatcher {
 	w := &configWatcher{
-		stoppedW:         make(chan struct{}),
-		stopWatch:        make(chan struct{}),
-		stopWatchConf:    make(chan struct{}),
-		stoppedWatchConf: make(chan struct{}),
-		reloadChan:       make(chan struct{}),
-		configPath:       configPath,
+		stoppedW:      make(chan struct{}),
+		stopWatch:     make(chan struct{}),
+		stopWatchConf: make(chan struct{}),
+		reloadChan:    make(chan struct{}),
+		configPath:    configPath,
 	}
 
 	go w.runConfig(config)
@@ -132,13 +114,34 @@ func newConfigWatcher(configPath string, config configuration, done chan struct{
 		for {
 			select {
 			case <-w.reloadChan:
-				w.reload()
-			case <-w.stoppedW:
-				close(done)
+				newConf, err := newConfiguration(w.configPath)
+				if err != nil {
+					log.Error(err)
+					continue
+				}
 
-				// there is no running runConfig function which can answer to the stop method
-				// we need to send to the w.stoppedW channel so that we don't block
-				w.stoppedW <- struct{}{}
+				// don't try to relaod anything if w is already canceled
+				if w.getCanceled() {
+					continue
+				}
+
+				// stop the old config and wait until it has stopped
+				w.stopWatch <- struct{}{}
+				<-w.stoppedW
+				go w.runConfig(newConf)
+
+				// restart the fsnotify config watcher (the include_dir folder may have changed)
+				// startWatchConfig returns when calling reload (we don't need to stop it)
+				go w.startWatchConfig(newConf)
+			case <-w.stoppedW:
+				// close the reloadChan
+				// every attempt to write to reloadChan would block forever otherwise
+				close(w.reloadChan)
+
+				// close the done channel
+				// this signals the main function that the configWatcher has completed all work
+				// for example all backends are configured with onetime=true
+				close(done)
 				return
 			}
 		}
@@ -148,9 +151,12 @@ func newConfigWatcher(configPath string, config configuration, done chan struct{
 }
 
 func (w *configWatcher) stop() {
+	w.mu.Lock()
+	w.canceled = true
+	w.mu.Unlock()
 	close(w.stopWatch)
-	<-w.stoppedW
 	close(w.stopWatchConf)
-	<-w.stoppedWatchConf
+
+	// wait for the main routine and startWatchConfig to exit
 	w.wg.Wait()
 }
