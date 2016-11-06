@@ -53,14 +53,19 @@ canonifyurls = true
 	weight = 20
 
 [[menu.main]]
+	name   = "Sample resource configuration"
+	url    = "config/sampleresource"
+    weight = 30
+
+[[menu.main]]
 	name   = "Template"
 	url    = "template/"
-	weight = 30
+	weight = 40
 
 [[menu.main]]
 	name   = "License"
 	url    = "license/"
-	weight = 40
+	weight = 50
 
 
 [blackfriday]

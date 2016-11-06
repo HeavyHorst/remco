@@ -15,18 +15,17 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/HeavyHorst/remco/backends/file"
 	"github.com/HeavyHorst/remco/log"
 )
 
 var (
-	fileConfig          = &file.Config{}
+	configPath          string
 	printVersionAndExit bool
 )
 
 func init() {
 	const defaultConfig = "/etc/remco/config"
-	flag.StringVar(&fileConfig.Filepath, "config", defaultConfig, "path to the configuration file")
+	flag.StringVar(&configPath, "config", defaultConfig, "path to the configuration file")
 	flag.BoolVar(&printVersionAndExit, "version", false, "print version and exit")
 }
 
@@ -35,18 +34,14 @@ func run() {
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
 	// we need a working config here - exit on error
-	c, err := newConfiguration(fileConfig.Filepath)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	s, err := fileConfig.Connect()
+	c, err := newConfiguration(configPath)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	done := make(chan struct{})
-	cfgWatcher := newConfigWatcher(fileConfig.Filepath, s.ReadWatcher, c, done)
+	// watch the configuration file and all files under include_dir for changes
+	cfgWatcher := newConfigWatcher(configPath, c, done)
 	defer cfgWatcher.stop()
 
 	for {

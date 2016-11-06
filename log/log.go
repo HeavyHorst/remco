@@ -38,7 +38,7 @@ func SetFormatter(format string) {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
 	case "text":
-		log.SetFormatter(&prefixed.TextFormatter{DisableSorting: true})
+		log.SetFormatter(&prefixed.TextFormatter{DisableSorting: false})
 	}
 }
 

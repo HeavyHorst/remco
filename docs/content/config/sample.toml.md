@@ -11,6 +11,7 @@ title: Sample configuration file
 ################################################################
 log_level = "debug"
 log_format = "text"
+include_dir = "/etc/remco/resource.d/"
 
 
 ################################################################
@@ -18,39 +19,13 @@ log_format = "text"
 ################################################################
 [[resource]]
   [[resource.template]]
-    src = "/etc/confd/templates/test.cfg"
-    dst = "/home/rkaufmann/haproxy.cfg"
+    src = "/etc/remco/templates/haproxy.cfg"
+    dst = "/etc/haproxy/haproxy.cfg"
     checkCmd = ""
     reloadCmd = ""
     mode = "0644"
 
   [resource.backend]
-    [resource.backend.etcd]
-      nodes = ["127.0.0.1:2379"]
-      client_cert = "/path/to/client_cert"
-      client_key = "/path/to/client_key"
-      client_ca_keys = "/path/to/client_ca_keys"
-      username = "admin"
-      password = "p@SsWord"
-      version = 3
-
-      # These values are valid in every backend
-      watch = true
-      prefix = "/"
-      onetime = true
-      interval = 1
-      keys = ["/"]
-
-    [resource.backend.file]
-      filepath = "/etc/remco/test.yml"
-
-    [resource.backend.consul]
-      nodes = ["127.0.0.1:8500"]
-      scheme = "http" #{http/https}
-      client_cert = "/path/to/client_cert"
-      client_key = "/path/to/client_key"
-      client_ca_keys = "/path/to/client_ca_keys"
-    
     [resource.backend.vault]
       node = "http://127.0.0.1:8200"
       ## Token based auth backend
@@ -67,5 +42,16 @@ log_format = "text"
       client_cert = "/path/to/client_cert"
       client_key = "/path/to/client_key"
       client_ca_keys = "/path/to/client_ca_keys"
+      
+	  # These values are valid in every backend
+      watch = true
+      prefix = "/"
+      onetime = true
+      interval = 1
+      keys = ["/"]
+
+    [resource.backend.file]
+      filepath = "/etc/remco/test.yml"
+	  watch = true
 
 ```      
