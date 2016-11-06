@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/HeavyHorst/remco/backends"
@@ -69,15 +70,24 @@ func newConfiguration(path string) (configuration, error) {
 			return c, err
 		}
 		for _, file := range files {
-			buf, err := readFileAndExpandEnv(filepath.Join(c.IncludeDir, file.Name()))
-			if err != nil {
-				return c, err
+			if strings.HasSuffix(file.Name(), ".toml") {
+				fp := filepath.Join(c.IncludeDir, file.Name())
+				log.WithFields(logrus.Fields{
+					"path": fp,
+				}).Info("Loading resource configuration")
+				buf, err := readFileAndExpandEnv(fp)
+				if err != nil {
+					return c, err
+				}
+				var r resource
+				if err := toml.Unmarshal(buf, &r); err != nil {
+					return c, err
+				}
+				// don't add empty resources
+				if len(r.Template) > 0 {
+					c.Resource = append(c.Resource, r)
+				}
 			}
-			var r resource
-			if err := toml.Unmarshal(buf, &r); err != nil {
-				return c, err
-			}
-			c.Resource = append(c.Resource, r)
 		}
 	}
 
