@@ -273,6 +273,10 @@ func (t *Resource) process(storeClients []Backend) error {
 }
 
 func (s Backend) watch(ctx context.Context, processChan chan Backend) {
+	if s.Onetime {
+		return
+	}
+
 	var lastIndex uint64
 	keysPrefix := appendPrefix(s.Prefix, s.Keys)
 
@@ -315,7 +319,6 @@ func (s Backend) interval(ctx context.Context, processChan chan Backend) {
 // It will process all given tamplates on changes.
 func (t *Resource) Monitor(ctx context.Context) {
 	wg := &sync.WaitGroup{}
-	done := make(chan struct{})
 
 	processChan := make(chan Backend)
 	defer close(processChan)
@@ -333,13 +336,16 @@ func (t *Resource) Monitor(ctx context.Context) {
 	}
 
 	for _, sc := range t.backends {
-		wg.Add(1)
 		if sc.Watch {
+			wg.Add(1)
 			go func(s Backend) {
 				defer wg.Done()
 				s.watch(ctx, processChan)
 			}(sc)
-		} else {
+		}
+
+		if sc.Interval > 0 {
+			wg.Add(1)
 			go func(s Backend) {
 				defer wg.Done()
 				s.interval(ctx, processChan)
@@ -347,6 +353,7 @@ func (t *Resource) Monitor(ctx context.Context) {
 		}
 	}
 
+	done := make(chan struct{})
 	go func() {
 		// If there is no goroutine left - quit
 		wg.Wait()

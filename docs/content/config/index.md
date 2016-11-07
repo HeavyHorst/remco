@@ -45,9 +45,9 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
  - **prefix(string):**
    - Key path prefix. Default is "".
  - **interval(int):**
-   - The backend polling interval. Only used when watch mode is disabled.
+   - The backend polling interval. Can be used as a reconcilation loop for watch or standalone.
  - **onetime(bool, optional):**
-   - Render the config file and quit. Only used when watch mode is disabled. Default is false.
+   - Render the config file and quit. Default is false.
  - **keys([]string):**
    - The backend keys that the template requires to be rendered correctly. The child keys are also loaded.
 </details>
