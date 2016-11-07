@@ -5,68 +5,68 @@
 		{
 			"checksumSHA1": "tHM+owb+dcT6UWTOzz4dBTxKgzo=",
 			"path": "github.com/HeavyHorst/easyKV",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
-			"checksumSHA1": "4rs9Q2SfGXOf3wl7rNesViS0hPU=",
+			"checksumSHA1": "9ONO6+rxWgLbam1JAWKBDtpTGng=",
 			"path": "github.com/HeavyHorst/easyKV/consul",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
-			"checksumSHA1": "bLAQmRnn+ZK85swjiDEG9qtm89g=",
+			"checksumSHA1": "/XxVGkLmOErJ33cZ1nlWPWqrWhE=",
 			"path": "github.com/HeavyHorst/easyKV/env",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
 			"checksumSHA1": "6ya7Sxh668aLFTcLEI1s70UP02Q=",
 			"path": "github.com/HeavyHorst/easyKV/etcd",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
-			"checksumSHA1": "a1vUZ+oUglqASKlkq1ktaHrdwvg=",
+			"checksumSHA1": "DtB19ZLEF0yS/Fzwt0gS/xozsQA=",
 			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv2",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
 			"checksumSHA1": "g0CzWyAzy+w9NwDdZp2emvbAYV4=",
 			"path": "github.com/HeavyHorst/easyKV/etcd/etcdv3",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
 			"checksumSHA1": "rBLway9oRJJrrq+whtZkT58LooE=",
 			"path": "github.com/HeavyHorst/easyKV/file",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
 			"checksumSHA1": "GM66wGtnH5zDSWvCaN/yuH1W0Fc=",
 			"path": "github.com/HeavyHorst/easyKV/mock",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
-			"checksumSHA1": "nJzJVj7tHHmbkaYpWFdTGnmrQtw=",
+			"checksumSHA1": "7DXliEs/q3ICw6x3wXUrgDcAZv8=",
 			"path": "github.com/HeavyHorst/easyKV/redis",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
-			"checksumSHA1": "TrTE4ajKFd9UzjC+sF0t+Z1he5Y=",
+			"checksumSHA1": "wWGRSMlC4UpUvLcHmngPLU8hfJc=",
 			"path": "github.com/HeavyHorst/easyKV/vault",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
-			"checksumSHA1": "7cd3dO7sU7pyNX13rb5rROJYYck=",
+			"checksumSHA1": "uhIhyPJwbDpJXp7wRFAm2BHMVm0=",
 			"path": "github.com/HeavyHorst/easyKV/zookeeper",
-			"revision": "2ce58dcf5cdf43f30a72a2d7589afc1ad9da7652",
-			"revisionTime": "2016-11-02T16:29:25Z"
+			"revision": "f2592a6cad70bd742b3505af37e37eb37cd9825a",
+			"revisionTime": "2016-11-07T21:04:59Z"
 		},
 		{
 			"checksumSHA1": "8umlt4JpcqFrQC75XxTbrAOcer0=",
