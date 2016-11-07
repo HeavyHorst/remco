@@ -1,7 +1,8 @@
 /*
  * This file is part of easyKV.
- * Based on code from confd. https://github.com/kelseyhightower/confd
- * confd contributors (zookeeper backend)
+ * Based on code from confd.
+ * https://github.com/kelseyhightower/confd/blob/5e4438f2e7c2e04fee7981548ccc775181377a8b/backends/zookeeper/client.go
+ * Users who have contributed to this file
  * © 2013 Kelsey Hightower
  * © 2014 github.com/sheepkiller
  * © 2015 cinience@hotmail.com

@@ -1,6 +1,7 @@
 /*
  * This file is part of remco.
- * Based on code from confd. https://github.com/kelseyhightower/confd
+ * Based on code from confd.
+ * https://github.com/kelseyhightower/confd/blob/abba746a0cb7c8cb5fe135fa2d884ea3c4a5f666/resource/template/util.go
  * © 2013 Kelsey Hightower
  * © 2016 The Remco Authors
  *

@@ -1,7 +1,19 @@
 /*
  * This file is part of remco.
- * Based on code from confd. https://github.com/kelseyhightower/confd
+ * Based on code from confd.
+ * https://github.com/kelseyhightower/confd/blob/30663b9822fe8e800d1f2ea78447fba0ebce8f6c/resource/template/resource.go
+ * Users who have contributed to this file
  * © 2013 Kelsey Hightower
+ * © 2014 Armon Dadgar
+ * © 2014 Ernesto Jimenez
+ * © 2014 Nathan Fritz
+ * © 2014 John Engelman
+ * © 2014 Joanna Solmon
+ * © 2014 Chris Armstrong
+ * © 2014 Chris McNabb
+ * © 2015 Phil Kates
+ * © 2015 Matthew Fisher
+ *
  * © 2016 The Remco Authors
  *
  * For the full copyright and license information, please view the LICENSE

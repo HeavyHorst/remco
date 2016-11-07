@@ -1,7 +1,8 @@
 /*
  * This file is part of easyKV.
- * Based on code from confd. https://github.com/kelseyhightower/confd
- * confd contributors (vault backend)
+ * Based on code from confd.
+ * https://github.com/kelseyhightower/confd/blob/2cacfab234a5d61be4cd88b9e97bee44437c318d/backends/vault/client.go
+ * Users who have contributed to this file
  * © 2013 Kelsey Hightower
  *
  * © 2016 The easyKV Authors

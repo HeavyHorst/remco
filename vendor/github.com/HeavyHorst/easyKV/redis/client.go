@@ -1,7 +1,8 @@
 /*
  * This file is part of easyKV.
- * Based on code from confd. https://github.com/kelseyhightower/confd
- * confd contributors (redis backend)
+ * Based on code from confd.
+ * https://github.com/kelseyhightower/confd/blob/3b7d0dd5a3f960d7e18e2ce26468f9899f55ae1a/backends/redis/client.go
+ * Users who have contributed to this file
  * © 2013 Kelsey Hightower
  * © 2015 cinience@hotmail.com
  * © 2016 Eric Barch

@@ -1,7 +1,8 @@
 /*
  * This file is part of easyKV.
- * Based on code from confd. https://github.com/kelseyhightower/confd
- * confd contributors (etcd backend)
+ * Based on code from confd.
+ * https://github.com/kelseyhightower/confd/blob/8d0d0efc97bfbd9e4af982eca1161ef11fc06b0b/backends/etcd/client.go
+ * Users who have contributed to this file
  * © 2013 Kelsey Hightower
  * © 2014 Chris Armstrong
  * © 2015 Jens Henrik Hertz
