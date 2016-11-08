@@ -335,15 +335,29 @@ func (t *Resource) Monitor(ctx context.Context) {
 	processChan := make(chan Backend)
 	defer close(processChan)
 
-	if err := t.process(t.backends); err != nil {
-		switch err.(type) {
-		case berr.BackendError:
-			err := err.(berr.BackendError)
-			log.WithFields(logrus.Fields{
-				"backend": err.Backend,
-			}).Error(err)
+	// try to process the template resource with all given backends
+	// we wait 2 seconds and try again (with all backends - no stale data)
+	// if some error occurs
+retryloop:
+	for {
+		select {
+		case <-ctx.Done():
+			return
 		default:
-			log.Error(err)
+			if err := t.process(t.backends); err != nil {
+				switch err.(type) {
+				case berr.BackendError:
+					err := err.(berr.BackendError)
+					log.WithFields(logrus.Fields{
+						"backend": err.Backend,
+					}).Error(err)
+				default:
+					log.Error(err)
+				}
+				time.Sleep(2 * time.Second)
+				continue retryloop
+			}
+			break retryloop
 		}
 	}
 
