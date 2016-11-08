@@ -219,6 +219,24 @@
 
 
 
+<a  title="Sample resource configuration" href="https://heavyhorst.github.io/remco/config/sampleresource">
+	
+	Sample resource configuration
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
 <a  title="Template" href="https://heavyhorst.github.io/remco/template/">
 	
 	Template
@@ -304,6 +322,11 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 <ul>
 <li>The format of the log messages. Valid formats are <em>text</em> and <em>json</em>.</li>
 </ul></li>
+<li><strong>include_dir(string):</strong>
+
+<ul>
+<li>Specify an entire directory of resource configuration files to include.</li>
+</ul></li>
 </ul>
 
 <h2 id="template-configuration-options">Template configuration options</h2>
@@ -365,12 +388,12 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 <li><strong>interval(int):</strong>
 
 <ul>
-<li>The backend polling interval. Only used when watch mode is disabled.</li>
+<li>The backend polling interval. Can be used as a reconcilation loop for watch or standalone.</li>
 </ul></li>
 <li><strong>onetime(bool, optional):</strong>
 
 <ul>
-<li>Render the config file and quit. Only used when watch mode is disabled. Default is false.</li>
+<li>Render the config file and quit. Default is false.</li>
 </ul></li>
 <li><strong>keys([]string):</strong>
 

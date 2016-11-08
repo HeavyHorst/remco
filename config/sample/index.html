@@ -216,6 +216,24 @@
 
 
 
+<a  title="Sample resource configuration" href="https://heavyhorst.github.io/remco/config/sampleresource">
+	
+	Sample resource configuration
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
 <a  title="Template" href="https://heavyhorst.github.io/remco/template/">
 	
 	Template
@@ -283,6 +301,7 @@
 ################################################################
 log_level = &quot;debug&quot;
 log_format = &quot;text&quot;
+include_dir = &quot;/etc/remco/resource.d/&quot;
 
 
 ################################################################
@@ -290,39 +309,13 @@ log_format = &quot;text&quot;
 ################################################################
 [[resource]]
   [[resource.template]]
-    src = &quot;/etc/confd/templates/test.cfg&quot;
-    dst = &quot;/home/rkaufmann/haproxy.cfg&quot;
+    src = &quot;/etc/remco/templates/haproxy.cfg&quot;
+    dst = &quot;/etc/haproxy/haproxy.cfg&quot;
     checkCmd = &quot;&quot;
     reloadCmd = &quot;&quot;
     mode = &quot;0644&quot;
 
   [resource.backend]
-    [resource.backend.etcd]
-      nodes = [&quot;127.0.0.1:2379&quot;]
-      client_cert = &quot;/path/to/client_cert&quot;
-      client_key = &quot;/path/to/client_key&quot;
-      client_ca_keys = &quot;/path/to/client_ca_keys&quot;
-      username = &quot;admin&quot;
-      password = &quot;p@SsWord&quot;
-      version = 3
-
-      # These values are valid in every backend
-      watch = true
-      prefix = &quot;/&quot;
-      onetime = true
-      interval = 1
-      keys = [&quot;/&quot;]
-
-    [resource.backend.file]
-      filepath = &quot;/etc/remco/test.yml&quot;
-
-    [resource.backend.consul]
-      nodes = [&quot;127.0.0.1:8500&quot;]
-      scheme = &quot;http&quot; #{http/https}
-      client_cert = &quot;/path/to/client_cert&quot;
-      client_key = &quot;/path/to/client_key&quot;
-      client_ca_keys = &quot;/path/to/client_ca_keys&quot;
-    
     [resource.backend.vault]
       node = &quot;http://127.0.0.1:8200&quot;
       ## Token based auth backend
@@ -339,6 +332,17 @@ log_format = &quot;text&quot;
       client_cert = &quot;/path/to/client_cert&quot;
       client_key = &quot;/path/to/client_key&quot;
       client_ca_keys = &quot;/path/to/client_ca_keys&quot;
+      
+	  # These values are valid in every backend
+      watch = true
+      prefix = &quot;/&quot;
+      onetime = true
+      interval = 1
+      keys = [&quot;/&quot;]
+
+    [resource.backend.file]
+      filepath = &quot;/etc/remco/test.yml&quot;
+	  watch = true
 
 </code></pre>
 

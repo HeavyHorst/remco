@@ -9,18 +9,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>LICENCE - Remco Docs</title>
+    <title>Sample resource file - Remco Docs</title>
     <meta name="generator" content="Hugo 0.17" />
 
     
     <meta name="description" content="remco is a lightweight configuration management tool">
     
-    <link rel="canonical" href="https://heavyhorst.github.io/remco/license/">
+    <link rel="canonical" href="https://heavyhorst.github.io/remco/config/sampleresource/">
     
     <meta name="author" content="The remco authors">
     
 
-    <meta property="og:url" content="https://heavyhorst.github.io/remco/license/">
+    <meta property="og:url" content="https://heavyhorst.github.io/remco/config/sampleresource/">
     <meta property="og:title" content="Remco Docs">
     <meta property="og:image" content="https://heavyhorst.github.io/remco/images/logo.png">
     <meta name="apple-mobile-web-app-title" content="Remco Docs">
@@ -97,7 +97,7 @@
     </div>
     <div class="stretch">
       <div class="title">
-        LICENCE
+        Sample resource file
       </div>
     </div>
 
@@ -252,14 +252,11 @@
 
 
 
-<a class="current" title="License" href="https://heavyhorst.github.io/remco/license/">
+<a  title="License" href="https://heavyhorst.github.io/remco/license/">
 	
 	License
 </a>
 
-
-<ul id="scrollspy">
-</ul>
 
 
   
@@ -296,30 +293,22 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>LICENCE </h1>
+			<h1>Sample resource file </h1>
 
-			<pre>
-Copyright © 2013 Kelsey Hightower
-Copyright © 2016 The Remco Authors
+			<pre><code>[[template]]
+  src = &quot;/etc/remco/templates/haproxy.cfg&quot;
+  dst = &quot;/etc/haproxy/haproxy.cfg&quot;
+  mode = &quot;0644&quot;
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
+[backend]
+  [backend.etcd]
+    nodes = [&quot;http://localhost:2379&quot;]
+    keys = [&quot;/&quot;]
+    watch = true
+    interval = 1
+    version = 3
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-</pre>
+</code></pre>
 
 
 			<aside class="copyright" role="note">
@@ -338,25 +327,25 @@ SOFTWARE.
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="https://heavyhorst.github.io/remco/config/sample/" title="Sample configuration file">
-        <span class="direction">
-          Previous
-        </span>
-        <div class="page">
-          <div class="button button-previous" role="button" aria-label="Previous">
-            <i class="icon icon-back"></i>
-          </div>
-          <div class="stretch">
-            <div class="title">
-              Sample configuration file
-            </div>
-          </div>
-        </div>
-      </a>
-  
   </div>
 
   <div class="next">
+  
+      <a href="https://heavyhorst.github.io/remco/template/" title="Templates">
+        <span class="direction">
+          Next
+        </span>
+        <div class="page">
+          <div class="stretch">
+            <div class="title">
+              Templates
+            </div>
+          </div>
+          <div class="button button-next" role="button" aria-label="Next">
+            <i class="icon icon-forward"></i>
+          </div>
+        </div>
+      </a>
   
   </div>
 </nav>

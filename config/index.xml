@@ -7,8 +7,31 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Released under the MIT license</copyright>
-    <lastBuildDate>Wed, 05 Oct 2016 17:24:57 +0200</lastBuildDate>
+    <lastBuildDate>Sun, 06 Nov 2016 17:24:57 +0200</lastBuildDate>
     <atom:link href="https://heavyhorst.github.io/remco/config/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Sample resource file</title>
+      <link>https://heavyhorst.github.io/remco/config/sampleresource/</link>
+      <pubDate>Sun, 06 Nov 2016 17:24:57 +0200</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/config/sampleresource/</guid>
+      <description>&lt;pre&gt;&lt;code&gt;[[template]]
+  src = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
+  dst = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
+  mode = &amp;quot;0644&amp;quot;
+
+[backend]
+  [backend.etcd]
+    nodes = [&amp;quot;http://localhost:2379&amp;quot;]
+    keys = [&amp;quot;/&amp;quot;]
+    watch = true
+    interval = 1
+    version = 3
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Configuring remco</title>
@@ -38,6 +61,11 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 
 &lt;ul&gt;
 &lt;li&gt;The format of the log messages. Valid formats are &lt;em&gt;text&lt;/em&gt; and &lt;em&gt;json&lt;/em&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;include_dir(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Specify an entire directory of resource configuration files to include.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -100,12 +128,12 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;li&gt;&lt;strong&gt;interval(int):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The backend polling interval. Only used when watch mode is disabled.&lt;/li&gt;
+&lt;li&gt;The backend polling interval. Can be used as a reconcilation loop for watch or standalone.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;onetime(bool, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Render the config file and quit. Only used when watch mode is disabled. Default is false.&lt;/li&gt;
+&lt;li&gt;Render the config file and quit. Default is false.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;keys([]string):&lt;/strong&gt;
 
@@ -315,6 +343,7 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 ################################################################
 log_level = &amp;quot;debug&amp;quot;
 log_format = &amp;quot;text&amp;quot;
+include_dir = &amp;quot;/etc/remco/resource.d/&amp;quot;
 
 
 ################################################################
@@ -322,39 +351,13 @@ log_format = &amp;quot;text&amp;quot;
 ################################################################
 [[resource]]
   [[resource.template]]
-    src = &amp;quot;/etc/confd/templates/test.cfg&amp;quot;
-    dst = &amp;quot;/home/rkaufmann/haproxy.cfg&amp;quot;
+    src = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
+    dst = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
     checkCmd = &amp;quot;&amp;quot;
     reloadCmd = &amp;quot;&amp;quot;
     mode = &amp;quot;0644&amp;quot;
 
   [resource.backend]
-    [resource.backend.etcd]
-      nodes = [&amp;quot;127.0.0.1:2379&amp;quot;]
-      client_cert = &amp;quot;/path/to/client_cert&amp;quot;
-      client_key = &amp;quot;/path/to/client_key&amp;quot;
-      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
-      username = &amp;quot;admin&amp;quot;
-      password = &amp;quot;p@SsWord&amp;quot;
-      version = 3
-
-      # These values are valid in every backend
-      watch = true
-      prefix = &amp;quot;/&amp;quot;
-      onetime = true
-      interval = 1
-      keys = [&amp;quot;/&amp;quot;]
-
-    [resource.backend.file]
-      filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
-
-    [resource.backend.consul]
-      nodes = [&amp;quot;127.0.0.1:8500&amp;quot;]
-      scheme = &amp;quot;http&amp;quot; #{http/https}
-      client_cert = &amp;quot;/path/to/client_cert&amp;quot;
-      client_key = &amp;quot;/path/to/client_key&amp;quot;
-      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
-    
     [resource.backend.vault]
       node = &amp;quot;http://127.0.0.1:8200&amp;quot;
       ## Token based auth backend
@@ -371,6 +374,17 @@ log_format = &amp;quot;text&amp;quot;
       client_cert = &amp;quot;/path/to/client_cert&amp;quot;
       client_key = &amp;quot;/path/to/client_key&amp;quot;
       client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
+      
+	  # These values are valid in every backend
+      watch = true
+      prefix = &amp;quot;/&amp;quot;
+      onetime = true
+      interval = 1
+      keys = [&amp;quot;/&amp;quot;]
+
+    [resource.backend.file]
+      filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
+	  watch = true
 
 &lt;/code&gt;&lt;/pre&gt;
 </description>
