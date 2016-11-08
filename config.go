@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/HeavyHorst/remco/backends"
 	backendErrors "github.com/HeavyHorst/remco/backends/error"
@@ -116,36 +117,49 @@ func (c *configuration) run(stop chan struct{}) {
 
 	wait := sync.WaitGroup{}
 	for _, v := range c.Resource {
-		var backendList template.Backends
-
-		// try to connect to all supported backends
-		// add them to the backendList on success
-		// log an error otherwise
-		for _, config := range v.Backend.GetBackends() {
-			b, err := config.Connect()
-			if err == nil {
-				backendList = append(backendList, b)
-			} else if err != backendErrors.ErrNilConfig {
-				log.WithFields(logrus.Fields{
-					"backend": b.Name,
-				}).Error(err)
-			}
-		}
-
-		// create a new template resource with given backends and template processing configuration
-		t, err := template.NewResource(backendList, v.Template)
-		if err != nil {
-			log.Error(err.Error())
-			continue
-		}
-
 		wait.Add(1)
-		go func() {
+		go func(v resource) {
+			var backendList template.Backends
 			defer wait.Done()
+
+			// try to connect to all backends
+			// connection to all backends must succeed to continue
+			for _, config := range v.Backend.GetBackends() {
+			retryloop:
+				for {
+					select {
+					case <-ctx.Done():
+						backendList.Close()
+						return
+					default:
+						b, err := config.Connect()
+						if err == nil {
+							backendList = append(backendList, b)
+						} else if err != backendErrors.ErrNilConfig {
+							log.WithFields(logrus.Fields{
+								"backend": b.Name,
+							}).Error(err)
+							// try again every 2 seconds
+							time.Sleep(2 * time.Second)
+							continue retryloop
+						}
+						// break out of the loop on success or if the backend is nil
+						break retryloop
+					}
+				}
+			}
+
 			// make sure that all backend clients are closed cleanly
 			defer backendList.Close()
+
+			t, err := template.NewResource(backendList, v.Template)
+			if err != nil {
+				log.Error(err.Error())
+				return
+			}
+
 			t.Monitor(ctx)
-		}()
+		}(v)
 	}
 
 	go func() {
