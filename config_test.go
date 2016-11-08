@@ -27,8 +27,8 @@ log_level = "debug"
 log_format = "text"
 [[resource]]
   [[resource.template]]
-    src = "test12345"
-    dst = "test12345"
+    src = "/tmp/test12345.tmpl"
+    dst = "/tmp/test12345.cfg"
     checkCmd = ""
     reloadCmd = ""
     mode = "0644"
@@ -42,8 +42,8 @@ log_format = "text"
 
 var expectedTemplates = []*template.ProcessConfig{
 	&template.ProcessConfig{
-		Src:  "test12345",
-		Dst:  "test12345",
+		Src:  "/tmp/test12345.tmpl",
+		Dst:  "/tmp/test12345.cfg",
 		Mode: "0644",
 	},
 }
@@ -80,16 +80,28 @@ type FilterSuite struct {
 var _ = Suite(&FilterSuite{})
 
 func (s *FilterSuite) SetUpSuite(t *C) {
-	f, err := ioutil.TempFile("/tmp", "")
+	// write cfg and tmpl file
+	f, err := os.Create("/tmp/test12345.tmpl")
 	if err != nil {
 		t.Error(err)
 	}
 	defer f.Close()
-	_, err = f.WriteString(testFile)
+	f2, err := os.Create("/tmp/test12345.cfg")
 	if err != nil {
 		t.Error(err)
 	}
-	s.cfgPath = f.Name()
+	defer f2.Close()
+
+	f3, err := ioutil.TempFile("/tmp", "")
+	if err != nil {
+		t.Error(err)
+	}
+	defer f3.Close()
+	_, err = f3.WriteString(testFile)
+	if err != nil {
+		t.Error(err)
+	}
+	s.cfgPath = f3.Name()
 }
 
 func (s *FilterSuite) TearDownSuite(t *C) {
