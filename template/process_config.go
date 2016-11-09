@@ -18,8 +18,8 @@ import (
 	"os/exec"
 	"strconv"
 
-	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template/fileutil"
+	"github.com/Sirupsen/logrus"
 )
 
 // ProcessConfig contains all data needed for the template processing
@@ -32,6 +32,7 @@ type ProcessConfig struct {
 	ReloadCmd string
 	CheckCmd  string
 	stageFile *os.File
+	logger    *logrus.Entry
 }
 
 func (s *ProcessConfig) getFileMode() (os.FileMode, error) {
@@ -73,14 +74,14 @@ func (s *ProcessConfig) check(stageFile string) error {
 	if err := tmpl.Execute(&cmdBuffer, data); err != nil {
 		return err
 	}
-	log.Debug("Running " + cmdBuffer.String())
+	s.logger.Debug("Running " + cmdBuffer.String())
 	c := exec.Command("/bin/sh", "-c", cmdBuffer.String())
 	output, err := c.CombinedOutput()
 	if err != nil {
-		log.Error(fmt.Sprintf("%q", string(output)))
+		s.logger.Error(fmt.Sprintf("%q", string(output)))
 		return err
 	}
-	log.Debug(fmt.Sprintf("%q", string(output)))
+	s.logger.Debug(fmt.Sprintf("%q", string(output)))
 	return nil
 }
 
@@ -90,13 +91,13 @@ func (s *ProcessConfig) reload() error {
 	if s.ReloadCmd == "" {
 		return nil
 	}
-	log.Debug("Running " + s.ReloadCmd)
+	s.logger.Debug("Running " + s.ReloadCmd)
 	c := exec.Command("/bin/sh", "-c", s.ReloadCmd)
 	output, err := c.CombinedOutput()
 	if err != nil {
-		log.Error(fmt.Sprintf("%q", string(output)))
+		s.logger.Error(fmt.Sprintf("%q", string(output)))
 		return err
 	}
-	log.Debug(fmt.Sprintf("%q", string(output)))
+	s.logger.Debug(fmt.Sprintf("%q", string(output)))
 	return nil
 }

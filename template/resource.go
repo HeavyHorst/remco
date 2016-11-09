@@ -64,12 +64,12 @@ type Backend struct {
 type Backends []Backend
 
 // Close is calling the close method on all backends
-func (b Backends) Close() {
-	for _, v := range b {
-		log.WithFields(logrus.Fields{
+func (t *Resource) Close() {
+	for _, v := range t.backends {
+		t.logger.WithFields(logrus.Fields{
 			"backend": v.Name,
 		}).Debug("Closing client connection")
-		v.ReadWatcher.Close()
+		v.Close()
 	}
 }
 
@@ -79,21 +79,25 @@ type Resource struct {
 	funcMap  map[string]interface{}
 	store    memkv.Store
 	sources  []*ProcessConfig
+	logger   *logrus.Entry
 }
 
 // ErrEmptySrc is returned if an emty src template is passed to NewResource
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(backends Backends, sources []*ProcessConfig) (*Resource, error) {
+func NewResource(backends Backends, sources []*ProcessConfig, name string) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
+
+	logger := log.WithFields(logrus.Fields{"resource": name})
 
 	for _, v := range sources {
 		if v.Src == "" {
 			return nil, ErrEmptySrc
 		}
+		v.logger = logger
 	}
 
 	tr := &Resource{
@@ -101,6 +105,7 @@ func NewResource(backends Backends, sources []*ProcessConfig) (*Resource, error)
 		store:    memkv.New(),
 		funcMap:  newFuncMap(),
 		sources:  sources,
+		logger:   logger,
 	}
 
 	// initialize the inidividual backend memkv Stores
@@ -109,7 +114,7 @@ func NewResource(backends Backends, sources []*ProcessConfig) (*Resource, error)
 		tr.backends[i].store = &store
 
 		if tr.backends[i].Interval <= 0 && tr.backends[i].Onetime == false && tr.backends[i].Watch == false {
-			log.Warning("Interval needs to be > 0: setting interval to 60")
+			logger.Warning("Interval needs to be > 0: setting interval to 60")
 			tr.backends[i].Interval = 60
 		}
 	}
@@ -123,7 +128,7 @@ func NewResource(backends Backends, sources []*ProcessConfig) (*Resource, error)
 func (t *Resource) setVars(storeClient Backend) error {
 	var err error
 
-	log.WithFields(logrus.Fields{
+	t.logger.WithFields(logrus.Fields{
 		"backend":    storeClient.Name,
 		"key_prefix": storeClient.Prefix,
 	}).Debug("Retrieving keys")
@@ -144,7 +149,7 @@ func (t *Resource) setVars(storeClient Backend) error {
 	for _, v := range t.backends {
 		for _, kv := range v.store.GetAllKVs() {
 			if t.store.Exists(kv.Key) {
-				log.Warning("Key collision - " + kv.Key)
+				t.logger.Warning("Key collision - " + kv.Key)
 			}
 			t.store.Set(kv.Key, kv.Value)
 		}
@@ -163,7 +168,7 @@ func (t *Resource) createStageFileAndSync() error {
 			return errors.New("Missing template: " + s.Src)
 		}
 
-		log.WithFields(logrus.Fields{
+		t.logger.WithFields(logrus.Fields{
 			"template": s.Src,
 		}).Debug("Compiling source template")
 
@@ -213,18 +218,18 @@ func (t *Resource) sync(s *ProcessConfig) error {
 	staged := s.stageFile.Name()
 	defer os.Remove(staged)
 
-	log.WithFields(logrus.Fields{
+	t.logger.WithFields(logrus.Fields{
 		"staged": path.Base(staged),
 		"dest":   s.Dst,
 	}).Debug("Comparing staged and dest config files")
 
-	ok, err := fileutil.SameFile(staged, s.Dst)
+	ok, err := fileutil.SameFile(staged, s.Dst, t.logger)
 	if err != nil {
 		log.Error(err.Error())
 	}
 
 	if !ok {
-		log.WithFields(logrus.Fields{
+		t.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
 		}).Info("Target config out of sync")
 
@@ -232,7 +237,7 @@ func (t *Resource) sync(s *ProcessConfig) error {
 			return errors.New("Config check failed: " + err.Error())
 		}
 
-		log.WithFields(logrus.Fields{
+		t.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
 		}).Debug("Overwriting target config")
 
@@ -240,7 +245,7 @@ func (t *Resource) sync(s *ProcessConfig) error {
 		if err != nil {
 			return err
 		}
-		if err := fileutil.ReplaceFile(staged, s.Dst, fileMode); err != nil {
+		if err := fileutil.ReplaceFile(staged, s.Dst, fileMode, t.logger); err != nil {
 			return err
 		}
 
@@ -251,12 +256,12 @@ func (t *Resource) sync(s *ProcessConfig) error {
 			return err
 		}
 
-		log.WithFields(logrus.Fields{
+		t.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
 		}).Info("Target config has been updated")
 
 	} else {
-		log.WithFields(logrus.Fields{
+		t.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
 		}).Debug("Target config in sync")
 
@@ -284,7 +289,7 @@ func (t *Resource) process(storeClients []Backend) error {
 	return nil
 }
 
-func (s Backend) watch(ctx context.Context, processChan chan Backend) {
+func (s Backend) watch(ctx context.Context, processChan chan Backend, errChan chan berr.BackendError) {
 	if s.Onetime {
 		return
 	}
@@ -300,9 +305,7 @@ func (s Backend) watch(ctx context.Context, processChan chan Backend) {
 			index, err := s.WatchPrefix(s.Prefix, ctx, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
 			if err != nil {
 				if err != easyKV.ErrWatchCanceled {
-					log.WithFields(logrus.Fields{
-						"backend": s.Name,
-					}).Error(err)
+					errChan <- berr.BackendError{Message: err.Error(), Backend: s.Name}
 					time.Sleep(2 * time.Second)
 				}
 				continue
@@ -334,6 +337,7 @@ func (t *Resource) Monitor(ctx context.Context) {
 
 	processChan := make(chan Backend)
 	defer close(processChan)
+	errChan := make(chan berr.BackendError, 10)
 
 	// try to process the template resource with all given backends
 	// we wait 2 seconds and try again (with all backends - no stale data)
@@ -348,7 +352,7 @@ retryloop:
 				switch err.(type) {
 				case berr.BackendError:
 					err := err.(berr.BackendError)
-					log.WithFields(logrus.Fields{
+					t.logger.WithFields(logrus.Fields{
 						"backend": err.Backend,
 					}).Error(err)
 				default:
@@ -366,7 +370,7 @@ retryloop:
 			wg.Add(1)
 			go func(s Backend) {
 				defer wg.Done()
-				s.watch(ctx, processChan)
+				s.watch(ctx, processChan, errChan)
 			}(sc)
 		}
 
@@ -391,13 +395,17 @@ retryloop:
 		case storeClient := <-processChan:
 			if err := t.process([]Backend{storeClient}); err != nil {
 				if _, ok := err.(berr.BackendError); ok {
-					log.WithFields(logrus.Fields{
+					t.logger.WithFields(logrus.Fields{
 						"backend": storeClient.Name,
 					}).Error(err)
 				} else {
 					log.Error(err)
 				}
 			}
+		case err := <-errChan:
+			t.logger.WithFields(logrus.Fields{
+				"backend": err.Backend,
+			}).Error(err.Message)
 		case <-ctx.Done():
 			go func() {
 				for range processChan {

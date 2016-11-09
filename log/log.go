@@ -59,6 +59,9 @@ func SetLevel(level string) error {
 //withSource adds the field source to the logs
 //example: source=resource.go:310
 func withSource(l *log.Entry) *log.Entry {
+	lock.Lock()
+	defer lock.Unlock()
+
 	_, file, line, ok := runtime.Caller(2)
 	if !ok {
 		file = "<???>"
@@ -73,36 +76,26 @@ func withSource(l *log.Entry) *log.Entry {
 
 // Debug logs a message with severity DEBUG.
 func Debug(v ...interface{}) {
-	lock.Lock()
-	defer lock.Unlock()
 	withSource(logger).Debug(v)
 }
 
 // Error logs a message with severity ERROR.
 func Error(v ...interface{}) {
-	lock.Lock()
-	defer lock.Unlock()
 	withSource(logger).Error(v)
 }
 
 // Fatal logs a message with severity ERROR followed by a call to os.Exit().
 func Fatal(v ...interface{}) {
-	lock.Lock()
-	defer lock.Unlock()
 	withSource(logger).Fatal(v)
 }
 
 // Info logs a message with severity INFO.
 func Info(v ...interface{}) {
-	lock.Lock()
-	defer lock.Unlock()
 	withSource(logger).Info(v)
 }
 
 // Warning logs a message with severity WARNING.
 func Warning(v ...interface{}) {
-	lock.Lock()
-	defer lock.Unlock()
 	withSource(logger).Warning(v)
 }
 

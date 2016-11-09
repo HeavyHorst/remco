@@ -9,6 +9,7 @@
 package main
 
 import (
+	"context"
 	"strings"
 	"sync"
 	"time"
@@ -30,13 +31,40 @@ type configWatcher struct {
 	configPath       string
 }
 
-// call c.run in its own goroutine
-// and write to the w.stoppedW chan if its done
 func (w *configWatcher) runConfig(c configuration) {
 	defer func() {
 		w.stoppedW <- struct{}{}
 	}()
-	c.run(w.stopWatch)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan struct{})
+
+	wait := sync.WaitGroup{}
+	for _, v := range c.Resource {
+		wait.Add(1)
+		go func(r resource) {
+			defer wait.Done()
+			r.run(ctx)
+		}(v)
+	}
+
+	go func() {
+		// If there is no goroutine left - quit
+		wait.Wait()
+		close(done)
+	}()
+
+	for {
+		select {
+		case <-w.stopWatch:
+			cancel()
+			wait.Wait()
+			return
+		case <-done:
+			return
+		}
+	}
 }
 
 func (w *configWatcher) getCanceled() bool {

@@ -9,10 +9,8 @@
 package main
 
 import (
-	"errors"
 	"io/ioutil"
 	"os"
-	"sync"
 	"testing"
 
 	"github.com/HeavyHorst/remco/backends"
@@ -80,18 +78,6 @@ type FilterSuite struct {
 var _ = Suite(&FilterSuite{})
 
 func (s *FilterSuite) SetUpSuite(t *C) {
-	// write cfg and tmpl file
-	f, err := os.Create("/tmp/test12345.tmpl")
-	if err != nil {
-		t.Error(err)
-	}
-	defer f.Close()
-	f2, err := os.Create("/tmp/test12345.cfg")
-	if err != nil {
-		t.Error(err)
-	}
-	defer f2.Close()
-
 	f3, err := ioutil.TempFile("/tmp", "")
 	if err != nil {
 		t.Error(err)
@@ -117,38 +103,4 @@ func (s *FilterSuite) TestNewConf(t *C) {
 		t.Error(err)
 	}
 	t.Check(cfg, DeepEquals, expected)
-}
-
-func runTest(cfg configuration, t *C) {
-	wait := sync.WaitGroup{}
-	stop := make(chan struct{})
-	wait.Add(1)
-	go func() {
-		defer wait.Done()
-		cfg.run(stop)
-	}()
-	close(stop)
-	wait.Wait()
-}
-
-func (s *FilterSuite) TestRun(t *C) {
-	cfg, err := newConfiguration(s.cfgPath)
-	if err != nil {
-		t.Error(err)
-	}
-	runTest(cfg, t)
-}
-
-// the error should just be logged
-func (s *FilterSuite) TestRunWithError(t *C) {
-	cfg := expected
-	cfg.Resource[0].Backend.Mock.Error = errors.New("test")
-	runTest(cfg, t)
-}
-
-// should run and exit on its own -- no need to close the stopchan
-func (s *FilterSuite) TestRunOnetime(t *C) {
-	cfg := expected
-	cfg.Resource[0].Backend.Mock.Backend.Onetime = true
-	cfg.run(make(chan struct{}))
 }
