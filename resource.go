@@ -20,7 +20,7 @@ type resource struct {
 }
 
 func (r *resource) run(ctx context.Context) {
-	var backendList template.Backends
+	var backendList []template.Backend
 
 	// try to connect to all backends
 	// connection to all backends must succeed to continue

@@ -61,8 +61,6 @@ type Backend struct {
 	store    *memkv.Store
 }
 
-type Backends []Backend
-
 // Close is calling the close method on all backends
 func (t *Resource) Close() {
 	for _, v := range t.backends {
@@ -86,7 +84,7 @@ type Resource struct {
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(backends Backends, sources []*ProcessConfig, name string) (*Resource, error) {
+func NewResource(backends []Backend, sources []*ProcessConfig, name string) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
