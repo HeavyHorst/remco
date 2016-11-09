@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/HeavyHorst/remco/log"
+	"github.com/Sirupsen/logrus"
 	. "gopkg.in/check.v1"
 )
 
@@ -48,7 +49,7 @@ func testSameFile(t *C, srcTxt, dstTxt string) bool {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	status, err := SameFile(src.Name(), dst.Name())
+	status, err := SameFile(src.Name(), dst.Name(), logrus.WithFields(logrus.Fields{}))
 	if err != nil {
 		t.Error(err.Error())
 	}

@@ -18,6 +18,7 @@ include_dir = "/etc/remco/resource.d/"
 # Resource configuration
 ################################################################
 [[resource]]
+  name = "haproxy"
   [[resource.template]]
     src = "/etc/remco/templates/haproxy.cfg"
     dst = "/etc/haproxy/haproxy.cfg"

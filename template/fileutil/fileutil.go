@@ -16,7 +16,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/HeavyHorst/remco/log"
 	"github.com/Sirupsen/logrus"
 )
 
@@ -40,11 +39,11 @@ func IsFileExist(fpath string) bool {
 // ReplaceFile just renames (move) the file if possible.
 // If that fails it will read the src file and write the content to the destination file.
 // It returns an error iof any.
-func ReplaceFile(src, dest string, mode os.FileMode) error {
+func ReplaceFile(src, dest string, mode os.FileMode, logger *logrus.Entry) error {
 	err := os.Rename(src, dest)
 	if err != nil {
 		if strings.Contains(err.Error(), "device or resource busy") {
-			log.Debug("Rename failed - target is likely a mount. Trying to write instead")
+			logger.Debug("Rename failed - target is likely a mount. Trying to write instead")
 			// try to open the file and write to it
 			var contents []byte
 			var rerr error
@@ -67,7 +66,7 @@ func ReplaceFile(src, dest string, mode os.FileMode) error {
 // Two config files are equal when they have the same file contents and
 // Unix permissions. The owner, group, and mode must match.
 // It return false in other cases.
-func SameFile(src, dest string) (bool, error) {
+func SameFile(src, dest string, logger *logrus.Entry) (bool, error) {
 	if !IsFileExist(dest) {
 		return false, nil
 	}
@@ -80,28 +79,28 @@ func SameFile(src, dest string) (bool, error) {
 		return false, err
 	}
 	if d.Uid != s.Uid {
-		log.WithFields(logrus.Fields{
+		logger.WithFields(logrus.Fields{
 			"config":  dest,
 			"current": d.Uid,
 			"new":     s.Uid,
 		}).Info("wrong UID")
 	}
 	if d.Gid != s.Gid {
-		log.WithFields(logrus.Fields{
+		logger.WithFields(logrus.Fields{
 			"config":  dest,
 			"current": d.Gid,
 			"new":     s.Gid,
 		}).Info("wrong GID")
 	}
 	if d.Mode != s.Mode {
-		log.WithFields(logrus.Fields{
+		logger.WithFields(logrus.Fields{
 			"config":  dest,
 			"current": os.FileMode(d.Mode),
 			"new":     os.FileMode(s.Mode),
 		}).Info("wrong filemode")
 	}
 	if d.Hash != s.Hash {
-		log.WithFields(logrus.Fields{
+		logger.WithFields(logrus.Fields{
 			"config":  dest,
 			"current": d.Hash,
 			"new":     s.Hash,

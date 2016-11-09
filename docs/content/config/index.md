@@ -19,6 +19,10 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
  - **include_dir(string):**
    - Specify an entire directory of resource configuration files to include.
 
+## Resource configuration options
+ - **name(string, optional):**
+    - You can give the resource a name which is added to the logs as field *resource*. Default is the name of the resource file.
+
 ## Template configuration options
  - **src(string):**
     - The path of the template that will be used to render the application's configuration file.
