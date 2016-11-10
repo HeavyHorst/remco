@@ -38,8 +38,8 @@ log_format = "text"
 		onetime = false
 `
 
-var expectedTemplates = []*template.ProcessConfig{
-	&template.ProcessConfig{
+var expectedTemplates = []*template.Processor{
+	&template.Processor{
 		Src:  "/tmp/test12345.tmpl",
 		Dst:  "/tmp/test12345.cfg",
 		Mode: "0644",

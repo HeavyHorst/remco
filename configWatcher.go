@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/HeavyHorst/remco/log"
+	"github.com/Sirupsen/logrus"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -110,6 +111,9 @@ func (w *configWatcher) startWatchConfig(config configuration) {
 				event.Op&fsnotify.Create == fsnotify.Create {
 				// only watch .toml files
 				if strings.HasSuffix(event.Name, ".toml") || event.Name == w.configPath {
+					log.WithFields(logrus.Fields{
+						"file": event.Name,
+					}).Info("config change detected")
 					time.Sleep(500 * time.Millisecond)
 
 					// don't try to reload if w is already canceled
@@ -142,6 +146,9 @@ func newConfigWatcher(configPath string, config configuration, done chan struct{
 		for {
 			select {
 			case <-w.reloadChan:
+				log.WithFields(logrus.Fields{
+					"file": w.configPath,
+				}).Info("loading new config")
 				newConf, err := newConfiguration(w.configPath)
 				if err != nil {
 					log.Error(err)
@@ -154,6 +161,9 @@ func newConfigWatcher(configPath string, config configuration, done chan struct{
 				}
 
 				// stop the old config and wait until it has stopped
+				log.WithFields(logrus.Fields{
+					"file": w.configPath,
+				}).Info("stopping the old config")
 				w.stopWatch <- struct{}{}
 				<-w.stoppedW
 				go w.runConfig(newConf)

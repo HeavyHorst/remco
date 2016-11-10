@@ -12,18 +12,24 @@ package template
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
+	"path/filepath"
 	"strconv"
 
+	"github.com/HeavyHorst/confd/log"
+	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/Sirupsen/logrus"
 )
 
-// ProcessConfig contains all data needed for the template processing
-type ProcessConfig struct {
+// Processor contains all data needed for the template processing
+type Processor struct {
 	Src       string
 	Dst       string
 	Mode      string
@@ -35,7 +41,113 @@ type ProcessConfig struct {
 	logger    *logrus.Entry
 }
 
-func (s *ProcessConfig) getFileMode() (os.FileMode, error) {
+// createStageFile stages the src configuration file by processing the src
+// template and setting the desired owner, group, and mode. It also sets the
+// StageFile for the template resource.
+// It returns an error if any.
+func (s *Processor) createStageFile(funcMap map[string]interface{}) error {
+	if !fileutil.IsFileExist(s.Src) {
+		return errors.New("Missing template: " + s.Src)
+	}
+
+	s.logger.WithFields(logrus.Fields{
+		"template": s.Src,
+	}).Debug("Compiling source template")
+
+	set := pongo2.NewSet("local", &pongo2.LocalFilesystemLoader{})
+	tmpl, err := set.FromFile(s.Src)
+	if err != nil {
+		return fmt.Errorf("Unable to process template %s, %s", s.Src, err)
+	}
+
+	// create TempFile in Dest directory to avoid cross-filesystem issues
+	temp, err := ioutil.TempFile(filepath.Dir(s.Dst), "."+filepath.Base(s.Dst))
+	if err != nil {
+		return err
+	}
+
+	if err = tmpl.ExecuteWriter(funcMap, temp); err != nil {
+		temp.Close()
+		os.Remove(temp.Name())
+		return err
+	}
+
+	temp.Close()
+
+	fileMode, err := s.getFileMode()
+	if err != nil {
+		return err
+	}
+	// Set the owner, group, and mode on the stage file now to make it easier to
+	// compare against the destination configuration file later.
+	os.Chmod(temp.Name(), fileMode)
+	os.Chown(temp.Name(), s.UID, s.GID)
+	s.stageFile = temp
+
+	return nil
+}
+
+// syncFiles compares the staged and dest config files and attempts to sync them
+// if they differ. syncFiles will run a config check command if set before
+// overwriting the target config file. Finally, syncFile will run a reload command
+// if set to have the application or service pick up the changes.
+// It returns an error if any.
+func (s *Processor) syncFiles() error {
+	staged := s.stageFile.Name()
+	defer os.Remove(staged)
+
+	s.logger.WithFields(logrus.Fields{
+		"staged": path.Base(staged),
+		"dest":   s.Dst,
+	}).Debug("Comparing staged and dest config files")
+
+	ok, err := fileutil.SameFile(staged, s.Dst, s.logger)
+	if err != nil {
+		log.Error(err.Error())
+	}
+
+	if !ok {
+		s.logger.WithFields(logrus.Fields{
+			"config": s.Dst,
+		}).Info("Target config out of sync")
+
+		if err := s.check(staged); err != nil {
+			return errors.New("Config check failed: " + err.Error())
+		}
+
+		s.logger.WithFields(logrus.Fields{
+			"config": s.Dst,
+		}).Debug("Overwriting target config")
+
+		fileMode, err := s.getFileMode()
+		if err != nil {
+			return err
+		}
+		if err := fileutil.ReplaceFile(staged, s.Dst, fileMode, s.logger); err != nil {
+			return err
+		}
+
+		// make sure owner and group match the temp file, in case the file was created with WriteFile
+		os.Chown(s.Dst, s.UID, s.GID)
+
+		if err := s.reload(); err != nil {
+			return err
+		}
+
+		s.logger.WithFields(logrus.Fields{
+			"config": s.Dst,
+		}).Info("Target config has been updated")
+
+	} else {
+		s.logger.WithFields(logrus.Fields{
+			"config": s.Dst,
+		}).Debug("Target config in sync")
+
+	}
+	return nil
+}
+
+func (s *Processor) getFileMode() (os.FileMode, error) {
 	if s.Mode == "" {
 		if !fileutil.IsFileExist(s.Dst) {
 			return 0644, nil
@@ -60,7 +172,7 @@ func (s *ProcessConfig) getFileMode() (os.FileMode, error) {
 // with a string representing the full path of the staged file. This allows the
 // check to be run on the staged file before overwriting the destination config file.
 // It returns nil if the check command returns 0 and there are no other errors.
-func (s *ProcessConfig) check(stageFile string) error {
+func (s *Processor) check(stageFile string) error {
 	if s.CheckCmd == "" {
 		return nil
 	}
@@ -87,7 +199,7 @@ func (s *ProcessConfig) check(stageFile string) error {
 
 // reload executes the reload command.
 // It returns nil if the reload command returns 0.
-func (s *ProcessConfig) reload() error {
+func (s *Processor) reload() error {
 	if s.ReloadCmd == "" {
 		return nil
 	}

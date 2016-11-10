@@ -25,58 +25,23 @@ package template
 import (
 	"context"
 	"errors"
-	"fmt"
-	"io/ioutil"
-	"os"
 	"path"
-	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/memkv"
-	"github.com/HeavyHorst/pongo2"
 	berr "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/log"
-	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/Sirupsen/logrus"
 )
-
-// A BackendConfig - Every backend implements this interface. If Connect is called a new connection to the underlaying kv-store will be established.
-// Connect should also set the name and the StoreClient of the Backend. The other values of Backend will be loaded from the configuration file.
-type BackendConfig interface {
-	Connect() (Backend, error)
-}
-
-// Backend is the representation of a template backend like etcd or consul
-type Backend struct {
-	easyKV.ReadWatcher
-	Name     string
-	Onetime  bool
-	Watch    bool
-	Prefix   string
-	Interval int
-	Keys     []string
-	store    *memkv.Store
-}
-
-// Close is calling the close method on all backends
-func (t *Resource) Close() {
-	for _, v := range t.backends {
-		t.logger.WithFields(logrus.Fields{
-			"backend": v.Name,
-		}).Debug("Closing client connection")
-		v.Close()
-	}
-}
 
 // Resource is the representation of a parsed template resource.
 type Resource struct {
 	backends []Backend
 	funcMap  map[string]interface{}
 	store    memkv.Store
-	sources  []*ProcessConfig
+	sources  []*Processor
 	logger   *logrus.Entry
 }
 
@@ -84,7 +49,7 @@ type Resource struct {
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(backends []Backend, sources []*ProcessConfig, name string) (*Resource, error) {
+func NewResource(backends []Backend, sources []*Processor, name string) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
@@ -122,6 +87,16 @@ func NewResource(backends []Backend, sources []*ProcessConfig, name string) (*Re
 	return tr, nil
 }
 
+// Close is calling the close method on all backends
+func (t *Resource) Close() {
+	for _, v := range t.backends {
+		t.logger.WithFields(logrus.Fields{
+			"backend": v.Name,
+		}).Debug("Closing client connection")
+		v.Close()
+	}
+}
+
 // setVars sets the Vars for a template resource.
 func (t *Resource) setVars(storeClient Backend) error {
 	var err error
@@ -156,113 +131,15 @@ func (t *Resource) setVars(storeClient Backend) error {
 	return nil
 }
 
-// createStageFile stages the src configuration file by processing the src
-// template and setting the desired owner, group, and mode. It also sets the
-// StageFile for the template resource.
-// It returns an error if any.
 func (t *Resource) createStageFileAndSync() error {
 	for _, s := range t.sources {
-		if !fileutil.IsFileExist(s.Src) {
-			return errors.New("Missing template: " + s.Src)
-		}
-
-		t.logger.WithFields(logrus.Fields{
-			"template": s.Src,
-		}).Debug("Compiling source template")
-
-		set := pongo2.NewSet("local", &pongo2.LocalFilesystemLoader{})
-		tmpl, err := set.FromFile(s.Src)
-		if err != nil {
-			return fmt.Errorf("Unable to process template %s, %s", s.Src, err)
-		}
-
-		// create TempFile in Dest directory to avoid cross-filesystem issues
-		temp, err := ioutil.TempFile(filepath.Dir(s.Dst), "."+filepath.Base(s.Dst))
+		err := s.createStageFile(t.funcMap)
 		if err != nil {
 			return err
 		}
-
-		if err = tmpl.ExecuteWriter(t.funcMap, temp); err != nil {
-			temp.Close()
-			os.Remove(temp.Name())
+		if err = s.syncFiles(); err != nil {
 			return err
 		}
-
-		temp.Close()
-
-		fileMode, err := s.getFileMode()
-		if err != nil {
-			return err
-		}
-		// Set the owner, group, and mode on the stage file now to make it easier to
-		// compare against the destination configuration file later.
-		os.Chmod(temp.Name(), fileMode)
-		os.Chown(temp.Name(), s.UID, s.GID)
-		s.stageFile = temp
-
-		if err = t.sync(s); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// sync compares the staged and dest config files and attempts to sync them
-// if they differ. sync will run a config check command if set before
-// overwriting the target config file. Finally, sync will run a reload command
-// if set to have the application or service pick up the changes.
-// It returns an error if any.
-func (t *Resource) sync(s *ProcessConfig) error {
-	staged := s.stageFile.Name()
-	defer os.Remove(staged)
-
-	t.logger.WithFields(logrus.Fields{
-		"staged": path.Base(staged),
-		"dest":   s.Dst,
-	}).Debug("Comparing staged and dest config files")
-
-	ok, err := fileutil.SameFile(staged, s.Dst, t.logger)
-	if err != nil {
-		log.Error(err.Error())
-	}
-
-	if !ok {
-		t.logger.WithFields(logrus.Fields{
-			"config": s.Dst,
-		}).Info("Target config out of sync")
-
-		if err := s.check(staged); err != nil {
-			return errors.New("Config check failed: " + err.Error())
-		}
-
-		t.logger.WithFields(logrus.Fields{
-			"config": s.Dst,
-		}).Debug("Overwriting target config")
-
-		fileMode, err := s.getFileMode()
-		if err != nil {
-			return err
-		}
-		if err := fileutil.ReplaceFile(staged, s.Dst, fileMode, t.logger); err != nil {
-			return err
-		}
-
-		// make sure owner and group match the temp file, in case the file was created with WriteFile
-		os.Chown(s.Dst, s.UID, s.GID)
-
-		if err := s.reload(); err != nil {
-			return err
-		}
-
-		t.logger.WithFields(logrus.Fields{
-			"config": s.Dst,
-		}).Info("Target config has been updated")
-
-	} else {
-		t.logger.WithFields(logrus.Fields{
-			"config": s.Dst,
-		}).Debug("Target config in sync")
-
 	}
 	return nil
 }
@@ -285,47 +162,6 @@ func (t *Resource) process(storeClients []Backend) error {
 		return err
 	}
 	return nil
-}
-
-func (s Backend) watch(ctx context.Context, processChan chan Backend, errChan chan berr.BackendError) {
-	if s.Onetime {
-		return
-	}
-
-	var lastIndex uint64
-	keysPrefix := appendPrefix(s.Prefix, s.Keys)
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			index, err := s.WatchPrefix(s.Prefix, ctx, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
-			if err != nil {
-				if err != easyKV.ErrWatchCanceled {
-					errChan <- berr.BackendError{Message: err.Error(), Backend: s.Name}
-					time.Sleep(2 * time.Second)
-				}
-				continue
-			}
-			processChan <- s
-			lastIndex = index
-		}
-	}
-}
-
-func (s Backend) interval(ctx context.Context, processChan chan Backend) {
-	if s.Onetime {
-		return
-	}
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(time.Duration(s.Interval) * time.Second):
-			processChan <- s
-		}
-	}
 }
 
 // Monitor will start to monitor all given Backends for changes.
