@@ -59,19 +59,23 @@ func SetLevel(level string) error {
 //withSource adds the field source to the logs
 //example: source=resource.go:310
 func withSource(l *log.Entry) *log.Entry {
-	lock.Lock()
-	defer lock.Unlock()
+	if log.GetLevel() == log.DebugLevel {
 
-	_, file, line, ok := runtime.Caller(2)
-	if !ok {
-		file = "<???>"
-		line = 1
-	} else {
-		slash := strings.LastIndex(file, "/")
-		file = file[slash+1:]
+		lock.Lock()
+		defer lock.Unlock()
+
+		_, file, line, ok := runtime.Caller(2)
+		if !ok {
+			file = "<???>"
+			line = 1
+		} else {
+			slash := strings.LastIndex(file, "/")
+			file = file[slash+1:]
+		}
+		logger := l.WithField("source", fmt.Sprintf("%s:%d", file, line))
+		return logger
 	}
-	logger := l.WithField("source", fmt.Sprintf("%s:%d", file, line))
-	return logger
+	return l
 }
 
 // Debug logs a message with severity DEBUG.
