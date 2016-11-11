@@ -190,7 +190,7 @@ retryloop:
 						"backend": err.Backend,
 					}).Error(err)
 				default:
-					log.Error(err)
+					t.logger.Error(err)
 				}
 				time.Sleep(2 * time.Second)
 				continue retryloop
