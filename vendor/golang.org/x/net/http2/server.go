@@ -386,8 +386,8 @@ type serverConn struct {
 	advMaxStreams         uint32 // our SETTINGS_MAX_CONCURRENT_STREAMS advertised the client
 	curClientStreams      uint32 // number of open streams initiated by the client
 	curPushedStreams      uint32 // number of open streams initiated by server push
-	maxStreamID           uint32 // max ever seen from client
-	maxPushPromiseID      uint32 // ID of the last push promise, or 0 if there have been no pushes
+	maxClientStreamID     uint32 // max ever seen from client (odd), or 0 if there have been no client requests
+	maxPushPromiseID      uint32 // ID of the last push promise (even), or 0 if there have been no pushes
 	streams               map[uint32]*stream
 	initialWindowSize     int32
 	maxFrameSize          int32
@@ -477,8 +477,14 @@ func (sc *serverConn) state(streamID uint32) (streamState, *stream) {
 	// a client sends a HEADERS frame on stream 7 without ever sending a
 	// frame on stream 5, then stream 5 transitions to the "closed"
 	// state when the first frame for stream 7 is sent or received."
-	if streamID <= sc.maxStreamID {
-		return stateClosed, nil
+	if streamID%2 == 1 {
+		if streamID <= sc.maxClientStreamID {
+			return stateClosed, nil
+		}
+	} else {
+		if streamID <= sc.maxPushPromiseID {
+			return stateClosed, nil
+		}
 	}
 	return stateIdle, nil
 }
@@ -1011,7 +1017,7 @@ func (sc *serverConn) scheduleFrameWrite() {
 			sc.needToSendGoAway = false
 			sc.startFrameWrite(FrameWriteRequest{
 				write: &writeGoAway{
-					maxStreamID: sc.maxStreamID,
+					maxStreamID: sc.maxClientStreamID,
 					code:        sc.goAwayCode,
 				},
 			})
@@ -1160,6 +1166,8 @@ func (sc *serverConn) processFrame(f Frame) error {
 		return sc.processResetStream(f)
 	case *PriorityFrame:
 		return sc.processPriority(f)
+	case *GoAwayFrame:
+		return sc.processGoAway(f)
 	case *PushPromiseFrame:
 		// A client cannot push. Thus, servers MUST treat the receipt of a PUSH_PROMISE
 		// frame as a connection error (Section 5.4.1) of type PROTOCOL_ERROR.
@@ -1185,7 +1193,7 @@ func (sc *serverConn) processPing(f *PingFrame) error {
 		// PROTOCOL_ERROR."
 		return ConnectionError(ErrCodeProtocol)
 	}
-	if sc.inGoAway {
+	if sc.inGoAway && sc.goAwayCode != ErrCodeNo {
 		return nil
 	}
 	sc.writeFrame(FrameWriteRequest{write: writePingAck{f}})
@@ -1194,9 +1202,6 @@ func (sc *serverConn) processPing(f *PingFrame) error {
 
 func (sc *serverConn) processWindowUpdate(f *WindowUpdateFrame) error {
 	sc.serveG.check()
-	if sc.inGoAway {
-		return nil
-	}
 	switch {
 	case f.StreamID != 0: // stream-level flow control
 		state, st := sc.state(f.StreamID)
@@ -1229,9 +1234,6 @@ func (sc *serverConn) processWindowUpdate(f *WindowUpdateFrame) error {
 
 func (sc *serverConn) processResetStream(f *RSTStreamFrame) error {
 	sc.serveG.check()
-	if sc.inGoAway {
-		return nil
-	}
 
 	state, st := sc.state(f.StreamID)
 	if state == stateIdle {
@@ -1289,9 +1291,6 @@ func (sc *serverConn) processSettings(f *SettingsFrame) error {
 			// hang up on them anyway.
 			return ConnectionError(ErrCodeProtocol)
 		}
-		return nil
-	}
-	if sc.inGoAway {
 		return nil
 	}
 	if err := f.ForeachSetting(sc.processSetting); err != nil {
@@ -1365,7 +1364,7 @@ func (sc *serverConn) processSettingInitialWindowSize(val uint32) error {
 
 func (sc *serverConn) processData(f *DataFrame) error {
 	sc.serveG.check()
-	if sc.inGoAway {
+	if sc.inGoAway && sc.goAwayCode != ErrCodeNo {
 		return nil
 	}
 	data := f.Data()
@@ -1444,6 +1443,20 @@ func (sc *serverConn) processData(f *DataFrame) error {
 	return nil
 }
 
+func (sc *serverConn) processGoAway(f *GoAwayFrame) error {
+	sc.serveG.check()
+	if f.ErrCode != ErrCodeNo {
+		sc.logf("http2: received GOAWAY %+v, starting graceful shutdown", f)
+	} else {
+		sc.vlogf("http2: received GOAWAY %+v, starting graceful shutdown", f)
+	}
+	sc.goAwayIn(ErrCodeNo, 0)
+	// http://tools.ietf.org/html/rfc7540#section-6.8
+	// We should not create any new streams, which means we should disable push.
+	sc.pushEnabled = false
+	return nil
+}
+
 // isPushed reports whether the stream is server-initiated.
 func (st *stream) isPushed() bool {
 	return st.id%2 == 0
@@ -1504,10 +1517,10 @@ func (sc *serverConn) processHeaders(f *MetaHeadersFrame) error {
 	// endpoint has opened or reserved. [...]  An endpoint that
 	// receives an unexpected stream identifier MUST respond with
 	// a connection error (Section 5.4.1) of type PROTOCOL_ERROR.
-	if id <= sc.maxStreamID {
+	if id <= sc.maxClientStreamID {
 		return ConnectionError(ErrCodeProtocol)
 	}
-	sc.maxStreamID = id
+	sc.maxClientStreamID = id
 
 	if sc.idleTimer != nil {
 		sc.idleTimer.Stop()
@@ -1843,15 +1856,17 @@ func (sc *serverConn) runHandler(rw *responseWriter, req *http.Request, handler 
 		rw.rws.stream.cancelCtx()
 		if didPanic {
 			e := recover()
-			// Same as net/http:
-			const size = 64 << 10
-			buf := make([]byte, size)
-			buf = buf[:runtime.Stack(buf, false)]
 			sc.writeFrameFromHandler(FrameWriteRequest{
 				write:  handlerPanicRST{rw.rws.stream.id},
 				stream: rw.rws.stream,
 			})
-			sc.logf("http2: panic serving %v: %v\n%s", sc.conn.RemoteAddr(), e, buf)
+			// Same as net/http:
+			if shouldLogPanic(e) {
+				const size = 64 << 10
+				buf := make([]byte, size)
+				buf = buf[:runtime.Stack(buf, false)]
+				sc.logf("http2: panic serving %v: %v\n%s", sc.conn.RemoteAddr(), e, buf)
+			}
 			return
 		}
 		rw.handlerDone()
@@ -2263,8 +2278,9 @@ func (w *responseWriter) CloseNotify() <-chan bool {
 	if ch == nil {
 		ch = make(chan bool, 1)
 		rws.closeNotifierCh = ch
+		cw := rws.stream.cw
 		go func() {
-			rws.stream.cw.Wait() // wait for close
+			cw.Wait() // wait for close
 			ch <- true
 		}()
 	}
@@ -2510,6 +2526,12 @@ func (sc *serverConn) startPush(msg startPushRequest) {
 
 		// http://tools.ietf.org/html/rfc7540#section-5.1.1.
 		// Streams initiated by the server MUST use even-numbered identifiers.
+		// A server that is unable to establish a new stream identifier can send a GOAWAY
+		// frame so that the client is forced to open a new connection for new streams.
+		if sc.maxPushPromiseID+2 >= 1<<31 {
+			sc.goAwayIn(ErrCodeNo, 0)
+			return 0, ErrPushLimitReached
+		}
 		sc.maxPushPromiseID += 2
 		promisedID := sc.maxPushPromiseID
 
