@@ -30,8 +30,13 @@ func init() {
 }
 
 func run() {
+	// handle exit signals
+	// signalExitChan := make(chan os.Signal, 1)
+	// signal.Notify(signalExitChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// catch all signals
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(signalChan)
 
 	// we need a working config here - exit on error
 	c, err := newConfiguration(configPath)
@@ -47,8 +52,13 @@ func run() {
 	for {
 		select {
 		case s := <-signalChan:
-			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			return
+			switch s {
+			case syscall.SIGINT, syscall.SIGTERM:
+				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
+				return
+			default:
+				cfgWatcher.sendSignal(s)
+			}
 		case <-done:
 			return
 		}

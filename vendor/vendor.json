@@ -248,6 +248,18 @@
 			"revisionTime": "2016-11-05T22:35:13Z"
 		},
 		{
+			"checksumSHA1": "+JUQvWp1JUVeRT5weWL9hi6Fu4Y=",
+			"path": "github.com/hashicorp/consul-template/child",
+			"revision": "468d743592ab250ca8e9fdcef2002401634fcf75",
+			"revisionTime": "2016-11-03T15:46:17Z"
+		},
+		{
+			"checksumSHA1": "ByMIKPf7bXpyhhy80IjKLKYrjpo=",
+			"path": "github.com/hashicorp/consul-template/signals",
+			"revision": "468d743592ab250ca8e9fdcef2002401634fcf75",
+			"revisionTime": "2016-11-03T15:46:17Z"
+		},
+		{
 			"checksumSHA1": "IDQRmtgnEkGpjc1pNyPyczkm9dY=",
 			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/consul/api",
 			"path": "github.com/hashicorp/consul/api",
@@ -337,6 +349,12 @@
 			"path": "github.com/hashicorp/vault/api",
 			"revision": "7ac1091ca77699f898d17a0680e5ed22c9bcfa17",
 			"revisionTime": "2016-10-03T16:37:55Z"
+		},
+		{
+			"checksumSHA1": "ajImwVZHzsI+aNwsgzCSFSbmJqs=",
+			"path": "github.com/mattn/go-shellwords",
+			"revision": "525bedee691b5a8df547cb5cf9f86b7fb1883e24",
+			"revisionTime": "2016-03-15T04:08:06Z"
 		},
 		{
 			"checksumSHA1": "bKMZjd2wPw13VwoE7mBeSv5djFA=",

@@ -25,6 +25,8 @@ package template
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"path"
 	"strings"
 	"sync"
@@ -34,6 +36,9 @@ import (
 	berr "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/Sirupsen/logrus"
+	"github.com/hashicorp/consul-template/child"
+	"github.com/hashicorp/consul-template/signals"
+	shellwords "github.com/mattn/go-shellwords"
 )
 
 // Resource is the representation of a parsed template resource.
@@ -43,13 +48,23 @@ type Resource struct {
 	store    memkv.Store
 	sources  []*Processor
 	logger   *logrus.Entry
+
+	// exec mode related stuff
+	child        *child.Child
+	childLock    sync.RWMutex
+	execCommand  string
+	reloadSignal os.Signal
+	killSignal   os.Signal
+	killTimeout  time.Duration
+	// a channel to send signals to the childprocess
+	SignalChan chan os.Signal
 }
 
 // ErrEmptySrc is returned if an emty src template is passed to NewResource
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(backends []Backend, sources []*Processor, name string) (*Resource, error) {
+func NewResource(backends []Backend, sources []*Processor, name, exec, reloadSignal, killSignal string, killTimeout int) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
@@ -63,12 +78,32 @@ func NewResource(backends []Backend, sources []*Processor, name string) (*Resour
 		v.logger = logger
 	}
 
+	var rs, ks os.Signal
+	var err error
+	if reloadSignal != "" {
+		rs, err = signals.Parse(reloadSignal)
+		if err != nil {
+			logger.Error(err)
+		}
+	}
+	if killSignal != "" {
+		ks, err = signals.Parse(killSignal)
+		if err != nil {
+			logger.Error(err)
+		}
+	}
+
 	tr := &Resource{
-		backends: backends,
-		store:    memkv.New(),
-		funcMap:  newFuncMap(),
-		sources:  sources,
-		logger:   logger,
+		backends:     backends,
+		store:        memkv.New(),
+		funcMap:      newFuncMap(),
+		sources:      sources,
+		logger:       logger,
+		execCommand:  exec,
+		reloadSignal: rs,
+		killSignal:   ks,
+		killTimeout:  time.Duration(killTimeout) * time.Second,
+		SignalChan:   make(chan os.Signal, 1),
 	}
 
 	// initialize the inidividual backend memkv Stores
@@ -131,17 +166,20 @@ func (t *Resource) setVars(storeClient Backend) error {
 	return nil
 }
 
-func (t *Resource) createStageFileAndSync() error {
+func (t *Resource) createStageFileAndSync() (bool, error) {
+	var changed bool
 	for _, s := range t.sources {
 		err := s.createStageFile(t.funcMap)
 		if err != nil {
-			return err
+			return changed, err
 		}
-		if err = s.syncFiles(); err != nil {
-			return err
+		c, err := s.syncFiles()
+		changed = changed || c
+		if err != nil {
+			return changed, err
 		}
 	}
-	return nil
+	return changed, nil
 }
 
 // Process is a convenience function that wraps calls to the three main tasks
@@ -149,17 +187,75 @@ func (t *Resource) createStageFileAndSync() error {
 // from the store, then we stage a candidate configuration file, and finally sync
 // things up.
 // It returns an error if any.
-func (t *Resource) process(storeClients []Backend) error {
+func (t *Resource) process(storeClients []Backend) (bool, error) {
+	var changed bool
+	var err error
 	for _, storeClient := range storeClients {
-		if err := t.setVars(storeClient); err != nil {
-			return berr.BackendError{
+		if err = t.setVars(storeClient); err != nil {
+			return changed, berr.BackendError{
 				Message: err.Error(),
 				Backend: storeClient.Name,
 			}
 		}
 	}
-	if err := t.createStageFileAndSync(); err != nil {
-		return err
+	if changed, err = t.createStageFileAndSync(); err != nil {
+		return changed, err
+	}
+	return changed, nil
+}
+
+func (t *Resource) spawnChild() error {
+	if t.execCommand != "" {
+		t.childLock.Lock()
+		defer t.childLock.Unlock()
+
+		p := shellwords.NewParser()
+		p.ParseBacktick = true
+		args, err := p.Parse(t.execCommand)
+		if err != nil {
+			return err
+		}
+
+		child, err := child.New(&child.NewInput{
+			Stdin:        os.Stdin,
+			Stdout:       os.Stdout,
+			Stderr:       os.Stderr,
+			Command:      args[0],
+			Args:         args[1:],
+			ReloadSignal: t.reloadSignal,
+			KillSignal:   t.killSignal,
+			KillTimeout:  t.killTimeout,
+		})
+
+		if err != nil {
+			return fmt.Errorf("error creating child: %s", err)
+		}
+		t.child = child
+		if err := t.child.Start(); err != nil {
+			return fmt.Errorf("error starting child: %s", err)
+		}
+		return nil
+	}
+	return nil
+}
+
+func (t *Resource) stopChild() {
+	t.childLock.RLock()
+	defer t.childLock.RUnlock()
+
+	if t.child != nil {
+		t.child.Stop()
+	}
+}
+
+func (t *Resource) signalChild(s os.Signal) error {
+	t.childLock.RLock()
+	defer t.childLock.RUnlock()
+
+	if t.child != nil {
+		if err := t.child.Signal(s); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -182,7 +278,7 @@ retryloop:
 		case <-ctx.Done():
 			return
 		default:
-			if err := t.process(t.backends); err != nil {
+			if _, err := t.process(t.backends); err != nil {
 				switch err.(type) {
 				case berr.BackendError:
 					err := err.(berr.BackendError)
@@ -199,12 +295,18 @@ retryloop:
 		}
 	}
 
+	err := t.spawnChild()
+	if err != nil {
+		t.logger.Error(err)
+	}
+
+	// start the watch and interval processors so that we get notfied on changes
 	for _, sc := range t.backends {
 		if sc.Watch {
 			wg.Add(1)
 			go func(s Backend) {
 				defer wg.Done()
-				s.watch(ctx, processChan, errChan)
+				s.watch(ctx, processChan, errChangnal)
 			}(sc)
 		}
 
@@ -227,15 +329,28 @@ retryloop:
 	for {
 		select {
 		case storeClient := <-processChan:
-			if err := t.process([]Backend{storeClient}); err != nil {
+			changed, err := t.process([]Backend{storeClient})
+			if err != nil {
 				if _, ok := err.(berr.BackendError); ok {
 					t.logger.WithFields(logrus.Fields{
 						"backend": storeClient.Name,
 					}).Error(err)
 				} else {
-					log.Error(err)
+					t.logger.Error(err)
 				}
+			} else if changed {
+				// reload t.child if its config is changed
+				// and t.child != nil
+				t.childLock.RLock()
+				if t.child != nil {
+					if err := t.child.Reload(); err != nil {
+						t.logger.Error(err)
+					}
+				}
+				t.childLock.RUnlock()
 			}
+		case s := <-t.SignalChan:
+			t.signalChild(s)
 		case err := <-errChan:
 			t.logger.WithFields(logrus.Fields{
 				"backend": err.Backend,
@@ -246,8 +361,10 @@ retryloop:
 				}
 			}()
 			wg.Wait()
+			t.stopChild()
 			return
 		case <-done:
+			t.stopChild()
 			return
 		}
 	}

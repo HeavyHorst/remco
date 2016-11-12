@@ -10,6 +10,7 @@ package main
 
 import (
 	"context"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"github.com/HeavyHorst/remco/log"
 	"github.com/Sirupsen/logrus"
 	"github.com/fsnotify/fsnotify"
+	"github.com/pborman/uuid"
 )
 
 // the configWatcher watches the config file for changes
@@ -30,6 +32,29 @@ type configWatcher struct {
 	mu               sync.Mutex
 	canceled         bool
 	configPath       string
+
+	signalChans      map[string]chan os.Signal
+	signalChansMutex sync.RWMutex
+}
+
+func (w *configWatcher) addSignalChan(id string, sigchan chan os.Signal) {
+	w.signalChansMutex.Lock()
+	defer w.signalChansMutex.Unlock()
+	w.signalChans[id] = sigchan
+}
+
+func (w *configWatcher) removeSignalChan(id string) {
+	w.signalChansMutex.Lock()
+	defer w.signalChansMutex.Unlock()
+	delete(w.signalChans, id)
+}
+
+func (w *configWatcher) sendSignal(s os.Signal) {
+	w.signalChansMutex.RLock()
+	defer w.signalChansMutex.RUnlock()
+	for _, v := range w.signalChans {
+		v <- s
+	}
 }
 
 func (w *configWatcher) runConfig(c configuration) {
@@ -46,7 +71,16 @@ func (w *configWatcher) runConfig(c configuration) {
 		wait.Add(1)
 		go func(r resource) {
 			defer wait.Done()
-			r.run(ctx)
+			res, err := r.init(ctx)
+			defer res.Close()
+			if err != nil {
+				log.Error(err)
+			} else {
+				id := uuid.New()
+				w.addSignalChan(id, res.SignalChan)
+				defer w.removeSignalChan(id)
+				res.Monitor(ctx)
+			}
 		}(v)
 	}
 
@@ -136,6 +170,7 @@ func newConfigWatcher(configPath string, config configuration, done chan struct{
 		stopWatchConf: make(chan struct{}),
 		reloadChan:    make(chan struct{}),
 		configPath:    configPath,
+		signalChans:   make(map[string]chan os.Signal),
 	}
 
 	go w.runConfig(config)

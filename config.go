@@ -33,11 +33,19 @@ type configuration struct {
 }
 
 type resource struct {
+	Exec     exec
 	Template []*template.Processor
 	Backend  backends.Config
 
 	// defaults to the filename of the resource
 	Name string
+}
+
+type exec struct {
+	Command      string
+	ReloadSignal string
+	KillSignal   string
+	KillTimeout  int
 }
 
 func readFileAndExpandEnv(path string) ([]byte, error) {
@@ -122,7 +130,7 @@ func (c *configuration) configureLogger() {
 	}
 }
 
-func (r *resource) run(ctx context.Context) {
+func (r *resource) init(ctx context.Context) (*template.Resource, error) {
 	var backendList []template.Backend
 
 	// try to connect to all backends
@@ -135,7 +143,7 @@ func (r *resource) run(ctx context.Context) {
 				for _, b := range backendList {
 					b.Close()
 				}
-				return
+				return nil, ctx.Err()
 			default:
 				b, err := config.Connect()
 				if err == nil {
@@ -157,13 +165,6 @@ func (r *resource) run(ctx context.Context) {
 		}
 	}
 
-	t, err := template.NewResource(backendList, r.Template, r.Name)
-	// make sure that all backend clients are closed cleanly
-	defer t.Close()
-	if err != nil {
-		log.Error(err.Error())
-		return
-	}
+	return template.NewResource(backendList, r.Template, r.Name, r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout)
 
-	t.Monitor(ctx)
 }
