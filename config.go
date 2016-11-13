@@ -18,6 +18,7 @@ import (
 
 	"github.com/HeavyHorst/remco/backends"
 	backendErrors "github.com/HeavyHorst/remco/backends/error"
+	"github.com/HeavyHorst/remco/executor"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
@@ -29,15 +30,26 @@ type configuration struct {
 	LogLevel   string `toml:"log_level"`
 	LogFormat  string `toml:"log_format"`
 	IncludeDir string `toml:"include_dir"`
+	Http       string
 	Resource   []resource
 }
 
 type resource struct {
+	Exec     exec
 	Template []*template.Processor
 	Backend  backends.Config
 
 	// defaults to the filename of the resource
 	Name string
+}
+
+type exec struct {
+	Command          string `json:"command"`
+	ReloadSignal     string `toml:"reload_signal" json:"reload_signal"`
+	KillSignal       string `toml:"kill_signal" json:"kill_signal"`
+	KillTimeout      int    `toml:"kill_timeout" json:"kill_timeout"`
+	RestartOnFailure bool   `toml:"restart_on_failure" json:"restart_on_failure"`
+	Splay            int    `json:"splay"`
 }
 
 func readFileAndExpandEnv(path string) ([]byte, error) {
@@ -104,7 +116,6 @@ func newConfiguration(path string) (configuration, error) {
 			}
 		}
 	}
-
 	return c, nil
 }
 
@@ -122,7 +133,7 @@ func (c *configuration) configureLogger() {
 	}
 }
 
-func (r *resource) run(ctx context.Context) {
+func (r *resource) init(ctx context.Context) (*template.Resource, error) {
 	var backendList []template.Backend
 
 	// try to connect to all backends
@@ -135,7 +146,7 @@ func (r *resource) run(ctx context.Context) {
 				for _, b := range backendList {
 					b.Close()
 				}
-				return
+				return nil, ctx.Err()
 			default:
 				b, err := config.Connect()
 				if err == nil {
@@ -157,13 +168,13 @@ func (r *resource) run(ctx context.Context) {
 		}
 	}
 
-	t, err := template.NewResource(backendList, r.Template, r.Name)
-	// make sure that all backend clients are closed cleanly
-	defer t.Close()
+	logger := log.WithFields(logrus.Fields{"resource": r.Name})
+	exec := executor.New(r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout, r.Exec.Splay, logger, r.Exec.RestartOnFailure)
+	res, err := template.NewResource(backendList, r.Template, r.Name, exec)
 	if err != nil {
-		log.Error(err.Error())
-		return
+		for _, v := range backendList {
+			v.Close()
+		}
 	}
-
-	t.Monitor(ctx)
+	return res, err
 }

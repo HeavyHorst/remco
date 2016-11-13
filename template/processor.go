@@ -22,21 +22,21 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/HeavyHorst/confd/log"
 	"github.com/HeavyHorst/pongo2"
+	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template/fileutil"
 	"github.com/Sirupsen/logrus"
 )
 
 // Processor contains all data needed for the template processing
 type Processor struct {
-	Src       string
-	Dst       string
-	Mode      string
-	UID       int
-	GID       int
-	ReloadCmd string
-	CheckCmd  string
+	Src       string `json:"src"`
+	Dst       string `json:"dst"`
+	Mode      string `json:"mode"`
+	UID       int    `json:"uid"`
+	GID       int    `json:"gid"`
+	ReloadCmd string `toml:"reload_cmd" json:"reload_cmd"`
+	CheckCmd  string `toml:"check_cmd" json:"check_cmd"`
 	stageFile *os.File
 	logger    *logrus.Entry
 }
@@ -92,7 +92,8 @@ func (s *Processor) createStageFile(funcMap map[string]interface{}) error {
 // overwriting the target config file. Finally, syncFile will run a reload command
 // if set to have the application or service pick up the changes.
 // It returns an error if any.
-func (s *Processor) syncFiles() error {
+func (s *Processor) syncFiles() (bool, error) {
+	var changed bool
 	staged := s.stageFile.Name()
 	defer os.Remove(staged)
 
@@ -112,7 +113,7 @@ func (s *Processor) syncFiles() error {
 		}).Info("Target config out of sync")
 
 		if err := s.check(staged); err != nil {
-			return errors.New("Config check failed: " + err.Error())
+			return changed, errors.New("Config check failed: " + err.Error())
 		}
 
 		s.logger.WithFields(logrus.Fields{
@@ -121,17 +122,18 @@ func (s *Processor) syncFiles() error {
 
 		fileMode, err := s.getFileMode()
 		if err != nil {
-			return err
+			return changed, err
 		}
 		if err := fileutil.ReplaceFile(staged, s.Dst, fileMode, s.logger); err != nil {
-			return err
+			return changed, err
 		}
 
 		// make sure owner and group match the temp file, in case the file was created with WriteFile
 		os.Chown(s.Dst, s.UID, s.GID)
+		changed = true
 
 		if err := s.reload(); err != nil {
-			return err
+			return changed, err
 		}
 
 		s.logger.WithFields(logrus.Fields{
@@ -144,7 +146,7 @@ func (s *Processor) syncFiles() error {
 		}).Debug("Target config in sync")
 
 	}
-	return nil
+	return changed, nil
 }
 
 func (s *Processor) getFileMode() (os.FileMode, error) {

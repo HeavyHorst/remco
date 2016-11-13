@@ -11,10 +11,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/HeavyHorst/consul-template/signals"
 	"github.com/HeavyHorst/remco/log"
 )
 
@@ -30,8 +32,9 @@ func init() {
 }
 
 func run() {
+	// catch all signals
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(signalChan)
 
 	// we need a working config here - exit on error
 	c, err := newConfiguration(configPath)
@@ -44,11 +47,29 @@ func run() {
 	cfgWatcher := newConfigWatcher(configPath, c, done)
 	defer cfgWatcher.stop()
 
+	go func() {
+
+		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+			s, _ := cfgWatcher.status()
+			w.Write(s)
+		})
+		if c.Http != "" {
+			http.ListenAndServe(c.Http, nil)
+		}
+	}()
+
 	for {
 		select {
 		case s := <-signalChan:
-			log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-			return
+			switch s {
+			case syscall.SIGINT, syscall.SIGTERM:
+				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
+				return
+			case signals.SignalLookup["SIGCHLD"]:
+			default:
+				cfgWatcher.sendSignal(s)
+			}
 		case <-done:
 			return
 		}

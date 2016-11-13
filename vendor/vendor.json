@@ -3,6 +3,18 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "myGaNLVt9sop1khbNU/AaoSG9+o=",
+			"path": "github.com/HeavyHorst/consul-template/child",
+			"revision": "45f26ba665fb092b8a526051bbced4c349cd2354",
+			"revisionTime": "2016-11-13T10:49:44Z"
+		},
+		{
+			"checksumSHA1": "/z2nhTENn2s3CC+QU50CypxD7LQ=",
+			"path": "github.com/HeavyHorst/consul-template/signals",
+			"revision": "45f26ba665fb092b8a526051bbced4c349cd2354",
+			"revisionTime": "2016-11-13T10:49:44Z"
+		},
+		{
 			"checksumSHA1": "he1OdjwBy16r3GKUEeRceMIOE0I=",
 			"path": "github.com/HeavyHorst/easyKV",
 			"revision": "3d469d01aacc02becc0a8aa5fd708a452eb325eb",
@@ -339,6 +351,12 @@
 			"revisionTime": "2016-10-03T16:37:55Z"
 		},
 		{
+			"checksumSHA1": "ajImwVZHzsI+aNwsgzCSFSbmJqs=",
+			"path": "github.com/mattn/go-shellwords",
+			"revision": "525bedee691b5a8df547cb5cf9f86b7fb1883e24",
+			"revisionTime": "2016-03-15T04:08:06Z"
+		},
+		{
 			"checksumSHA1": "bKMZjd2wPw13VwoE7mBeSv5djFA=",
 			"path": "github.com/matttproud/golang_protobuf_extensions/pbutil",
 			"revision": "c12348ce28de40eed0136aa2b644d0ee0650e56c",
@@ -374,6 +392,12 @@
 			"path": "github.com/naoina/toml/ast",
 			"revision": "751171607256bb66e64c9f0220c00662420c38e9",
 			"revisionTime": "2015-07-27T12:48:37Z"
+		},
+		{
+			"checksumSHA1": "mhvIMH8oAtOiEyg37zWKmgb+6v4=",
+			"path": "github.com/pborman/uuid",
+			"revision": "3d4f2ba23642d3cfd06bd4b54cf03d99d95c0f1b",
+			"revisionTime": "2016-10-05T15:16:09Z"
 		},
 		{
 			"checksumSHA1": "GGb6UcrDCNMWWIjyjDgvauGw9qI=",

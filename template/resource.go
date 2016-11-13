@@ -25,6 +25,7 @@ package template
 import (
 	"context"
 	"errors"
+	"os"
 	"path"
 	"strings"
 	"sync"
@@ -32,6 +33,7 @@ import (
 
 	"github.com/HeavyHorst/memkv"
 	berr "github.com/HeavyHorst/remco/backends/error"
+	"github.com/HeavyHorst/remco/executor"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/Sirupsen/logrus"
 )
@@ -43,13 +45,16 @@ type Resource struct {
 	store    memkv.Store
 	sources  []*Processor
 	logger   *logrus.Entry
+
+	SignalChan chan os.Signal
+	exec       executor.Executor
 }
 
 // ErrEmptySrc is returned if an emty src template is passed to NewResource
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(backends []Backend, sources []*Processor, name string) (*Resource, error) {
+func NewResource(backends []Backend, sources []*Processor, name string, exec executor.Executor) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}
@@ -64,11 +69,13 @@ func NewResource(backends []Backend, sources []*Processor, name string) (*Resour
 	}
 
 	tr := &Resource{
-		backends: backends,
-		store:    memkv.New(),
-		funcMap:  newFuncMap(),
-		sources:  sources,
-		logger:   logger,
+		backends:   backends,
+		store:      memkv.New(),
+		funcMap:    newFuncMap(),
+		sources:    sources,
+		logger:     logger,
+		SignalChan: make(chan os.Signal, 1),
+		exec:       exec,
 	}
 
 	// initialize the inidividual backend memkv Stores
@@ -131,17 +138,20 @@ func (t *Resource) setVars(storeClient Backend) error {
 	return nil
 }
 
-func (t *Resource) createStageFileAndSync() error {
+func (t *Resource) createStageFileAndSync() (bool, error) {
+	var changed bool
 	for _, s := range t.sources {
 		err := s.createStageFile(t.funcMap)
 		if err != nil {
-			return err
+			return changed, err
 		}
-		if err = s.syncFiles(); err != nil {
-			return err
+		c, err := s.syncFiles()
+		changed = changed || c
+		if err != nil {
+			return changed, err
 		}
 	}
-	return nil
+	return changed, nil
 }
 
 // Process is a convenience function that wraps calls to the three main tasks
@@ -149,25 +159,30 @@ func (t *Resource) createStageFileAndSync() error {
 // from the store, then we stage a candidate configuration file, and finally sync
 // things up.
 // It returns an error if any.
-func (t *Resource) process(storeClients []Backend) error {
+func (t *Resource) process(storeClients []Backend) (bool, error) {
+	var changed bool
+	var err error
 	for _, storeClient := range storeClients {
-		if err := t.setVars(storeClient); err != nil {
-			return berr.BackendError{
+		if err = t.setVars(storeClient); err != nil {
+			return changed, berr.BackendError{
 				Message: err.Error(),
 				Backend: storeClient.Name,
 			}
 		}
 	}
-	if err := t.createStageFileAndSync(); err != nil {
-		return err
+	if changed, err = t.createStageFileAndSync(); err != nil {
+		return changed, err
 	}
-	return nil
+	return changed, nil
 }
 
 // Monitor will start to monitor all given Backends for changes.
 // It will process all given tamplates on changes.
 func (t *Resource) Monitor(ctx context.Context) {
 	wg := &sync.WaitGroup{}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	processChan := make(chan Backend)
 	defer close(processChan)
@@ -182,7 +197,7 @@ retryloop:
 		case <-ctx.Done():
 			return
 		default:
-			if err := t.process(t.backends); err != nil {
+			if _, err := t.process(t.backends); err != nil {
 				switch err.(type) {
 				case berr.BackendError:
 					err := err.(berr.BackendError)
@@ -199,6 +214,21 @@ retryloop:
 		}
 	}
 
+	err := t.exec.SpawnChild()
+	if err != nil {
+		t.logger.Error(err)
+		cancel()
+	}
+
+	done := make(chan struct{})
+	wg.Add(1)
+	go func() {
+		// run the cancel func if the childProcess quit
+		defer wg.Done()
+		t.exec.CancelOnExit(ctx, cancel)
+	}()
+
+	// start the watch and interval processors so that we get notfied on changes
 	for _, sc := range t.backends {
 		if sc.Watch {
 			wg.Add(1)
@@ -217,7 +247,6 @@ retryloop:
 		}
 	}
 
-	done := make(chan struct{})
 	go func() {
 		// If there is no goroutine left - quit
 		wg.Wait()
@@ -227,15 +256,22 @@ retryloop:
 	for {
 		select {
 		case storeClient := <-processChan:
-			if err := t.process([]Backend{storeClient}); err != nil {
+			changed, err := t.process([]Backend{storeClient})
+			if err != nil {
 				if _, ok := err.(berr.BackendError); ok {
 					t.logger.WithFields(logrus.Fields{
 						"backend": storeClient.Name,
 					}).Error(err)
 				} else {
-					log.Error(err)
+					t.logger.Error(err)
+				}
+			} else if changed {
+				if err := t.exec.Reload(); err != nil {
+					t.logger.Error(err)
 				}
 			}
+		case s := <-t.SignalChan:
+			t.exec.SignalChild(s)
 		case err := <-errChan:
 			t.logger.WithFields(logrus.Fields{
 				"backend": err.Backend,
@@ -246,8 +282,10 @@ retryloop:
 				}
 			}()
 			wg.Wait()
+			t.exec.StopChild()
 			return
 		case <-done:
+			t.exec.StopChild()
 			return
 		}
 	}
