@@ -22,8 +22,8 @@ include_dir = "/etc/remco/resource.d/"
   [[resource.template]]
     src = "/etc/remco/templates/haproxy.cfg"
     dst = "/etc/haproxy/haproxy.cfg"
-    checkCmd = ""
-    reloadCmd = ""
+    chec_cmd = ""
+    reload_cmd = ""
     mode = "0644"
 
   [resource.backend]

@@ -10,16 +10,26 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/HeavyHorst/remco/log"
+	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
 	"github.com/fsnotify/fsnotify"
 	"github.com/pborman/uuid"
 )
+
+type status struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	State    string `json:"state"`
+	Exec     exec
+	Template []*template.Processor
+}
 
 // the configWatcher watches the config file for changes
 type configWatcher struct {
@@ -35,6 +45,9 @@ type configWatcher struct {
 
 	signalChans      map[string]chan os.Signal
 	signalChansMutex sync.RWMutex
+
+	resourceMap      map[string]status
+	resourceMapMutex sync.RWMutex
 }
 
 func (w *configWatcher) addSignalChan(id string, sigchan chan os.Signal) {
@@ -57,6 +70,38 @@ func (w *configWatcher) sendSignal(s os.Signal) {
 	}
 }
 
+func (w *configWatcher) setResource(id, state string, r resource) {
+	w.resourceMapMutex.Lock()
+	defer w.resourceMapMutex.Unlock()
+	w.resourceMap[id] = status{
+		ID:       id,
+		Name:     r.Name,
+		State:    state,
+		Exec:     r.Exec,
+		Template: r.Template,
+	}
+}
+
+func (w *configWatcher) resetResourceMap() {
+	w.resourceMapMutex.Lock()
+	defer w.resourceMapMutex.Unlock()
+	w.resourceMap = make(map[string]status)
+}
+
+func (w *configWatcher) status() ([]byte, error) {
+	w.resourceMapMutex.RLock()
+	defer w.resourceMapMutex.RUnlock()
+	vs := make([]status, len(w.resourceMap))
+
+	idx := 0
+	for _, v := range w.resourceMap {
+		vs[idx] = v
+		idx++
+	}
+	dat, err := json.MarshalIndent(vs, "", "    ")
+	return dat, err
+}
+
 func (w *configWatcher) runConfig(c configuration) {
 	defer func() {
 		w.stoppedW <- struct{}{}
@@ -72,13 +117,15 @@ func (w *configWatcher) runConfig(c configuration) {
 		go func(r resource) {
 			defer wait.Done()
 			res, err := r.init(ctx)
-			defer res.Close()
 			if err != nil {
 				log.Error(err)
 			} else {
+				defer res.Close()
 				id := uuid.New()
+				w.setResource(id, "running", r)
 				w.addSignalChan(id, res.SignalChan)
 				defer w.removeSignalChan(id)
+				defer w.setResource(id, "stopped", r)
 				res.Monitor(ctx)
 			}
 		}(v)
@@ -171,6 +218,7 @@ func newConfigWatcher(configPath string, config configuration, done chan struct{
 		reloadChan:    make(chan struct{}),
 		configPath:    configPath,
 		signalChans:   make(map[string]chan os.Signal),
+		resourceMap:   make(map[string]status),
 	}
 
 	go w.runConfig(config)
@@ -202,6 +250,7 @@ func newConfigWatcher(configPath string, config configuration, done chan struct{
 				w.stopWatch <- struct{}{}
 				<-w.stoppedW
 				go w.runConfig(newConf)
+				w.resetResourceMap()
 
 				// restart the fsnotify config watcher (the include_dir folder may have changed)
 				// startWatchConfig returns when calling reload (we don't need to stop it)

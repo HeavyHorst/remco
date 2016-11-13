@@ -30,13 +30,13 @@ import (
 
 // Processor contains all data needed for the template processing
 type Processor struct {
-	Src       string
-	Dst       string
-	Mode      string
-	UID       int
-	GID       int
-	ReloadCmd string
-	CheckCmd  string
+	Src       string `json:"src"`
+	Dst       string `json:"dst"`
+	Mode      string `json:"mode"`
+	UID       int    `json:"uid"`
+	GID       int    `json:"gid"`
+	ReloadCmd string `toml:"reload_cmd" json:"reload_cmd"`
+	CheckCmd  string `toml:"check_cmd" json:"check_cmd"`
 	stageFile *os.File
 	logger    *logrus.Entry
 }

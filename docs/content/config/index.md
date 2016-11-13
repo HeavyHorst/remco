@@ -23,14 +23,29 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
  - **name(string, optional):**
     - You can give the resource a name which is added to the logs as field *resource*. Default is the name of the resource file.
 
+## Exec configuration options
+ - **command(string):**
+   - This is the command to exec as a child process. Note that the child process must remain in the foreground.
+ - **kill_signal(string):**
+   - This defines the signal sent to the child process when remco is gracefully shutting down. The application needs to exit before the `kill_timeout`,
+     it will be terminated otherwise (like kill -9). The default value is "SIGTERM".
+ - **kill_timeout(int):**
+   - the maximum amount of time (seconds) to wait for the child process to gracefully terminate. Default is 10.
+ - **reload_signal(string):**
+   - This defines the signal sent to the child process when some configuration data is changed. If no signal is specified the child process will be killed (gracefully) and started again.
+ - **splay(int):**
+   - A random splay to wait before killing the command. May be useful in large clusters to prevent all child processes to reload at the same time when configuration changes occur. Default is 0.
+ - **restart_on_failure(bool):**
+   - Remco will try to restart the child process if the child exited with a return code different then 0. Default is false.
+
 ## Template configuration options
  - **src(string):**
     - The path of the template that will be used to render the application's configuration file.
  - **dst(string):**
     - The location to place the rendered configuration file.
- - **checkCmd(string, optional):**
+ - **chec_cmd(string, optional):**
     - The command to check config. Use {{.src}} to reference the rendered source template.
- - **reloadCmd(string, optional):**
+ - **reload_cmd(string, optional):**
     - The command to reload config.
  - **mode(string, optional):**
     - The permission mode of the file. Default is "0644".

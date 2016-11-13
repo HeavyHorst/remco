@@ -18,6 +18,7 @@ import (
 
 	"github.com/HeavyHorst/remco/backends"
 	backendErrors "github.com/HeavyHorst/remco/backends/error"
+	"github.com/HeavyHorst/remco/executor"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
@@ -29,6 +30,7 @@ type configuration struct {
 	LogLevel   string `toml:"log_level"`
 	LogFormat  string `toml:"log_format"`
 	IncludeDir string `toml:"include_dir"`
+	Http       string
 	Resource   []resource
 }
 
@@ -42,10 +44,12 @@ type resource struct {
 }
 
 type exec struct {
-	Command      string
-	ReloadSignal string
-	KillSignal   string
-	KillTimeout  int
+	Command          string `json:"command"`
+	ReloadSignal     string `toml:"reload_signal" json:"reload_signal"`
+	KillSignal       string `toml:"kill_signal" json:"kill_signal"`
+	KillTimeout      int    `toml:"kill_timeout" json:"kill_timeout"`
+	RestartOnFailure bool   `toml:"restart_on_failure" json:"restart_on_failure"`
+	Splay            int    `json:"splay"`
 }
 
 func readFileAndExpandEnv(path string) ([]byte, error) {
@@ -112,7 +116,6 @@ func newConfiguration(path string) (configuration, error) {
 			}
 		}
 	}
-
 	return c, nil
 }
 
@@ -165,6 +168,13 @@ func (r *resource) init(ctx context.Context) (*template.Resource, error) {
 		}
 	}
 
-	return template.NewResource(backendList, r.Template, r.Name, r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout)
-
+	logger := log.WithFields(logrus.Fields{"resource": r.Name})
+	exec := executor.New(r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout, r.Exec.Splay, logger, r.Exec.RestartOnFailure)
+	res, err := template.NewResource(backendList, r.Template, r.Name, exec)
+	if err != nil {
+		for _, v := range backendList {
+			v.Close()
+		}
+	}
+	return res, err
 }
