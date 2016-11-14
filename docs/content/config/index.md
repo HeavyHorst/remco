@@ -37,8 +37,6 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - This defines the signal sent to the child process when some configuration data is changed. If no signal is specified the child process will be killed (gracefully) and started again.
  - **splay(int):**
    - A random splay to wait before killing the command. May be useful in large clusters to prevent all child processes to reload at the same time when configuration changes occur. Default is 0.
- - **restart_on_failure(bool):**
-   - Remco will try to restart the child process if the child exited with a return code different then 0. Default is false.
 
 ## Template configuration options
  - **src(string):**
