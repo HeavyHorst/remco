@@ -36,7 +36,7 @@ type Executor struct {
 }
 
 // New creates a new Executor
-func New(execCommand, reloadSignal, killSignal string, killTimeout, splay int, logger *logrus.Entry, restartOnFailure bool) Executor {
+func New(execCommand, reloadSignal, killSignal string, killTimeout, splay int, logger *logrus.Entry) Executor {
 	var rs, ks os.Signal
 	var err error
 	if reloadSignal != "" {
@@ -62,14 +62,13 @@ func New(execCommand, reloadSignal, killSignal string, killTimeout, splay int, l
 	}
 
 	return Executor{
-		childLock:        &sync.RWMutex{},
-		execCommand:      execCommand,
-		reloadSignal:     rs,
-		killSignal:       ks,
-		killTimeout:      time.Duration(killTimeout) * time.Second,
-		splay:            time.Duration(splay) * time.Second,
-		logger:           logger,
-		restartOnFailure: restartOnFailure,
+		childLock:    &sync.RWMutex{},
+		execCommand:  execCommand,
+		reloadSignal: rs,
+		killSignal:   ks,
+		killTimeout:  time.Duration(killTimeout) * time.Second,
+		splay:        time.Duration(splay) * time.Second,
+		logger:       logger,
 	}
 }
 
@@ -156,7 +155,7 @@ func (e *Executor) CancelOnExit(ctx context.Context, cancel context.CancelFunc) 
 		select {
 		case <-ctx.Done():
 			return
-		case code := <-exitChan:
+		case <-exitChan:
 			// wait a little bit to give the process time to start
 			// in case of a reload
 			time.Sleep(1 * time.Second)
@@ -171,27 +170,8 @@ func (e *Executor) CancelOnExit(ctx context.Context, cancel context.CancelFunc) 
 			}
 			// the process exited - stop
 			e.childLock.RUnlock()
-			if code != 0 {
-				e.logger.Error(fmt.Sprintf("(child) process exited unexpectedly with code: %d", code))
-				if e.restartOnFailure {
-					e.restartChild()
-					e.childLock.RLock()
-					exitChan = e.child.ExitCh()
-					e.childLock.RUnlock()
-					continue
-				}
-			}
 			cancel()
 		}
-	}
-}
-
-func (e *Executor) restartChild() {
-	e.childLock.Lock()
-	defer e.childLock.Unlock()
-
-	if err := e.child.Start(); err != nil {
-		e.logger.Error(fmt.Sprintf("error starting child: %s", err))
 	}
 }
 

@@ -47,12 +47,11 @@ type Resource struct {
 
 // Exec represents the configuration values for the exec mode
 type Exec struct {
-	Command          string `json:"command"`
-	ReloadSignal     string `toml:"reload_signal" json:"reload_signal"`
-	KillSignal       string `toml:"kill_signal" json:"kill_signal"`
-	KillTimeout      int    `toml:"kill_timeout" json:"kill_timeout"`
-	RestartOnFailure bool   `toml:"restart_on_failure" json:"restart_on_failure"`
-	Splay            int    `json:"splay"`
+	Command      string `json:"command"`
+	ReloadSignal string `toml:"reload_signal" json:"reload_signal"`
+	KillSignal   string `toml:"kill_signal" json:"kill_signal"`
+	KillTimeout  int    `toml:"kill_timeout" json:"kill_timeout"`
+	Splay        int    `json:"splay"`
 }
 
 func readFileAndExpandEnv(path string) ([]byte, error) {
@@ -172,7 +171,7 @@ func (r *Resource) Init(ctx context.Context) (*template.Resource, error) {
 	}
 
 	logger := log.WithFields(logrus.Fields{"resource": r.Name})
-	exec := executor.New(r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout, r.Exec.Splay, logger, r.Exec.RestartOnFailure)
+	exec := executor.New(r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout, r.Exec.Splay, logger)
 	res, err := template.NewResource(backendList, r.Template, r.Name, exec)
 	if err != nil {
 		for _, v := range backendList {
