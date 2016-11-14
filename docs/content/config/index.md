@@ -43,7 +43,7 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
     - The path of the template that will be used to render the application's configuration file.
  - **dst(string):**
     - The location to place the rendered configuration file.
- - **chec_cmd(string, optional):**
+ - **check_cmd(string, optional):**
     - The command to check config. Use {{.src}} to reference the rendered source template.
  - **reload_cmd(string, optional):**
     - The command to reload config.
