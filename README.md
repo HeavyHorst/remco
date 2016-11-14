@@ -20,3 +20,7 @@ See: https://heavyhorst.github.io/remco/
   - go install github.com/HeavyHorst/remco
 
   You should now have remco in your $GOPATH/bin directory
+
+## Project Status
+
+Remco is under active development. We do not recommend its use in production, but we encourage you to try out Remco and provide feedback via issues and pull requests.
