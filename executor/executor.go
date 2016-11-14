@@ -153,37 +153,35 @@ func (e *Executor) CancelOnExit(ctx context.Context, cancel context.CancelFunc) 
 	e.childLock.RUnlock()
 
 	for {
-		if notNil {
-			select {
-			case <-ctx.Done():
-				return
-			case code := <-exitChan:
-				// wait a little bit to give the process time to start
-				// in case of a reload
-				time.Sleep(1 * time.Second)
-				e.childLock.RLock()
-				nexitChan := e.child.ExitCh()
-				// the exitChan has changed which means the process was reloaded
-				// don't exit in this case
-				if nexitChan != exitChan {
-					exitChan = nexitChan
+		select {
+		case <-ctx.Done():
+			return
+		case code := <-exitChan:
+			// wait a little bit to give the process time to start
+			// in case of a reload
+			time.Sleep(1 * time.Second)
+			e.childLock.RLock()
+			nexitChan := e.child.ExitCh()
+			// the exitChan has changed which means the process was reloaded
+			// don't exit in this case
+			if nexitChan != exitChan {
+				exitChan = nexitChan
+				e.childLock.RUnlock()
+				continue
+			}
+			// the process exited - stop
+			e.childLock.RUnlock()
+			if code != 0 {
+				e.logger.Error(fmt.Sprintf("(child) process exited unexpectedly with code: %d", code))
+				if e.restartOnFailure {
+					e.restartChild()
+					e.childLock.RLock()
+					exitChan = e.child.ExitCh()
 					e.childLock.RUnlock()
 					continue
 				}
-				// the process exited - stop
-				e.childLock.RUnlock()
-				if code != 0 {
-					e.logger.Error(fmt.Sprintf("(child) process exited unexpectedly with code: %d", code))
-					if e.restartOnFailure {
-						e.restartChild()
-						e.childLock.RLock()
-						exitChan = e.child.ExitCh()
-						e.childLock.RUnlock()
-						continue
-					}
-				}
-				cancel()
 			}
+			cancel()
 		}
 	}
 }
