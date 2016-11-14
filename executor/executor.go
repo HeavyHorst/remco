@@ -24,15 +24,14 @@ import (
 
 // Executor provides some methods to control a subprocess
 type Executor struct {
-	child            *child.Child
-	childLock        *sync.RWMutex
-	execCommand      string
-	reloadSignal     os.Signal
-	killSignal       os.Signal
-	killTimeout      time.Duration
-	splay            time.Duration
-	logger           *logrus.Entry
-	restartOnFailure bool
+	child        *child.Child
+	childLock    *sync.RWMutex
+	execCommand  string
+	reloadSignal os.Signal
+	killSignal   os.Signal
+	killTimeout  time.Duration
+	splay        time.Duration
+	logger       *logrus.Entry
 }
 
 // New creates a new Executor
@@ -177,7 +176,7 @@ func (e *Executor) CancelOnExit(ctx context.Context, cancel context.CancelFunc) 
 
 // Reload reloads the child process.
 // If a reloadSignal is provided it will send this signal to the child.
-// Otherwise the child process will be killed and a new one started afterwards.
+// The child process will be killed and restarted otherwise.
 func (e *Executor) Reload() error {
 	e.childLock.RLock()
 	defer e.childLock.RUnlock()

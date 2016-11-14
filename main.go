@@ -43,7 +43,6 @@ func run() {
 		log.Fatal(err)
 	}
 	defer run.Stop()
-	run.StartStatusHandler()
 
 	// reap zombies if pid is 1
 	pidReapChan := make(reap.PidCh, 1)

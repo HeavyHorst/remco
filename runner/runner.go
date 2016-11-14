@@ -10,10 +10,8 @@ package runner
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"sync"
 
@@ -47,10 +45,6 @@ type Runner struct {
 	signalChans      map[string]chan os.Signal
 	signalChansMutex sync.RWMutex
 
-	resourceMap      map[string]status
-	resourceMapMutex sync.RWMutex
-
-	http    string
 	pidFile string
 }
 
@@ -63,7 +57,6 @@ func New(configPath string, done chan struct{}) (*Runner, error) {
 		reloadChan:    make(chan struct{}),
 		configPath:    configPath,
 		signalChans:   make(map[string]chan os.Signal),
-		resourceMap:   make(map[string]status),
 	}
 
 	cfg, err := config.NewConfiguration(configPath)
@@ -71,7 +64,6 @@ func New(configPath string, done chan struct{}) (*Runner, error) {
 		return nil, err
 	}
 
-	w.http = cfg.Http
 	w.pidFile = cfg.PidFile
 	pid := os.Getpid()
 	err = w.writePid(pid)
@@ -80,7 +72,6 @@ func New(configPath string, done chan struct{}) (*Runner, error) {
 	}
 
 	go w.runConfig(cfg)
-	// go w.startWatchConfig(config)
 	w.wg.Add(1)
 	go func() {
 		defer w.wg.Done()
@@ -121,7 +112,6 @@ func New(configPath string, done chan struct{}) (*Runner, error) {
 				w.stopWatch <- struct{}{}
 				<-w.stoppedW
 				go w.runConfig(newConf)
-				w.resetResourceMap()
 			case <-w.stoppedW:
 				// close the reloadChan
 				// every attempt to write to reloadChan would block forever otherwise
@@ -193,38 +183,6 @@ func (ru *Runner) SendSignal(s os.Signal) {
 	}
 }
 
-func (ru *Runner) setResource(id, state string, r config.Resource) {
-	ru.resourceMapMutex.Lock()
-	defer ru.resourceMapMutex.Unlock()
-	ru.resourceMap[id] = status{
-		ID:       id,
-		Name:     r.Name,
-		State:    state,
-		Exec:     r.Exec,
-		Template: r.Template,
-	}
-}
-
-func (ru *Runner) resetResourceMap() {
-	ru.resourceMapMutex.Lock()
-	defer ru.resourceMapMutex.Unlock()
-	ru.resourceMap = make(map[string]status)
-}
-
-func (ru *Runner) Status() ([]byte, error) {
-	ru.resourceMapMutex.RLock()
-	defer ru.resourceMapMutex.RUnlock()
-	vs := make([]status, len(ru.resourceMap))
-
-	idx := 0
-	for _, v := range ru.resourceMap {
-		vs[idx] = v
-		idx++
-	}
-	dat, err := json.MarshalIndent(vs, "", "    ")
-	return dat, err
-}
-
 func (ru *Runner) runConfig(c config.Configuration) {
 	defer func() {
 		ru.stoppedW <- struct{}{}
@@ -245,10 +203,8 @@ func (ru *Runner) runConfig(c config.Configuration) {
 			} else {
 				defer res.Close()
 				id := uuid.New()
-				ru.setResource(id, "running", r)
 				ru.addSignalChan(id, res.SignalChan)
 				defer ru.removeSignalChan(id)
-				defer ru.setResource(id, "stopped", r)
 				res.Monitor(ctx)
 			}
 		}(v)
@@ -276,19 +232,6 @@ func (ru *Runner) getCanceled() bool {
 	ru.mu.Lock()
 	defer ru.mu.Unlock()
 	return ru.canceled
-}
-
-func (ru *Runner) StartStatusHandler() {
-	go func() {
-		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-			s, _ := ru.Status()
-			w.Write(s)
-		})
-		if ru.http != "" {
-			http.ListenAndServe(ru.http, nil)
-		}
-	}()
 }
 
 // Reload rereads the configuration, stops the old Runner and starts a new one.
