@@ -11,6 +11,8 @@ package runner
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"sync"
@@ -48,7 +50,126 @@ type Runner struct {
 	resourceMap      map[string]status
 	resourceMapMutex sync.RWMutex
 
-	http string
+	http    string
+	pidFile string
+}
+
+// New creates a new Runner
+func New(configPath string, done chan struct{}) (*Runner, error) {
+	w := &Runner{
+		stoppedW:      make(chan struct{}),
+		stopWatch:     make(chan struct{}),
+		stopWatchConf: make(chan struct{}),
+		reloadChan:    make(chan struct{}),
+		configPath:    configPath,
+		signalChans:   make(map[string]chan os.Signal),
+		resourceMap:   make(map[string]status),
+	}
+
+	cfg, err := config.NewConfiguration(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	w.http = cfg.Http
+	w.pidFile = cfg.PidFile
+	pid := os.Getpid()
+	err = w.writePid(pid)
+	if err != nil {
+		log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
+	}
+
+	go w.runConfig(cfg)
+	// go w.startWatchConfig(config)
+	w.wg.Add(1)
+	go func() {
+		defer w.wg.Done()
+		for {
+			select {
+			case <-w.reloadChan:
+				log.WithFields(logrus.Fields{
+					"file": w.configPath,
+				}).Info("loading new config")
+				newConf, err := config.NewConfiguration(w.configPath)
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+
+				// don't try to relaod anything if w is already canceled
+				if w.getCanceled() {
+					continue
+				}
+
+				// write a new pidfile if the pid filepath has changed
+				if newConf.PidFile != w.pidFile {
+					err := w.deletePid()
+					if err != nil {
+						log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
+					}
+					w.pidFile = newConf.PidFile
+					err = w.writePid(pid)
+					if err != nil {
+						log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
+					}
+				}
+
+				// stop the old config and wait until it has stopped
+				log.WithFields(logrus.Fields{
+					"file": w.configPath,
+				}).Info("stopping the old config")
+				w.stopWatch <- struct{}{}
+				<-w.stoppedW
+				go w.runConfig(newConf)
+				w.resetResourceMap()
+			case <-w.stoppedW:
+				// close the reloadChan
+				// every attempt to write to reloadChan would block forever otherwise
+				close(w.reloadChan)
+
+				// close the done channel
+				// this signals the main function that the Runner has completed all work
+				// for example all backends are configured with onetime=true
+				close(done)
+				return
+			}
+		}
+	}()
+
+	return w, nil
+}
+
+func (ru *Runner) writePid(pid int) error {
+	if ru.pidFile == "" {
+		return nil
+	}
+
+	log.Info(fmt.Sprintf("creating pid file at %q", ru.pidFile))
+
+	err := ioutil.WriteFile(ru.pidFile, []byte(fmt.Sprintf("%d", pid)), 0666)
+	if err != nil {
+		return fmt.Errorf("could not create pid file: %s", err)
+	}
+	return nil
+}
+
+func (ru *Runner) deletePid() error {
+	if ru.pidFile == "" {
+		return nil
+	}
+
+	log.Debug(fmt.Sprintf("removing pid file at %q", ru.pidFile))
+
+	stat, err := os.Stat(ru.pidFile)
+	if err != nil {
+		return fmt.Errorf("could not remove pid file: %s", err)
+	}
+
+	if stat.IsDir() {
+		return fmt.Errorf("the pid file path seems to be a directory")
+	}
+
+	return os.Remove(ru.pidFile)
 }
 
 func (ru *Runner) addSignalChan(id string, sigchan chan os.Signal) {
@@ -157,72 +278,6 @@ func (ru *Runner) getCanceled() bool {
 	return ru.canceled
 }
 
-// New creates a new Runner
-func New(configPath string, done chan struct{}) (*Runner, error) {
-	w := &Runner{
-		stoppedW:      make(chan struct{}),
-		stopWatch:     make(chan struct{}),
-		stopWatchConf: make(chan struct{}),
-		reloadChan:    make(chan struct{}),
-		configPath:    configPath,
-		signalChans:   make(map[string]chan os.Signal),
-		resourceMap:   make(map[string]status),
-	}
-
-	cfg, err := config.NewConfiguration(configPath)
-	if err != nil {
-		return nil, err
-	}
-
-	w.http = cfg.Http
-
-	go w.runConfig(cfg)
-	// go w.startWatchConfig(config)
-	w.wg.Add(1)
-	go func() {
-		defer w.wg.Done()
-		for {
-			select {
-			case <-w.reloadChan:
-				log.WithFields(logrus.Fields{
-					"file": w.configPath,
-				}).Info("loading new config")
-				newConf, err := config.NewConfiguration(w.configPath)
-				if err != nil {
-					log.Error(err)
-					continue
-				}
-
-				// don't try to relaod anything if w is already canceled
-				if w.getCanceled() {
-					continue
-				}
-
-				// stop the old config and wait until it has stopped
-				log.WithFields(logrus.Fields{
-					"file": w.configPath,
-				}).Info("stopping the old config")
-				w.stopWatch <- struct{}{}
-				<-w.stoppedW
-				go w.runConfig(newConf)
-				w.resetResourceMap()
-			case <-w.stoppedW:
-				// close the reloadChan
-				// every attempt to write to reloadChan would block forever otherwise
-				close(w.reloadChan)
-
-				// close the done channel
-				// this signals the main function that the Runner has completed all work
-				// for example all backends are configured with onetime=true
-				close(done)
-				return
-			}
-		}
-	}()
-
-	return w, nil
-}
-
 func (ru *Runner) StartStatusHandler() {
 	go func() {
 		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
@@ -251,4 +306,10 @@ func (ru *Runner) Stop() {
 
 	// wait for the main routine and startWatchConfig to exit
 	ru.wg.Wait()
+
+	// remove the pidfile
+	err := ru.deletePid()
+	if err != nil {
+		log.WithFields(logrus.Fields{"pid_file": ru.pidFile}).Error(err)
+	}
 }

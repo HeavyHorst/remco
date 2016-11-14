@@ -30,6 +30,7 @@ type Configuration struct {
 	LogLevel   string `toml:"log_level"`
 	LogFormat  string `toml:"log_format"`
 	IncludeDir string `toml:"include_dir"`
+	PidFile    string `toml:"pid_file"`
 	Http       string
 	Resource   []Resource
 }

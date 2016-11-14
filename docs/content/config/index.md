@@ -18,6 +18,8 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - The format of the log messages. Valid formats are *text* and *json*.
  - **include_dir(string):**
    - Specify an entire directory of resource configuration files to include.
+ - **pid_file(string):**
+   - A filename to write the process-id to.
 
 ## Resource configuration options
  - **name(string, optional):**
