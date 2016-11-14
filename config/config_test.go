@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-package main
+package config
 
 import (
 	"io/ioutil"
@@ -57,11 +57,11 @@ var expectedBackend = backends.Config{
 	},
 }
 
-var expected = configuration{
+var expected = Configuration{
 	LogLevel:  "debug",
 	LogFormat: "text",
-	Resource: []resource{
-		resource{
+	Resource: []Resource{
+		Resource{
 			Template: expectedTemplates,
 			Backend:  expectedBackend,
 		},
@@ -98,7 +98,7 @@ func (s *FilterSuite) TearDownSuite(t *C) {
 }
 
 func (s *FilterSuite) TestNewConf(t *C) {
-	cfg, err := newConfiguration(s.cfgPath)
+	cfg, err := NewConfiguration(s.cfgPath)
 	if err != nil {
 		t.Error(err)
 	}

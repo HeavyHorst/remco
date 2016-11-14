@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-package main
+package config
 
 import (
 	"context"
@@ -25,17 +25,18 @@ import (
 	"github.com/naoina/toml"
 )
 
-// configuration is the representation of an config file
-type configuration struct {
+// Configuration is the representation of an config file
+type Configuration struct {
 	LogLevel   string `toml:"log_level"`
 	LogFormat  string `toml:"log_format"`
 	IncludeDir string `toml:"include_dir"`
 	Http       string
-	Resource   []resource
+	Resource   []Resource
 }
 
-type resource struct {
-	Exec     exec
+// Resource is the representation of an resource configuration
+type Resource struct {
+	Exec     Exec
 	Template []*template.Processor
 	Backend  backends.Config
 
@@ -43,7 +44,8 @@ type resource struct {
 	Name string
 }
 
-type exec struct {
+// Exec represents the configuration values for the exec mode
+type Exec struct {
 	Command          string `json:"command"`
 	ReloadSignal     string `toml:"reload_signal" json:"reload_signal"`
 	KillSignal       string `toml:"kill_signal" json:"kill_signal"`
@@ -62,11 +64,11 @@ func readFileAndExpandEnv(path string) ([]byte, error) {
 	return buf, nil
 }
 
-// newConfiguration reads the file at `path`, expand the environment variables
+// NewConfiguration reads the file at `path`, expand the environment variables
 // and unmarshals it to a new configuration struct.
 // it returns an error if any.
-func newConfiguration(path string) (configuration, error) {
-	var c configuration
+func NewConfiguration(path string) (Configuration, error) {
+	var c Configuration
 
 	buf, err := readFileAndExpandEnv(path)
 	if err != nil {
@@ -102,7 +104,7 @@ func newConfiguration(path string) (configuration, error) {
 				if err != nil {
 					return c, err
 				}
-				var r resource
+				var r Resource
 				if err := toml.Unmarshal(buf, &r); err != nil {
 					return c, err
 				}
@@ -121,7 +123,7 @@ func newConfiguration(path string) (configuration, error) {
 
 // configureLogger configures the global logger
 // for example it sets the log level and log formatting
-func (c *configuration) configureLogger() {
+func (c *Configuration) configureLogger() {
 	if c.LogLevel != "" {
 		err := log.SetLevel(c.LogLevel)
 		if err != nil {
@@ -133,7 +135,7 @@ func (c *configuration) configureLogger() {
 	}
 }
 
-func (r *resource) init(ctx context.Context) (*template.Resource, error) {
+func (r *Resource) Init(ctx context.Context) (*template.Resource, error) {
 	var backendList []template.Backend
 
 	// try to connect to all backends

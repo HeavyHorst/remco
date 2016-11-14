@@ -148,10 +148,9 @@ func (e *Executor) CancelOnExit(ctx context.Context, cancel context.CancelFunc) 
 	if !notNil {
 		e.childLock.RUnlock()
 		return
-	} else {
-		exitChan = e.child.ExitCh()
-		e.childLock.RUnlock()
 	}
+	exitChan = e.child.ExitCh()
+	e.childLock.RUnlock()
 
 	for {
 		if notNil {

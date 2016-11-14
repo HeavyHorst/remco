@@ -11,13 +11,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/HeavyHorst/consul-template/signals"
 	"github.com/HeavyHorst/remco/log"
+	"github.com/HeavyHorst/remco/runner"
 )
 
 var (
@@ -36,28 +36,14 @@ func run() {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan)
 
-	// we need a working config here - exit on error
-	c, err := newConfiguration(configPath)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
 	done := make(chan struct{})
 	// watch the configuration file and all files under include_dir for changes
-	cfgWatcher := newConfigWatcher(configPath, c, done)
-	defer cfgWatcher.stop()
-
-	go func() {
-
-		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-			s, _ := cfgWatcher.status()
-			w.Write(s)
-		})
-		if c.Http != "" {
-			http.ListenAndServe(c.Http, nil)
-		}
-	}()
+	run, err := runner.New(configPath, done)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer run.Stop()
+	run.StartStatusHandler()
 
 	for {
 		select {
@@ -66,9 +52,11 @@ func run() {
 			case syscall.SIGINT, syscall.SIGTERM:
 				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
 				return
+			case syscall.SIGHUP:
+				run.Reload()
 			case signals.SignalLookup["SIGCHLD"]:
 			default:
-				cfgWatcher.sendSignal(s)
+				run.SendSignal(s)
 			}
 		case <-done:
 			return
