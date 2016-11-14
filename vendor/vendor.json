@@ -274,6 +274,12 @@
 			"revisionTime": "2016-10-03T16:37:55Z"
 		},
 		{
+			"checksumSHA1": "7qEpaAJA78EvQDs16x9mYOWfgqo=",
+			"path": "github.com/hashicorp/go-reap",
+			"revision": "04ce4d0638f3b39b8a8030e2a22c4c90771fa5d6",
+			"revisionTime": "2016-09-01T16:39:55Z"
+		},
+		{
 			"checksumSHA1": "bJJp3lBIn2Lt/9ZGivcjLw8o2Hg=",
 			"origin": "github.com/kelseyhightower/confd/vendor/github.com/hashicorp/hcl",
 			"path": "github.com/hashicorp/hcl",

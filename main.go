@@ -18,6 +18,7 @@ import (
 	"github.com/HeavyHorst/consul-template/signals"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/runner"
+	reap "github.com/hashicorp/go-reap"
 )
 
 var (
@@ -37,13 +38,23 @@ func run() {
 	signal.Notify(signalChan)
 
 	done := make(chan struct{})
-	// watch the configuration file and all files under include_dir for changes
 	run, err := runner.New(configPath, done)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer run.Stop()
 	run.StartStatusHandler()
+
+	// reap zombies if pid is 1
+	pidReapChan := make(reap.PidCh, 1)
+	errorReapChan := make(reap.ErrorCh, 1)
+	if os.Getpid() == 1 {
+		if !reap.IsSupported() {
+			log.Warning("the pid is 1 but zombie reaping is not supported on this platform")
+		} else {
+			go reap.ReapChildren(pidReapChan, errorReapChan, done, nil)
+		}
+	}
 
 	for {
 		select {
@@ -58,6 +69,10 @@ func run() {
 			default:
 				run.SendSignal(s)
 			}
+		case pid := <-pidReapChan:
+			log.Debug(fmt.Sprintf("Reaped child process %d", pid))
+		case err := <-errorReapChan:
+			log.Error(fmt.Sprintf("Error reaping child process %v", err))
 		case <-done:
 			return
 		}
