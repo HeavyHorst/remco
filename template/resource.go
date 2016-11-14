@@ -46,8 +46,10 @@ type Resource struct {
 	sources  []*Processor
 	logger   *logrus.Entry
 
-	SignalChan chan os.Signal
 	exec       executor.Executor
+	SignalChan chan os.Signal
+
+	Failed bool
 }
 
 // ErrEmptySrc is returned if an emty src template is passed to NewResource
@@ -74,7 +76,7 @@ func NewResource(backends []Backend, sources []*Processor, name string, exec exe
 		funcMap:    newFuncMap(),
 		sources:    sources,
 		logger:     logger,
-		SignalChan: make(chan os.Signal, 1),
+		SignalChan: make(chan os.Signal, 10),
 		exec:       exec,
 	}
 
@@ -217,6 +219,7 @@ retryloop:
 	err := t.exec.SpawnChild()
 	if err != nil {
 		t.logger.Error(err)
+		t.Failed = true
 		cancel()
 	}
 
@@ -225,7 +228,11 @@ retryloop:
 	go func() {
 		// run the cancel func if the childProcess quit
 		defer wg.Done()
-		t.exec.CancelOnExit(ctx, cancel)
+		stopped := t.exec.IsStopped(ctx)
+		if stopped {
+			t.Failed = true
+			cancel()
+		}
 	}()
 
 	// start the watch and interval processors so that we get notfied on changes

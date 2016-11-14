@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/HeavyHorst/remco/config"
 	"github.com/HeavyHorst/remco/log"
@@ -178,8 +179,14 @@ func (ru *Runner) removeSignalChan(id string) {
 func (ru *Runner) SendSignal(s os.Signal) {
 	ru.signalChansMutex.RLock()
 	defer ru.signalChansMutex.RUnlock()
+	// try to send the signal to all child processes
+	// we don't block here if the signal can't be send
+	// the buffer size is 10 signals.
 	for _, v := range ru.signalChans {
-		v <- s
+		select {
+		case v <- s:
+		default:
+		}
 	}
 }
 
@@ -205,7 +212,15 @@ func (ru *Runner) runConfig(c config.Configuration) {
 				id := uuid.New()
 				ru.addSignalChan(id, res.SignalChan)
 				defer ru.removeSignalChan(id)
-				res.Monitor(ctx)
+				for {
+					res.Failed = false
+					res.Monitor(ctx)
+					if res.Failed {
+						time.Sleep(2 * time.Second)
+						continue
+					}
+					break
+				}
 			}
 		}(v)
 	}
