@@ -12,6 +12,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"sync"
 	"time"
@@ -211,14 +212,35 @@ func (ru *Runner) runConfig(c config.Configuration) {
 				id := uuid.New()
 				ru.addSignalChan(id, res.SignalChan)
 				defer ru.removeSignalChan(id)
+
+				restartChan := make(chan struct{}, 1)
+				restartChan <- struct{}{}
+
 				for {
-					res.Failed = false
-					res.Monitor(ctx)
-					if res.Failed {
-						time.Sleep(2 * time.Second)
-						continue
+					select {
+					case <-ctx.Done():
+						return
+					case <-restartChan:
+						res.Monitor(ctx)
+						if res.Failed {
+							go func() {
+								// try to restart the resource after a random amount of time
+								rn := rand.Int63n(30)
+								log.WithFields(logrus.Fields{
+									"resource": r.Name,
+								}).Error(fmt.Sprintf("resource execution failed, restarting after %d seconds", rn))
+								time.Sleep(time.Duration(rn) * time.Second)
+								select {
+								case <-ctx.Done():
+									return
+								default:
+									restartChan <- struct{}{}
+								}
+							}()
+						} else {
+							return
+						}
 					}
-					break
 				}
 			}
 		}(v)
