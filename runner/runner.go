@@ -12,8 +12,10 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/HeavyHorst/remco/config"
 	"github.com/HeavyHorst/remco/log"
@@ -178,8 +180,13 @@ func (ru *Runner) removeSignalChan(id string) {
 func (ru *Runner) SendSignal(s os.Signal) {
 	ru.signalChansMutex.RLock()
 	defer ru.signalChansMutex.RUnlock()
+	// try to send the signal to all child processes
+	// we don't block here if the signal can't be send
 	for _, v := range ru.signalChans {
-		v <- s
+		select {
+		case v <- s:
+		default:
+		}
 	}
 }
 
@@ -205,7 +212,36 @@ func (ru *Runner) runConfig(c config.Configuration) {
 				id := uuid.New()
 				ru.addSignalChan(id, res.SignalChan)
 				defer ru.removeSignalChan(id)
-				res.Monitor(ctx)
+
+				restartChan := make(chan struct{}, 1)
+				restartChan <- struct{}{}
+
+				for {
+					select {
+					case <-ctx.Done():
+						return
+					case <-restartChan:
+						res.Monitor(ctx)
+						if res.Failed {
+							go func() {
+								// try to restart the resource after a random amount of time
+								rn := rand.Int63n(30)
+								log.WithFields(logrus.Fields{
+									"resource": r.Name,
+								}).Error(fmt.Sprintf("resource execution failed, restarting after %d seconds", rn))
+								time.Sleep(time.Duration(rn) * time.Second)
+								select {
+								case <-ctx.Done():
+									return
+								default:
+									restartChan <- struct{}{}
+								}
+							}()
+						} else {
+							return
+						}
+					}
+				}
 			}
 		}(v)
 	}

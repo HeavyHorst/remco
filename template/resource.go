@@ -25,6 +25,8 @@ package template
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math/rand"
 	"os"
 	"path"
 	"strings"
@@ -46,8 +48,10 @@ type Resource struct {
 	sources  []*Processor
 	logger   *logrus.Entry
 
-	SignalChan chan os.Signal
 	exec       executor.Executor
+	SignalChan chan os.Signal
+
+	Failed bool
 }
 
 // ErrEmptySrc is returned if an emty src template is passed to NewResource
@@ -179,6 +183,7 @@ func (t *Resource) process(storeClients []Backend) (bool, error) {
 // Monitor will start to monitor all given Backends for changes.
 // It will process all given tamplates on changes.
 func (t *Resource) Monitor(ctx context.Context) {
+	t.Failed = false
 	wg := &sync.WaitGroup{}
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -189,14 +194,19 @@ func (t *Resource) Monitor(ctx context.Context) {
 	errChan := make(chan berr.BackendError, 10)
 
 	// try to process the template resource with all given backends
-	// we wait 2 seconds and try again (with all backends - no stale data)
+	// we wait a random amount of time (between 0 - 30 seconds)
+	// to prevent ddossing our backends and try again (with all backends - no stale data)
 	// if some error occurs
+
+	retryChan := make(chan struct{}, 1)
+	retryChan <- struct{}{}
+
 retryloop:
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		default:
+		case <-retryChan:
 			if _, err := t.process(t.backends); err != nil {
 				switch err.(type) {
 				case berr.BackendError:
@@ -207,7 +217,17 @@ retryloop:
 				default:
 					t.logger.Error(err)
 				}
-				time.Sleep(2 * time.Second)
+				go func() {
+					rn := rand.Int63n(30)
+					t.logger.Error(fmt.Sprintf("Not all templates could be rendered, trying again after %d seconds", rn))
+					time.Sleep(time.Duration(rn) * time.Second)
+					select {
+					case <-ctx.Done():
+						return
+					default:
+						retryChan <- struct{}{}
+					}
+				}()
 				continue retryloop
 			}
 			break retryloop
@@ -217,6 +237,7 @@ retryloop:
 	err := t.exec.SpawnChild()
 	if err != nil {
 		t.logger.Error(err)
+		t.Failed = true
 		cancel()
 	}
 
@@ -225,7 +246,11 @@ retryloop:
 	go func() {
 		// run the cancel func if the childProcess quit
 		defer wg.Done()
-		t.exec.CancelOnExit(ctx, cancel)
+		stopped := t.exec.IsStopped(ctx)
+		if stopped {
+			t.Failed = true
+			cancel()
+		}
 	}()
 
 	// start the watch and interval processors so that we get notfied on changes

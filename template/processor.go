@@ -153,20 +153,19 @@ func (s *Processor) getFileMode() (os.FileMode, error) {
 	if s.Mode == "" {
 		if !fileutil.IsFileExist(s.Dst) {
 			return 0644, nil
-		} else {
-			fi, err := os.Stat(s.Dst)
-			if err != nil {
-				return 0, err
-			}
-			return fi.Mode(), nil
 		}
-	} else {
-		mode, err := strconv.ParseUint(s.Mode, 0, 32)
+		fi, err := os.Stat(s.Dst)
 		if err != nil {
 			return 0, err
 		}
-		return os.FileMode(mode), nil
+		return fi.Mode(), nil
 	}
+	mode, err := strconv.ParseUint(s.Mode, 0, 32)
+	if err != nil {
+		return 0, err
+	}
+	return os.FileMode(mode), nil
+
 }
 
 // check executes the check command to validate the staged config file. The

@@ -135,17 +135,17 @@ func (e *Executor) SpawnChild() error {
 	return nil
 }
 
-// CancelOnExit waits for the children to stop.
-// If the children stop it calls the cancel function.
-// CancelOnExit ignores reloads.
-func (e *Executor) CancelOnExit(ctx context.Context, cancel context.CancelFunc) {
+// IsStopped waits for the children to stop.
+// Returns true if the command stops.
+// IsStopped ignores reloads.
+func (e *Executor) IsStopped(ctx context.Context) bool {
 	var exitChan <-chan int
 
 	e.childLock.RLock()
 	notNil := (e.child != nil)
 	if !notNil {
 		e.childLock.RUnlock()
-		return
+		return false
 	}
 	exitChan = e.child.ExitCh()
 	e.childLock.RUnlock()
@@ -153,7 +153,7 @@ func (e *Executor) CancelOnExit(ctx context.Context, cancel context.CancelFunc) 
 	for {
 		select {
 		case <-ctx.Done():
-			return
+			return false
 		case <-exitChan:
 			// wait a little bit to give the process time to start
 			// in case of a reload
@@ -169,7 +169,7 @@ func (e *Executor) CancelOnExit(ctx context.Context, cancel context.CancelFunc) 
 			}
 			// the process exited - stop
 			e.childLock.RUnlock()
-			cancel()
+			return true
 		}
 	}
 }
