@@ -76,7 +76,7 @@ func NewResource(backends []Backend, sources []*Processor, name string, exec exe
 		funcMap:    newFuncMap(),
 		sources:    sources,
 		logger:     logger,
-		SignalChan: make(chan os.Signal, 10),
+		SignalChan: make(chan os.Signal, 1),
 		exec:       exec,
 	}
 

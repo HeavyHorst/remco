@@ -181,7 +181,6 @@ func (ru *Runner) SendSignal(s os.Signal) {
 	defer ru.signalChansMutex.RUnlock()
 	// try to send the signal to all child processes
 	// we don't block here if the signal can't be send
-	// the buffer size is 10 signals.
 	for _, v := range ru.signalChans {
 		select {
 		case v <- s:
