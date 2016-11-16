@@ -29,11 +29,10 @@ type Runner struct {
 	stopWatch        chan struct{}
 	stopWatchConf    chan struct{}
 	stoppedWatchConf chan struct{}
-	reloadChan       chan struct{}
+	reloadChan       chan config.Configuration
 	wg               sync.WaitGroup
 	mu               sync.Mutex
 	canceled         bool
-	configPath       string
 
 	signalChans      map[string]chan os.Signal
 	signalChansMutex sync.RWMutex
@@ -44,25 +43,19 @@ type Runner struct {
 }
 
 // New creates a new Runner
-func New(configPath string, reapLock *sync.RWMutex, done chan struct{}) (*Runner, error) {
+func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *Runner {
 	w := &Runner{
 		stoppedW:      make(chan struct{}),
 		stopWatch:     make(chan struct{}),
 		stopWatchConf: make(chan struct{}),
-		reloadChan:    make(chan struct{}),
-		configPath:    configPath,
+		reloadChan:    make(chan config.Configuration),
 		signalChans:   make(map[string]chan os.Signal),
 		reapLock:      reapLock,
 	}
 
-	cfg, err := config.NewConfiguration(configPath)
-	if err != nil {
-		return nil, err
-	}
-
 	w.pidFile = cfg.PidFile
 	pid := os.Getpid()
-	err = w.writePid(pid)
+	err := w.writePid(pid)
 	if err != nil {
 		log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
 	}
@@ -73,21 +66,11 @@ func New(configPath string, reapLock *sync.RWMutex, done chan struct{}) (*Runner
 		defer w.wg.Done()
 		for {
 			select {
-			case <-w.reloadChan:
-				log.WithFields(logrus.Fields{
-					"file": w.configPath,
-				}).Info("loading new config")
-				newConf, err := config.NewConfiguration(w.configPath)
-				if err != nil {
-					log.Error(err)
-					continue
-				}
-
+			case newConf := <-w.reloadChan:
 				// don't try to relaod anything if w is already canceled
 				if w.getCanceled() {
 					continue
 				}
-
 				// write a new pidfile if the pid filepath has changed
 				if newConf.PidFile != w.pidFile {
 					err := w.deletePid()
@@ -100,11 +83,6 @@ func New(configPath string, reapLock *sync.RWMutex, done chan struct{}) (*Runner
 						log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
 					}
 				}
-
-				// stop the old config and wait until it has stopped
-				log.WithFields(logrus.Fields{
-					"file": w.configPath,
-				}).Info("stopping the old config")
 				w.stopWatch <- struct{}{}
 				<-w.stoppedW
 				go w.runConfig(newConf)
@@ -122,7 +100,7 @@ func New(configPath string, reapLock *sync.RWMutex, done chan struct{}) (*Runner
 		}
 	}()
 
-	return w, nil
+	return w
 }
 
 func (ru *Runner) writePid(pid int) error {
@@ -265,8 +243,8 @@ func (ru *Runner) getCanceled() bool {
 }
 
 // Reload rereads the configuration, stops the old Runner and starts a new one.
-func (ru *Runner) Reload() {
-	ru.reloadChan <- struct{}{}
+func (ru *Runner) Reload(cfg config.Configuration) {
+	ru.reloadChan <- cfg
 }
 
 // Stop stops the Runner gracefully.

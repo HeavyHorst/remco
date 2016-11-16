@@ -17,8 +17,10 @@ import (
 	"syscall"
 
 	"github.com/HeavyHorst/consul-template/signals"
+	"github.com/HeavyHorst/remco/config"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/runner"
+	"github.com/Sirupsen/logrus"
 	reap "github.com/hashicorp/go-reap"
 	"github.com/kardianos/service"
 )
@@ -63,10 +65,13 @@ func (p *program) run() {
 
 	done := make(chan struct{})
 	reapLock := &sync.RWMutex{}
-	run, err := runner.New(configPath, reapLock, done)
+
+	cfg, err := config.NewConfiguration(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	run := runner.New(cfg, reapLock, done)
 	p.runner = run
 
 	// reap zombies if pid is 1
@@ -85,8 +90,20 @@ func (p *program) run() {
 		case s := <-signalChan:
 			switch s {
 			case syscall.SIGHUP:
-				run.Reload()
+				log.WithFields(logrus.Fields{
+					"file": configPath,
+				}).Info("loading new config")
+				newConf, err := config.NewConfiguration(configPath)
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+				run.Reload(newConf)
 			case signals.SignalLookup["SIGCHLD"]:
+			case os.Interrupt, syscall.SIGTERM:
+				// the service package stops remco on these signals
+				// don't forward these signals to the subprocesses
+				// so that the configured kill and reload signals work as expected
 			default:
 				run.SendSignal(s)
 			}
