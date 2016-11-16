@@ -121,6 +121,8 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - List of backend nodes.
  - **password(string, optional):**
    - The redis password.
+ - **database(int, optional):**
+   - The redis database.
 </details>
 
 <details>

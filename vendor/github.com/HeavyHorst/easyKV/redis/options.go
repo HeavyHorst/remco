@@ -17,3 +17,10 @@ func WithPassword(pw string) Option {
 		o.password = pw
 	}
 }
+
+// WithDatabase configures the redis database
+func WithDatabase(db int) Option {
+	return func(o *Client) {
+		o.db = db
+	}
+}

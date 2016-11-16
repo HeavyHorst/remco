@@ -69,10 +69,10 @@
 			"revisionTime": "2016-11-07T22:07:25Z"
 		},
 		{
-			"checksumSHA1": "1BmIeg+EVI/1QyDgI0NSqPKBQbk=",
+			"checksumSHA1": "Sx4HMK20fRc9OBcdaSnuuuFROHg=",
 			"path": "github.com/HeavyHorst/easyKV/redis",
-			"revision": "3d469d01aacc02becc0a8aa5fd708a452eb325eb",
-			"revisionTime": "2016-11-07T22:07:25Z"
+			"revision": "316e47d31019ebe24674ab5cbff896c03a9e3960",
+			"revisionTime": "2016-11-16T19:40:36Z"
 		},
 		{
 			"checksumSHA1": "Z83+gh9Bxu2JF8ccaEJJYU0YCfI=",

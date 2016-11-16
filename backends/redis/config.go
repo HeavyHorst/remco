@@ -20,6 +20,7 @@ import (
 type Config struct {
 	Nodes    []string
 	Password string
+	Database int
 	template.Backend
 }
 
@@ -35,7 +36,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		"nodes":   c.Nodes,
 	}).Info("Set backend nodes")
 
-	client, err := redis.New(c.Nodes, redis.WithPassword(c.Password))
+	client, err := redis.New(c.Nodes, redis.WithPassword(c.Password), redis.WithDatabase(c.Database))
 	if err != nil {
 		return c.Backend, err
 	}

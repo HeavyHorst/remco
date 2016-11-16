@@ -31,12 +31,13 @@ type Client struct {
 	client   redis.Conn
 	machines []string
 	password string
+	db       int
 }
 
 // Iterate through `machines`, trying to connect to each in turn.
 // Returns the first successful connection or the last error encountered.
 // Assumes that `machines` is non-empty.
-func tryConnect(machines []string, password string) (redis.Conn, error) {
+func tryConnect(machines []string, db int, password string) (redis.Conn, error) {
 	var err error
 	for _, address := range machines {
 		var conn redis.Conn
@@ -49,6 +50,7 @@ func tryConnect(machines []string, password string) (redis.Conn, error) {
 			redis.DialConnectTimeout(time.Second),
 			redis.DialReadTimeout(time.Second),
 			redis.DialWriteTimeout(time.Second),
+			redis.DialDatabase(db),
 		}
 
 		if password != "" {
@@ -79,7 +81,7 @@ func (c *Client) connectedClient() (redis.Conn, error) {
 	// Existing client could have been deleted by previous block
 	if c.client == nil {
 		var err error
-		c.client, err = tryConnect(c.machines, c.password)
+		c.client, err = tryConnect(c.machines, c.db, c.password)
 		if err != nil {
 			return nil, err
 		}
@@ -98,7 +100,7 @@ func New(machines []string, opts ...Option) (*Client, error) {
 	}
 	c.machines = machines
 
-	c.client, err = tryConnect(c.machines, c.password)
+	c.client, err = tryConnect(c.machines, c.db, c.password)
 	return &c, err
 }
 
