@@ -22,7 +22,6 @@ import (
 	"github.com/HeavyHorst/remco/runner"
 	"github.com/Sirupsen/logrus"
 	reap "github.com/hashicorp/go-reap"
-	"github.com/kardianos/service"
 )
 
 var (
@@ -31,11 +30,6 @@ var (
 	printVersionAndExit bool
 )
 
-type program struct {
-	runner   *runner.Runner
-	stopChan chan struct{}
-}
-
 func init() {
 	const defaultConfig = "/etc/remco/config"
 	flag.StringVar(&configPath, "config", defaultConfig, "path to the configuration file")
@@ -43,22 +37,7 @@ func init() {
 	flag.StringVar(&serviceFlag, "service", "", "operate on the service")
 }
 
-func (p *program) Start(s service.Service) error {
-	p.stopChan = make(chan struct{})
-	go p.run()
-	return nil
-}
-
-func (p *program) Stop(s service.Service) error {
-	close(p.stopChan)
-	if p.runner != nil {
-		p.runner.Stop()
-	}
-
-	return nil
-}
-
-func (p *program) run() {
+func run() {
 	// catch all signals
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan)
@@ -72,7 +51,7 @@ func (p *program) run() {
 	}
 
 	run := runner.New(cfg, reapLock, done)
-	p.runner = run
+	defer run.Stop()
 
 	// reap zombies if pid is 1
 	pidReapChan := make(reap.PidCh, 1)
@@ -101,9 +80,8 @@ func (p *program) run() {
 				run.Reload(newConf)
 			case signals.SignalLookup["SIGCHLD"]:
 			case os.Interrupt, syscall.SIGTERM:
-				// the service package stops remco on these signals
-				// don't forward these signals to the subprocesses
-				// so that the configured kill and reload signals work as expected
+				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
+				return
 			default:
 				run.SendSignal(s)
 			}
@@ -111,11 +89,8 @@ func (p *program) run() {
 			log.Debug(fmt.Sprintf("Reaped child process %d", pid))
 		case err := <-errorReapChan:
 			log.Error(fmt.Sprintf("Error reaping child process %v", err))
-		case <-p.stopChan:
-			return
 		case <-done:
-			run.Stop()
-			os.Exit(0)
+			return
 		}
 	}
 }
@@ -125,31 +100,8 @@ func main() {
 
 	if printVersionAndExit {
 		printVersion()
+		return
 	}
 
-	svcConfig := &service.Config{
-		Name:        "remco",
-		DisplayName: "remco",
-		Description: "Remco remote configuration manager",
-	}
-
-	prg := &program{}
-	s, err := service.New(prg, svcConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if serviceFlag != "" {
-		if configPath != "" {
-			svcConfig.Arguments = []string{"-config", configPath}
-		}
-		err := service.Control(s, serviceFlag)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		err = s.Run()
-		if err != nil {
-			log.Error(err)
-		}
-	}
+	run()
 }
