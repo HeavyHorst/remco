@@ -45,7 +45,7 @@ type Resource struct {
 	backends []Backend
 	funcMap  map[string]interface{}
 	store    memkv.Store
-	sources  []*Processor
+	sources  []*Renderer
 	logger   *logrus.Entry
 
 	exec       executor.Executor
@@ -58,7 +58,7 @@ type Resource struct {
 var ErrEmptySrc = errors.New("empty src template")
 
 // NewResource creates a Resource.
-func NewResource(backends []Backend, sources []*Processor, name string, exec executor.Executor) (*Resource, error) {
+func NewResource(backends []Backend, sources []*Renderer, name string, exec executor.Executor) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, errors.New("A valid StoreClient is required.")
 	}

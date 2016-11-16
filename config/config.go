@@ -39,7 +39,7 @@ type Configuration struct {
 // Resource is the representation of an resource configuration
 type Resource struct {
 	Exec     Exec
-	Template []*template.Processor
+	Template []*template.Renderer
 	Backend  backends.Config
 
 	// defaults to the filename of the resource

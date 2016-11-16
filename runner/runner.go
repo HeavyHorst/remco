@@ -19,18 +19,9 @@ import (
 
 	"github.com/HeavyHorst/remco/config"
 	"github.com/HeavyHorst/remco/log"
-	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
 	"github.com/pborman/uuid"
 )
-
-type status struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	State    string `json:"state"`
-	Exec     config.Exec
-	Template []*template.Processor
-}
 
 // Runner runs
 type Runner struct {

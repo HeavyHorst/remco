@@ -14,7 +14,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -22,6 +21,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"sync"
+	"text/template"
 
 	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/log"
@@ -29,8 +29,8 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// Processor contains all data needed for the template processing
-type Processor struct {
+// Renderer contains all data needed for the template processing
+type Renderer struct {
 	Src       string `json:"src"`
 	Dst       string `json:"dst"`
 	Mode      string `json:"mode"`
@@ -47,7 +47,7 @@ type Processor struct {
 // template and setting the desired owner, group, and mode. It also sets the
 // StageFile for the template resource.
 // It returns an error if any.
-func (s *Processor) createStageFile(funcMap map[string]interface{}) error {
+func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 	if !fileutil.IsFileExist(s.Src) {
 		return errors.New("Missing template: " + s.Src)
 	}
@@ -94,7 +94,7 @@ func (s *Processor) createStageFile(funcMap map[string]interface{}) error {
 // overwriting the target config file. Finally, syncFile will run a reload command
 // if set to have the application or service pick up the changes.
 // It returns an error if any.
-func (s *Processor) syncFiles() (bool, error) {
+func (s *Renderer) syncFiles() (bool, error) {
 	var changed bool
 	staged := s.stageFile.Name()
 	defer os.Remove(staged)
@@ -151,7 +151,7 @@ func (s *Processor) syncFiles() (bool, error) {
 	return changed, nil
 }
 
-func (s *Processor) getFileMode() (os.FileMode, error) {
+func (s *Renderer) getFileMode() (os.FileMode, error) {
 	if s.Mode == "" {
 		if !fileutil.IsFileExist(s.Dst) {
 			return 0644, nil
@@ -175,7 +175,7 @@ func (s *Processor) getFileMode() (os.FileMode, error) {
 // with a string representing the full path of the staged file. This allows the
 // check to be run on the staged file before overwriting the destination config file.
 // It returns nil if the check command returns 0 and there are no other errors.
-func (s *Processor) check(stageFile string) error {
+func (s *Renderer) check(stageFile string) error {
 	if s.CheckCmd == "" {
 		return nil
 	}
@@ -208,7 +208,7 @@ func (s *Processor) check(stageFile string) error {
 
 // reload executes the reload command.
 // It returns nil if the reload command returns 0.
-func (s *Processor) reload() error {
+func (s *Renderer) reload() error {
 	if s.ReloadCmd == "" {
 		return nil
 	}
