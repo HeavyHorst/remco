@@ -17,13 +17,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/HeavyHorst/remco/backends"
 	backendErrors "github.com/HeavyHorst/remco/backends/error"
 	"github.com/HeavyHorst/remco/executor"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
-	"github.com/naoina/toml"
 )
 
 // Configuration is the representation of an config file
