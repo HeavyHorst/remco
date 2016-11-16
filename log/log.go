@@ -32,25 +32,42 @@ func init() {
 
 // SetFormatter sets the formatter. Valid formatters are json and text.
 func SetFormatter(format string) {
-	lock.Lock()
-	defer lock.Unlock()
-	switch format {
-	case "json":
-		log.SetFormatter(&log.JSONFormatter{})
-	case "text":
-		log.SetFormatter(&prefixed.TextFormatter{DisableSorting: false})
+	if format != "" {
+		lock.Lock()
+		defer lock.Unlock()
+		switch format {
+		case "json":
+			log.SetFormatter(&log.JSONFormatter{})
+		case "text":
+			log.SetFormatter(&prefixed.TextFormatter{DisableSorting: false})
+		}
 	}
+}
+
+func SetOutput(path string) error {
+	if path != "" {
+		lock.Lock()
+		defer lock.Unlock()
+		f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			return fmt.Errorf("could not open logfile %q", path)
+		}
+		log.SetOutput(f)
+	}
+	return nil
 }
 
 // SetLevel sets the log level. Valid levels are panic, fatal, error, warn, info and debug.
 func SetLevel(level string) error {
-	lock.Lock()
-	defer lock.Unlock()
-	lvl, err := log.ParseLevel(level)
-	if err != nil {
-		return err
+	if level != "" {
+		lock.Lock()
+		defer lock.Unlock()
+		lvl, err := log.ParseLevel(level)
+		if err != nil {
+			return err
+		}
+		log.SetLevel(lvl)
 	}
-	log.SetLevel(lvl)
 	return nil
 }
 

@@ -20,6 +20,8 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
    - Specify an entire directory of resource configuration files to include.
  - **pid_file(string):**
    - A filename to write the process-id to.
+ - **log_file(string):**
+   - Specify the log file name. The empty string means to log to stdout.
 
 ## Resource configuration options
  - **name(string, optional):**

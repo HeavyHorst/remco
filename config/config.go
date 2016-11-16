@@ -32,6 +32,7 @@ type Configuration struct {
 	LogFormat  string `toml:"log_format"`
 	IncludeDir string `toml:"include_dir"`
 	PidFile    string `toml:"pid_file"`
+	LogFile    string `toml:"log_file"`
 	Http       string
 	Resource   []Resource
 }
@@ -125,14 +126,15 @@ func NewConfiguration(path string) (Configuration, error) {
 // configureLogger configures the global logger
 // for example it sets the log level and log formatting
 func (c *Configuration) configureLogger() {
-	if c.LogLevel != "" {
-		err := log.SetLevel(c.LogLevel)
-		if err != nil {
-			log.Error(err)
-		}
+	err := log.SetLevel(c.LogLevel)
+	if err != nil {
+		log.Error(err)
 	}
-	if c.LogFormat != "" {
-		log.SetFormatter(c.LogFormat)
+	log.SetFormatter(c.LogFormat)
+
+	err = log.SetOutput(c.LogFile)
+	if err != nil {
+		log.Error(err)
 	}
 }
 
