@@ -48,10 +48,12 @@ type Runner struct {
 	signalChansMutex sync.RWMutex
 
 	pidFile string
+
+	reapLock *sync.RWMutex
 }
 
 // New creates a new Runner
-func New(configPath string, done chan struct{}) (*Runner, error) {
+func New(configPath string, reapLock *sync.RWMutex, done chan struct{}) (*Runner, error) {
 	w := &Runner{
 		stoppedW:      make(chan struct{}),
 		stopWatch:     make(chan struct{}),
@@ -59,6 +61,7 @@ func New(configPath string, done chan struct{}) (*Runner, error) {
 		reloadChan:    make(chan struct{}),
 		configPath:    configPath,
 		signalChans:   make(map[string]chan os.Signal),
+		reapLock:      reapLock,
 	}
 
 	cfg, err := config.NewConfiguration(configPath)
@@ -204,7 +207,7 @@ func (ru *Runner) runConfig(c config.Configuration) {
 		wait.Add(1)
 		go func(r config.Resource) {
 			defer wait.Done()
-			res, err := r.Init(ctx)
+			res, err := r.Init(ctx, ru.reapLock)
 			if err != nil {
 				log.Error(err)
 			} else {
@@ -278,6 +281,10 @@ func (ru *Runner) Reload() {
 // Stop stops the Runner gracefully.
 func (ru *Runner) Stop() {
 	ru.mu.Lock()
+	if ru.canceled {
+		ru.mu.Unlock()
+		return
+	}
 	ru.canceled = true
 	ru.mu.Unlock()
 	close(ru.stopWatch)

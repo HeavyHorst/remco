@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/HeavyHorst/remco/backends"
@@ -135,7 +136,7 @@ func (c *Configuration) configureLogger() {
 	}
 }
 
-func (r *Resource) Init(ctx context.Context) (*template.Resource, error) {
+func (r *Resource) Init(ctx context.Context, reapLock *sync.RWMutex) (*template.Resource, error) {
 	var backendList []template.Backend
 
 	// try to connect to all backends
@@ -168,6 +169,10 @@ func (r *Resource) Init(ctx context.Context) (*template.Resource, error) {
 				break retryloop
 			}
 		}
+	}
+
+	for _, p := range r.Template {
+		p.ReapLock = reapLock
 	}
 
 	logger := log.WithFields(logrus.Fields{"resource": r.Name})

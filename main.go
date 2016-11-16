@@ -13,36 +13,61 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/HeavyHorst/consul-template/signals"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/runner"
 	reap "github.com/hashicorp/go-reap"
+	"github.com/kardianos/service"
 )
 
 var (
 	configPath          string
+	serviceFlag         string
 	printVersionAndExit bool
 )
+
+type program struct {
+	runner   *runner.Runner
+	stopChan chan struct{}
+}
 
 func init() {
 	const defaultConfig = "/etc/remco/config"
 	flag.StringVar(&configPath, "config", defaultConfig, "path to the configuration file")
 	flag.BoolVar(&printVersionAndExit, "version", false, "print version and exit")
+	flag.StringVar(&serviceFlag, "service", "", "operate on the service")
 }
 
-func run() {
+func (p *program) Start(s service.Service) error {
+	p.stopChan = make(chan struct{})
+	go p.run()
+	return nil
+}
+
+func (p *program) Stop(s service.Service) error {
+	close(p.stopChan)
+	if p.runner != nil {
+		p.runner.Stop()
+	}
+
+	return nil
+}
+
+func (p *program) run() {
 	// catch all signals
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan)
 
 	done := make(chan struct{})
-	run, err := runner.New(configPath, done)
+	reapLock := &sync.RWMutex{}
+	run, err := runner.New(configPath, reapLock, done)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer run.Stop()
+	p.runner = run
 
 	// reap zombies if pid is 1
 	pidReapChan := make(reap.PidCh, 1)
@@ -51,7 +76,7 @@ func run() {
 		if !reap.IsSupported() {
 			log.Warning("the pid is 1 but zombie reaping is not supported on this platform")
 		} else {
-			go reap.ReapChildren(pidReapChan, errorReapChan, done, nil)
+			go reap.ReapChildren(pidReapChan, errorReapChan, done, reapLock)
 		}
 	}
 
@@ -59,9 +84,6 @@ func run() {
 		select {
 		case s := <-signalChan:
 			switch s {
-			case syscall.SIGINT, syscall.SIGTERM:
-				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-				return
 			case syscall.SIGHUP:
 				run.Reload()
 			case signals.SignalLookup["SIGCHLD"]:
@@ -72,8 +94,11 @@ func run() {
 			log.Debug(fmt.Sprintf("Reaped child process %d", pid))
 		case err := <-errorReapChan:
 			log.Error(fmt.Sprintf("Error reaping child process %v", err))
-		case <-done:
+		case <-p.stopChan:
 			return
+		case <-done:
+			run.Stop()
+			os.Exit(0)
 		}
 	}
 }
@@ -83,8 +108,31 @@ func main() {
 
 	if printVersionAndExit {
 		printVersion()
-		return
 	}
 
-	run()
+	svcConfig := &service.Config{
+		Name:        "remco",
+		DisplayName: "remco",
+		Description: "Remco remote configuration manager",
+	}
+
+	prg := &program{}
+	s, err := service.New(prg, svcConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if serviceFlag != "" {
+		if configPath != "" {
+			svcConfig.Arguments = []string{"-config", configPath}
+		}
+		err := service.Control(s, serviceFlag)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		err = s.Run()
+		if err != nil {
+			log.Error(err)
+		}
+	}
 }
