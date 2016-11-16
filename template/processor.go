@@ -21,6 +21,7 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"sync"
 
 	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/log"
@@ -39,6 +40,7 @@ type Processor struct {
 	CheckCmd  string `toml:"check_cmd" json:"check_cmd"`
 	stageFile *os.File
 	logger    *logrus.Entry
+	ReapLock  *sync.RWMutex
 }
 
 // createStageFile stages the src configuration file by processing the src
@@ -189,6 +191,12 @@ func (s *Processor) check(stageFile string) error {
 	}
 	s.logger.Debug("Running " + cmdBuffer.String())
 	c := exec.Command("/bin/sh", "-c", cmdBuffer.String())
+
+	if s.ReapLock != nil {
+		s.ReapLock.RLock()
+		defer s.ReapLock.RUnlock()
+	}
+
 	output, err := c.CombinedOutput()
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("%q", string(output)))
@@ -206,6 +214,12 @@ func (s *Processor) reload() error {
 	}
 	s.logger.Debug("Running " + s.ReloadCmd)
 	c := exec.Command("/bin/sh", "-c", s.ReloadCmd)
+
+	if s.ReapLock != nil {
+		s.ReapLock.RLock()
+		defer s.ReapLock.RUnlock()
+	}
+
 	output, err := c.CombinedOutput()
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("%q", string(output)))
