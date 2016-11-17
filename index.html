@@ -141,7 +141,7 @@
         </div>
       
       <div class="name">
-        <strong>Remco Docs <span class="version">v0.6.0</span></strong>
+        <strong>Remco Docs <span class="version">v0.7.0-alpha1</span></strong>
         
           <br>
           HeavyHorst/remco
@@ -327,6 +327,57 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 <ul>
 <li>Specify an entire directory of resource configuration files to include.</li>
 </ul></li>
+<li><strong>pid_file(string):</strong>
+
+<ul>
+<li>A filename to write the process-id to.</li>
+</ul></li>
+<li><strong>log_file(string):</strong>
+
+<ul>
+<li>Specify the log file name. The empty string means to log to stdout.</li>
+</ul></li>
+</ul>
+
+<h2 id="resource-configuration-options">Resource configuration options</h2>
+
+<ul>
+<li><strong>name(string, optional):</strong>
+
+<ul>
+<li>You can give the resource a name which is added to the logs as field <em>resource</em>. Default is the name of the resource file.</li>
+</ul></li>
+</ul>
+
+<h2 id="exec-configuration-options">Exec configuration options</h2>
+
+<ul>
+<li><strong>command(string):</strong>
+
+<ul>
+<li>This is the command to exec as a child process. Note that the child process must remain in the foreground.</li>
+</ul></li>
+<li><strong>kill_signal(string):</strong>
+
+<ul>
+<li>This defines the signal sent to the child process when remco is gracefully shutting down. The application needs to exit before the <code>kill_timeout</code>,
+it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGTERM&rdquo;.</li>
+</ul></li>
+<li><strong>kill_timeout(int):</strong>
+
+<ul>
+<li>the maximum amount of time (seconds) to wait for the child process to gracefully terminate. Default is 10.</li>
+</ul></li>
+<li><strong>reload_signal(string):</strong>
+
+<ul>
+<li>This defines the signal sent to the child process when some configuration data is changed. If no signal is specified the child process will be killed (gracefully) and started again.</li>
+</ul></li>
+<li><strong>splay(int):</strong>
+
+<ul>
+<li>A random splay to wait before killing the command. May be useful in large clusters to prevent all child processes to reload at the same time when configuration changes occur. Default is 0.</li>
+</ul></li>
 </ul>
 
 <h2 id="template-configuration-options">Template configuration options</h2>
@@ -342,12 +393,12 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 <ul>
 <li>The location to place the rendered configuration file.</li>
 </ul></li>
-<li><strong>checkCmd(string, optional):</strong>
+<li><strong>check_cmd(string, optional):</strong>
 
 <ul>
 <li>The command to check config. Use {{.src}} to reference the rendered source template.</li>
 </ul></li>
-<li><strong>reloadCmd(string, optional):</strong>
+<li><strong>reload_cmd(string, optional):</strong>
 
 <ul>
 <li>The command to reload config.</li>
@@ -501,7 +552,12 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 <li><strong>password(string, optional):</strong>
 
 <ul>
-<li>The redis password.
+<li>The redis password.</li>
+</ul></li>
+<li><strong>database(int, optional):</strong>
+
+<ul>
+<li>The redis database.
 </details></li>
 </ul></li>
 </ul>

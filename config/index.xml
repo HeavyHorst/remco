@@ -67,6 +67,57 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;ul&gt;
 &lt;li&gt;Specify an entire directory of resource configuration files to include.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;pid_file(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A filename to write the process-id to.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;log_file(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Specify the log file name. The empty string means to log to stdout.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;resource-configuration-options&#34;&gt;Resource configuration options&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;name(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;You can give the resource a name which is added to the logs as field &lt;em&gt;resource&lt;/em&gt;. Default is the name of the resource file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;exec-configuration-options&#34;&gt;Exec configuration options&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;command(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;This is the command to exec as a child process. Note that the child process must remain in the foreground.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;kill_signal(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;This defines the signal sent to the child process when remco is gracefully shutting down. The application needs to exit before the &lt;code&gt;kill_timeout&lt;/code&gt;,
+it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;SIGTERM&amp;rdquo;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;kill_timeout(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;the maximum amount of time (seconds) to wait for the child process to gracefully terminate. Default is 10.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;reload_signal(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;This defines the signal sent to the child process when some configuration data is changed. If no signal is specified the child process will be killed (gracefully) and started again.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;splay(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A random splay to wait before killing the command. May be useful in large clusters to prevent all child processes to reload at the same time when configuration changes occur. Default is 0.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;template-configuration-options&#34;&gt;Template configuration options&lt;/h2&gt;
@@ -82,12 +133,12 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;ul&gt;
 &lt;li&gt;The location to place the rendered configuration file.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;checkCmd(string, optional):&lt;/strong&gt;
+&lt;li&gt;&lt;strong&gt;check_cmd(string, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
 &lt;li&gt;The command to check config. Use {{.src}} to reference the rendered source template.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;reloadCmd(string, optional):&lt;/strong&gt;
+&lt;li&gt;&lt;strong&gt;reload_cmd(string, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
 &lt;li&gt;The command to reload config.&lt;/li&gt;
@@ -241,7 +292,12 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;li&gt;&lt;strong&gt;password(string, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The redis password.
+&lt;li&gt;The redis password.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;database(int, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The redis database.
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -350,11 +406,12 @@ include_dir = &amp;quot;/etc/remco/resource.d/&amp;quot;
 # Resource configuration
 ################################################################
 [[resource]]
+  name = &amp;quot;haproxy&amp;quot;
   [[resource.template]]
     src = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
     dst = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
-    checkCmd = &amp;quot;&amp;quot;
-    reloadCmd = &amp;quot;&amp;quot;
+    chec_cmd = &amp;quot;&amp;quot;
+    reload_cmd = &amp;quot;&amp;quot;
     mode = &amp;quot;0644&amp;quot;
 
   [resource.backend]

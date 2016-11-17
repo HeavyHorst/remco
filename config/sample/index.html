@@ -138,7 +138,7 @@
         </div>
       
       <div class="name">
-        <strong>Remco Docs <span class="version">v0.6.0</span></strong>
+        <strong>Remco Docs <span class="version">v0.7.0-alpha1</span></strong>
         
           <br>
           HeavyHorst/remco
@@ -308,11 +308,12 @@ include_dir = &quot;/etc/remco/resource.d/&quot;
 # Resource configuration
 ################################################################
 [[resource]]
+  name = &quot;haproxy&quot;
   [[resource.template]]
     src = &quot;/etc/remco/templates/haproxy.cfg&quot;
     dst = &quot;/etc/haproxy/haproxy.cfg&quot;
-    checkCmd = &quot;&quot;
-    reloadCmd = &quot;&quot;
+    chec_cmd = &quot;&quot;
+    reload_cmd = &quot;&quot;
     mode = &quot;0644&quot;
 
   [resource.backend]
