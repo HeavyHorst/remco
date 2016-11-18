@@ -113,6 +113,27 @@ something
 ```
 </details>
 
+<details>
+<summary> **lookupIP** -- Wrapper for the [net.LookupIP](https://golang.org/pkg/net/#LookupIP) function. The wrapper returns the IP addresses in alphabetical order. </summary>
+```
+{% for ip in lookupIP("kube-master") %}
+ {{ ip }}
+{% endfor %}
+```
+</details>
+
+<details>
+<summary> **lookupSRV** -- Wrapper for the [net.LookupSRV](https://golang.org/pkg/net/#LookupSRV) function. The wrapper returns the SRV records in alphabetical order. </summary>
+```
+{% for srv in lookupSRV("xmpp-server", "tcp", "google.com") %}
+  target: {{ srv.Target }}
+  port: {{ srv.Port }}
+  priority: {{ srv.Priority }}
+  weight: {{ srv.Weight }}
+{% endfor %}
+```
+</details>
+
 ## Template Filters
 
 <details>
