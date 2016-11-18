@@ -26,7 +26,6 @@ import (
 
 var (
 	configPath          string
-	serviceFlag         string
 	printVersionAndExit bool
 )
 
@@ -34,7 +33,6 @@ func init() {
 	const defaultConfig = "/etc/remco/config"
 	flag.StringVar(&configPath, "config", defaultConfig, "path to the configuration file")
 	flag.BoolVar(&printVersionAndExit, "version", false, "print version and exit")
-	flag.StringVar(&serviceFlag, "service", "", "operate on the service")
 }
 
 func run() {
