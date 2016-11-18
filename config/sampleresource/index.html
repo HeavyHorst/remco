@@ -295,18 +295,27 @@
 		<div class="wrapper">
 			<h1>Sample resource file </h1>
 
-			<pre><code>[[template]]
-  src = &quot;/etc/remco/templates/haproxy.cfg&quot;
-  dst = &quot;/etc/haproxy/haproxy.cfg&quot;
-  mode = &quot;0644&quot;
+			<pre><code>[exec]
+  command       = &quot;/path/to/program&quot;
+  kill_signal   = &quot;SIGTERM&quot;
+  reload_signal = &quot;SIGHUP&quot;
+  kill_timeout  = 10
+  splay         = 10
+
+
+[[template]]
+  src           = &quot;/etc/remco/templates/haproxy.cfg&quot;
+  dst           = &quot;/etc/haproxy/haproxy.cfg&quot;
+  reload_cmd 	= &quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&quot;
+  mode          = &quot;0644&quot;
 
 [backend]
   [backend.etcd]
-    nodes = [&quot;http://localhost:2379&quot;]
-    keys = [&quot;/&quot;]
-    watch = true
-    interval = 1
-    version = 3
+    nodes    = [&quot;http://localhost:2379&quot;]
+    keys     = [&quot;/service-registry&quot;]
+    watch    = true
+    interval = 60
+    version  = 3
 
 </code></pre>
 

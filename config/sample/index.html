@@ -299,9 +299,11 @@
 ################################################################
 # Global configuration
 ################################################################
-log_level = &quot;debug&quot;
-log_format = &quot;text&quot;
+log_level   = &quot;debug&quot;
+log_format  = &quot;json&quot;
 include_dir = &quot;/etc/remco/resource.d/&quot;
+pid_file    = &quot;/var/run/remco/remco.pid&quot;
+log_file    = &quot;/var/log/remco.log&quot;
 
 
 ################################################################
@@ -310,40 +312,43 @@ include_dir = &quot;/etc/remco/resource.d/&quot;
 [[resource]]
   name = &quot;haproxy&quot;
   [[resource.template]]
-    src = &quot;/etc/remco/templates/haproxy.cfg&quot;
-    dst = &quot;/etc/haproxy/haproxy.cfg&quot;
-    chec_cmd = &quot;&quot;
-    reload_cmd = &quot;&quot;
-    mode = &quot;0644&quot;
+    src         = &quot;/etc/remco/templates/haproxy.cfg&quot;
+    dst         = &quot;/etc/haproxy/haproxy.cfg&quot;
+    check_cmd   = &quot;somecommand&quot;
+    reload_cmd  = &quot;somecommand&quot;
+    mode        = &quot;0644&quot;
 
   [resource.backend]
+    # you can use as many backends as you like
+	# in this example vault and file
     [resource.backend.vault]
-      node = &quot;http://127.0.0.1:8200&quot;
+      node           = &quot;http://127.0.0.1:8200&quot;
       ## Token based auth backend
-      auth_type = &quot;token&quot;
-      auth_token = &quot;vault_token&quot;
+      auth_type      = &quot;token&quot;
+      auth_token     = &quot;vault_token&quot;
       ## AppID based auth backend
-      # auth_type = &quot;app-id&quot;
-      # app_id = &quot;vault_app_id&quot;
-      # user_id = &quot;vault_user_id&quot;
+      # auth_type    = &quot;app-id&quot;
+      # app_id       = &quot;vault_app_id&quot;
+      # user_id      = &quot;vault_user_id&quot;
       ## userpass based auth backend
-      # auth_type = &quot;userpass&quot;
-      # username = &quot;username&quot;
-      # password = &quot;password&quot;
-      client_cert = &quot;/path/to/client_cert&quot;
-      client_key = &quot;/path/to/client_key&quot;
+      # auth_type    = &quot;userpass&quot;
+      # username     = &quot;username&quot;
+      # password     = &quot;password&quot;
+      client_cert    = &quot;/path/to/client_cert&quot;
+      client_key     = &quot;/path/to/client_key&quot;
       client_ca_keys = &quot;/path/to/client_ca_keys&quot;
       
 	  # These values are valid in every backend
-      watch = true
-      prefix = &quot;/&quot;
-      onetime = true
+      watch    = true
+      prefix   = &quot;/&quot;
+      onetime  = true
       interval = 1
-      keys = [&quot;/&quot;]
+      keys     = [&quot;/&quot;]
 
     [resource.backend.file]
       filepath = &quot;/etc/remco/test.yml&quot;
-	  watch = true
+	  watch    = true
+	  keys     = [&quot;/prefix&quot;]
 
 </code></pre>
 
