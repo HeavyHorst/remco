@@ -166,6 +166,29 @@ something
 
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;lookupIP&lt;/strong&gt; &amp;ndash; Wrapper for the &lt;a href=&#34;https://golang.org/pkg/net/#LookupIP&#34;&gt;net.LookupIP&lt;/a&gt; function. The wrapper returns the IP addresses in alphabetical order. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% for ip in lookupIP(&amp;quot;kube-master&amp;quot;) %}
+ {{ ip }}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;lookupSRV&lt;/strong&gt; &amp;ndash; Wrapper for the &lt;a href=&#34;https://golang.org/pkg/net/#LookupSRV&#34;&gt;net.LookupSRV&lt;/a&gt; function. The wrapper returns the SRV records in alphabetical order. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% for srv in lookupSRV(&amp;quot;xmpp-server&amp;quot;, &amp;quot;tcp&amp;quot;, &amp;quot;google.com&amp;quot;) %}
+  target: {{ srv.Target }}
+  port: {{ srv.Port }}
+  priority: {{ srv.Priority }}
+  weight: {{ srv.Weight }}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
 &lt;h2 id=&#34;template-filters&#34;&gt;Template Filters&lt;/h2&gt;
 
 &lt;p&gt;&lt;details&gt;

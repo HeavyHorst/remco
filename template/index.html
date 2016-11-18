@@ -425,6 +425,29 @@ something
 
 <p></details></p>
 
+<p><details>
+<summary> <strong>lookupIP</strong> &ndash; Wrapper for the <a href="https://golang.org/pkg/net/#LookupIP">net.LookupIP</a> function. The wrapper returns the IP addresses in alphabetical order. </summary></p>
+
+<pre><code>{% for ip in lookupIP(&quot;kube-master&quot;) %}
+ {{ ip }}
+{% endfor %}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary> <strong>lookupSRV</strong> &ndash; Wrapper for the <a href="https://golang.org/pkg/net/#LookupSRV">net.LookupSRV</a> function. The wrapper returns the SRV records in alphabetical order. </summary></p>
+
+<pre><code>{% for srv in lookupSRV(&quot;xmpp-server&quot;, &quot;tcp&quot;, &quot;google.com&quot;) %}
+  target: {{ srv.Target }}
+  port: {{ srv.Port }}
+  priority: {{ srv.Priority }}
+  weight: {{ srv.Weight }}
+{% endfor %}
+</code></pre>
+
+<p></details></p>
+
 <h2 id="template-filters">Template Filters</h2>
 
 <p><details>
