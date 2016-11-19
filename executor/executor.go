@@ -135,10 +135,10 @@ func (e *Executor) SpawnChild() error {
 	return nil
 }
 
-// IsStopped waits for the children to stop.
+// Wait waits for the children to stop.
 // Returns true if the command stops.
-// IsStopped ignores reloads.
-func (e *Executor) IsStopped(ctx context.Context) bool {
+// Wait ignores reloads.
+func (e *Executor) Wait(ctx context.Context) bool {
 	var exitChan <-chan int
 
 	e.childLock.RLock()

@@ -246,7 +246,7 @@ retryloop:
 	go func() {
 		// run the cancel func if the childProcess quit
 		defer wg.Done()
-		stopped := t.exec.IsStopped(ctx)
+		stopped := t.exec.Wait(ctx)
 		if stopped {
 			t.Failed = true
 			cancel()
