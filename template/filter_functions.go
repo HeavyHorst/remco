@@ -28,8 +28,8 @@ import (
 func init() {
 	pongo2.RegisterFilter("reverse", filterReverse)
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
-	pongo2.RegisterFilter("parseJSON", filterUnmarshalJSONObject)
-	pongo2.RegisterFilter("parseJSONArray", filterUnmarshalJSONArray)
+	pongo2.RegisterFilter("parseYAML", filterUnmarshalYAMLObject)
+	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAMLArray)
 	pongo2.RegisterFilter("toJSON", filterToJSON)
 	pongo2.RegisterFilter("toPrettyJSON", filterToPrettyJSON)
 	pongo2.RegisterFilter("toYAML", filterToYAML)
@@ -85,25 +85,25 @@ func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	return pongo2.AsValue(string(b)), nil
 }
 
-func filterUnmarshalJSONObject(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+func filterUnmarshalYAMLObject(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	if !in.IsString() {
 		return in, nil
 	}
 
 	var ret map[string]interface{}
-	if err := json.Unmarshal([]byte(in.String()), &ret); err != nil {
+	if err := yaml.Unmarshal([]byte(in.String()), &ret); err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
 	return pongo2.AsValue(ret), nil
 }
 
-func filterUnmarshalJSONArray(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+func filterUnmarshalYAMLArray(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	if !in.IsString() {
 		return in, nil
 	}
 
 	var ret []interface{}
-	if err := json.Unmarshal([]byte(in.String()), &ret); err != nil {
+	if err := yaml.Unmarshal([]byte(in.String()), &ret); err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
 	return pongo2.AsValue(ret), nil

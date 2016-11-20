@@ -109,14 +109,14 @@ test3: 2.5
 	t.Check(res.String(), Equals, expected)
 }
 
-func (s *FilterSuite) TestFilterUnmarshalJSONObject(t *C) {
+func (s *FilterSuite) TestFilterUnmarshalYAMLObject(t *C) {
 	in := pongo2.AsValue(`{"test":"bla","test2":"1","test3":"2.5"}`)
 	expected := map[string]interface{}{
 		"test":  "bla",
 		"test2": "1",
 		"test3": "2.5",
 	}
-	res, err := filterUnmarshalJSONObject(in, nil)
+	res, err := filterUnmarshalYAMLObject(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
@@ -124,10 +124,10 @@ func (s *FilterSuite) TestFilterUnmarshalJSONObject(t *C) {
 	t.Check(m1, DeepEquals, expected)
 }
 
-func (s *FilterSuite) TestFilterUnmarshalJSONArray(t *C) {
+func (s *FilterSuite) TestFilterUnmarshalYAMLArray(t *C) {
 	in := pongo2.AsValue(`["a", "b", "c"]`)
 	expected := []interface{}{"a", "b", "c"}
-	res, err := filterUnmarshalJSONArray(in, nil)
+	res, err := filterUnmarshalYAMLArray(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
