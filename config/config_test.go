@@ -9,6 +9,7 @@
 package config
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -20,23 +21,27 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-const testFile string = `
-log_level = "debug"
-log_format = "text"
-[[resource]]
-  [[resource.template]]
-    src = "/tmp/test12345.tmpl"
-    dst = "/tmp/test12345.cfg"
-    checkCmd = ""
-    reloadCmd = ""
-    mode = "0644"
- [resource.backend]
-      [resource.backend.mock]
-	    keys = ["/"]
-		watch = false
-		interval = 1
-		onetime = false
+const (
+	testFile string = `
+      log_level = "debug"
+      log_format = "text"
+      include_dir = "/tmp/resource.d/"
 `
+	resourceFile string = `
+        [[template]]
+        src = "/tmp/test12345.tmpl"
+        dst = "/tmp/test12345.cfg"
+        checkCmd = ""
+        reloadCmd = ""
+        mode = "0644"
+        [backend]
+        [backend.mock]
+	      keys = ["/"]
+		  watch = false
+		  interval = 1
+		  onetime = false
+`
+)
 
 var expectedTemplates = []*template.Renderer{
 	&template.Renderer{
@@ -58,10 +63,12 @@ var expectedBackend = backends.Config{
 }
 
 var expected = Configuration{
-	LogLevel:  "debug",
-	LogFormat: "text",
+	LogLevel:   "debug",
+	LogFormat:  "text",
+	IncludeDir: "/tmp/resource.d/",
 	Resource: []Resource{
 		Resource{
+			Name:     "test.toml",
 			Template: expectedTemplates,
 			Backend:  expectedBackend,
 		},
@@ -78,6 +85,16 @@ type FilterSuite struct {
 var _ = Suite(&FilterSuite{})
 
 func (s *FilterSuite) SetUpSuite(t *C) {
+	err := os.Mkdir("/tmp/resource.d", 0755)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = ioutil.WriteFile("/tmp/resource.d/test.toml", []byte(resourceFile), 0644)
+	if err != nil {
+		t.Error(err)
+	}
+
 	f3, err := ioutil.TempFile("/tmp", "")
 	if err != nil {
 		t.Error(err)
@@ -95,6 +112,10 @@ func (s *FilterSuite) TearDownSuite(t *C) {
 	if err != nil {
 		t.Log(err)
 	}
+	err = os.RemoveAll("/tmp/resource.d")
+	if err != nil {
+		t.Log(err)
+	}
 }
 
 func (s *FilterSuite) TestNewConf(t *C) {
@@ -103,4 +124,17 @@ func (s *FilterSuite) TestNewConf(t *C) {
 		t.Error(err)
 	}
 	t.Check(cfg, DeepEquals, expected)
+}
+
+func (s *FilterSuite) TestResourceInit(t *C) {
+	cfg, err := NewConfiguration(s.cfgPath)
+	if err != nil {
+		t.Error(err)
+	}
+
+	r, err := cfg.Resource[0].Init(context.Background(), nil)
+	if err != nil {
+		t.Error(err)
+	}
+	defer r.Close()
 }
