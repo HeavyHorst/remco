@@ -21,47 +21,95 @@ import (
 // Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
 
-type TestSuite struct{}
+type TestSuite struct {
+	file          *os.File
+	sameFile      *os.File
+	differentHash *os.File
+
+	replaceFile  *os.File
+	replaceFile1 *os.File
+}
 
 var _ = Suite(&TestSuite{})
 
 func init() {
-	log.SetLevel("warning")
+	log.SetLevel("debug")
 }
 
-func testSameFile(t *C, srcTxt, dstTxt string) bool {
-	src, err := ioutil.TempFile("", "src")
+func writeFile(t *C, file *os.File, value string) {
+	_, err := file.WriteString(value)
 	if err != nil {
 		t.Error(err.Error())
 	}
-	defer os.Remove(src.Name())
-	dst, err := ioutil.TempFile("", "dest")
-	if err != nil {
-		t.Error(err.Error())
-	}
-	defer os.Remove(dst.Name())
+}
 
-	_, err = src.WriteString(srcTxt)
+func createTempFile(t *C, name string) *os.File {
+	tempFile, err := ioutil.TempFile("", name)
 	if err != nil {
 		t.Error(err.Error())
 	}
-	_, err = dst.WriteString(dstTxt)
-	if err != nil {
-		t.Error(err.Error())
-	}
-	status, err := SameFile(src.Name(), dst.Name(), logrus.WithFields(logrus.Fields{}))
-	if err != nil {
-		t.Error(err.Error())
-	}
-	return status
+	return tempFile
+}
+
+func (s *TestSuite) SetUpSuite(t *C) {
+	src := createTempFile(t, "src")
+	defer src.Close()
+
+	dst := createTempFile(t, "dest")
+	defer dst.Close()
+
+	differentHash := createTempFile(t, "hash")
+	defer differentHash.Close()
+
+	replaceFile := createTempFile(t, "replace")
+	defer replaceFile.Close()
+	replaceFile1 := createTempFile(t, "replace1")
+	defer replaceFile1.Close()
+
+	writeFile(t, src, "bla")
+	writeFile(t, dst, "bla")
+	writeFile(t, replaceFile, "bla")
+	writeFile(t, differentHash, "mmmh lecker Gurkensalat!")
+
+	s.file = src
+	s.sameFile = dst
+	s.differentHash = differentHash
+	s.replaceFile = replaceFile
+	s.replaceFile1 = replaceFile1
+}
+
+func (s *TestSuite) TearDownSuite(t *C) {
+	os.Remove(s.file.Name())
+	os.Remove(s.sameFile.Name())
+	os.Remove(s.differentHash.Name())
+	os.Remove(s.replaceFile.Name())
+	os.Remove(s.replaceFile1.Name())
 }
 
 func (s *TestSuite) TestSameFileTrue(t *C) {
-	status := testSameFile(t, "bla", "bla")
+	status, err := SameFile(s.file.Name(), s.sameFile.Name(), logrus.NewEntry(logrus.StandardLogger()))
+	if err != nil {
+		t.Error(err.Error())
+	}
 	t.Check(status, Equals, true)
 }
 
 func (s *TestSuite) TestSameFileFalse(t *C) {
-	status := testSameFile(t, "bla", "bla2")
+	status, err := SameFile(s.file.Name(), s.differentHash.Name(), logrus.NewEntry(logrus.StandardLogger()))
+	if err != nil {
+		t.Error(err.Error())
+	}
 	t.Check(status, Equals, false)
+}
+
+func (s *TestSuite) TestReplaceFile(t *C) {
+	fileStat, err := stat(s.file.Name())
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	err = ReplaceFile(s.replaceFile.Name(), s.replaceFile1.Name(), fileStat.Mode, logrus.NewEntry(logrus.StandardLogger()))
+	if err != nil {
+		t.Error(err.Error())
+	}
 }
