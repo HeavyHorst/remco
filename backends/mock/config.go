@@ -26,7 +26,7 @@ func (c *Config) Connect() (template.Backend, error) {
 		return template.Backend{}, berr.ErrNilConfig
 	}
 	c.Backend.Name = "mock"
-	client, err := mock.New(c.Error)
+	client, err := mock.New(c.Error, make(map[string]string))
 	if err != nil {
 		return c.Backend, err
 	}

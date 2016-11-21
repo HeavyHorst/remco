@@ -16,17 +16,21 @@ import (
 
 // Client is the mock client
 type Client struct {
-	Err error
+	Err  error
+	Data map[string]string
 }
 
 // New creates a new mock client, err will be returned by all methods
-func New(err error) (*Client, error) {
-	return &Client{Err: err}, nil
+func New(err error, data map[string]string) (*Client, error) {
+	return &Client{
+		Err:  err,
+		Data: data,
+	}, nil
 }
 
 // GetValues mock
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
-	return make(map[string]string), c.Err
+	return c.Data, c.Err
 }
 
 // Close mock
