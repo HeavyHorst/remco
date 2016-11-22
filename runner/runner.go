@@ -27,12 +27,11 @@ import (
 type Runner struct {
 	stoppedW         chan struct{}
 	stopWatch        chan struct{}
-	stopWatchConf    chan struct{}
 	stoppedWatchConf chan struct{}
 	reloadChan       chan config.Configuration
+	reloadComplete   chan struct{}
 	wg               sync.WaitGroup
 	mu               sync.Mutex
-	canceled         bool
 
 	signalChans      map[string]chan os.Signal
 	signalChansMutex sync.RWMutex
@@ -45,12 +44,12 @@ type Runner struct {
 // New creates a new Runner
 func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *Runner {
 	w := &Runner{
-		stoppedW:      make(chan struct{}),
-		stopWatch:     make(chan struct{}),
-		stopWatchConf: make(chan struct{}),
-		reloadChan:    make(chan config.Configuration),
-		signalChans:   make(map[string]chan os.Signal),
-		reapLock:      reapLock,
+		stoppedW:       make(chan struct{}),
+		stopWatch:      make(chan struct{}),
+		reloadChan:     make(chan config.Configuration),
+		reloadComplete: make(chan struct{}),
+		signalChans:    make(map[string]chan os.Signal),
+		reapLock:       reapLock,
 	}
 
 	w.pidFile = cfg.PidFile
@@ -64,13 +63,13 @@ func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *
 	w.wg.Add(1)
 	go func() {
 		defer w.wg.Done()
+		// close the done channel
+		// this signals the main function that the Runner has completed all work
+		// for example all backends are configured with onetime=true
+		defer close(done)
 		for {
 			select {
 			case newConf := <-w.reloadChan:
-				// don't try to relaod anything if w is already canceled
-				if w.getCanceled() {
-					continue
-				}
 				// write a new pidfile if the pid filepath has changed
 				if newConf.PidFile != w.pidFile {
 					err := w.deletePid()
@@ -86,15 +85,8 @@ func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *
 				w.stopWatch <- struct{}{}
 				<-w.stoppedW
 				go w.runConfig(newConf)
+				w.reloadComplete <- struct{}{}
 			case <-w.stoppedW:
-				// close the reloadChan
-				// every attempt to write to reloadChan would block forever otherwise
-				close(w.reloadChan)
-
-				// close the done channel
-				// this signals the main function that the Runner has completed all work
-				// for example all backends are configured with onetime=true
-				close(done)
 				return
 			}
 		}
@@ -236,30 +228,24 @@ func (ru *Runner) runConfig(c config.Configuration) {
 	}
 }
 
-func (ru *Runner) getCanceled() bool {
-	ru.mu.Lock()
-	defer ru.mu.Unlock()
-	return ru.canceled
-}
-
 // Reload rereads the configuration, stops the old Runner and starts a new one.
 func (ru *Runner) Reload(cfg config.Configuration) {
+	// lock the runner while we reload the config
+	ru.mu.Lock()
+	defer ru.mu.Unlock()
+
 	ru.reloadChan <- cfg
+	<-ru.reloadComplete
 }
 
 // Stop stops the Runner gracefully.
 func (ru *Runner) Stop() {
+	// lock the runner while we are shutting it down
 	ru.mu.Lock()
-	if ru.canceled {
-		ru.mu.Unlock()
-		return
-	}
-	ru.canceled = true
-	ru.mu.Unlock()
-	close(ru.stopWatch)
-	close(ru.stopWatchConf)
+	defer ru.mu.Unlock()
 
-	// wait for the main routine and startWatchConfig to exit
+	close(ru.stopWatch)
+	// wait for the main routine to exit
 	ru.wg.Wait()
 
 	// remove the pidfile

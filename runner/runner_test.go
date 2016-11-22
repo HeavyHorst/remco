@@ -69,7 +69,6 @@ func (s *RunnerTestSuite) SetUpSuite(t *C) {
 func (s *RunnerTestSuite) TestNew(t *C) {
 	t.Check(s.runner.stoppedW, NotNil)
 	t.Check(s.runner.stopWatch, NotNil)
-	t.Check(s.runner.stopWatchConf, NotNil)
 	t.Check(s.runner.reloadChan, NotNil)
 	t.Check(s.runner.signalChans, NotNil)
 	t.Check(s.runner.reapLock, IsNil)
@@ -108,5 +107,4 @@ func (s *RunnerTestSuite) TestReload(t *C) {
 func (s *RunnerTestSuite) TearDownSuite(t *C) {
 	s.runner.Stop()
 	t.Check(s.runner.signalChans, HasLen, 0)
-	t.Check(s.runner.canceled, Equals, true)
 }
