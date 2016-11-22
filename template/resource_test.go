@@ -21,7 +21,15 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-const tmplString string = "{{ getallkvs() | toPrettyJSON }}"
+const (
+	tmplString string = "{{ getallkvs() | toPrettyJSON }}"
+	tmplFile   string = `[
+    {
+        "Key": "/some/path/data",
+        "Value": "someData"
+    }
+]`
+)
 
 type ResourceSuite struct {
 	templateFile string
@@ -103,6 +111,10 @@ func (s *ResourceSuite) TestCreateStageFileAndSync(t *C) {
 func (s *ResourceSuite) TestProcess(t *C) {
 	_, err := s.resource.process(s.resource.backends)
 	t.Check(err, IsNil)
+
+	data, err := ioutil.ReadFile("/tmp/remco-basic-test.conf")
+	t.Assert(err, IsNil)
+	t.Check(string(data), Equals, tmplFile)
 }
 
 func (s *ResourceSuite) TestMonitor(t *C) {
