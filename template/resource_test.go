@@ -131,5 +131,4 @@ func (s *ResourceSuite) TestMonitorWithBackendError(t *C) {
 	s.resource.Monitor(ctx)
 	t.Check(s.resource.Failed, Equals, false)
 	s.resource.backends[0].ReadWatcher.(*mock.Client).Err = nil
-	s.resource.Failed = false
 }

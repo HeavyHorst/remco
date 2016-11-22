@@ -87,10 +87,10 @@
 			"revisionTime": "2016-11-07T22:07:25Z"
 		},
 		{
-			"checksumSHA1": "8umlt4JpcqFrQC75XxTbrAOcer0=",
+			"checksumSHA1": "PStyMyGMoC3z2oDYk7jPomENh/8=",
 			"path": "github.com/HeavyHorst/memkv",
-			"revision": "54f77155768f1e5861164a7af7c6009407f91bc3",
-			"revisionTime": "2016-11-02T21:33:34Z"
+			"revision": "7a3c2af8906e415273e45127c1dbc365e01aa4f3",
+			"revisionTime": "2016-11-22T12:47:30Z"
 		},
 		{
 			"checksumSHA1": "Pautei4PXpJjwcbNqiGVIiqepS8=",
@@ -99,16 +99,16 @@
 			"revisionTime": "2016-11-04T15:42:24Z"
 		},
 		{
-			"checksumSHA1": "47aKZDpK1BL+fJxU1zFrAH9Zmlo=",
-			"path": "github.com/HeavyHorst/trie",
-			"revision": "469842d9e0c19fdbdab3c4dd3674e9583814adb6",
-			"revisionTime": "2016-10-19T19:56:41Z"
-		},
-		{
 			"checksumSHA1": "z9ckOyaoHErgXLQDx514AOMxdeo=",
 			"path": "github.com/Sirupsen/logrus",
 			"revision": "abc6f20dabf4b10195f233ad21ea6c5ba33acae0",
 			"revisionTime": "2016-11-11T12:09:51Z"
+		},
+		{
+			"checksumSHA1": "gNO0JNpLzYOdInGeq7HqMZUzx9M=",
+			"path": "github.com/armon/go-radix",
+			"revision": "4239b77079c7b5d1243b7b4736304ce8ddb6f0f2",
+			"revisionTime": "2016-01-15T23:47:25Z"
 		},
 		{
 			"checksumSHA1": "spyv5/YFBjYyZLZa1U2LBfDR8PM=",

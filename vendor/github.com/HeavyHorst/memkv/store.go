@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/HeavyHorst/trie"
+	radix "github.com/armon/go-radix"
 )
 
 // A Store represents an in-memory key-value store safe for
@@ -14,12 +14,12 @@ import (
 type Store struct {
 	FuncMap map[string]interface{}
 	*sync.RWMutex
-	t *trie.Trie
+	t *radix.Tree
 }
 
 func New() Store {
 	s := Store{
-		t:       trie.New(),
+		t:       radix.New(),
 		RWMutex: &sync.RWMutex{},
 	}
 	s.FuncMap = map[string]interface{}{
@@ -38,14 +38,14 @@ func New() Store {
 // Delete deletes the KVPair associated with key.
 func (s Store) Del(key string) {
 	s.Lock()
-	s.t.Remove(key)
+	s.t.Delete(key)
 	s.Unlock()
 }
 
 // Exists checks for the existence of key in the store.
 func (s Store) Exists(key string) bool {
 	s.RLock()
-	_, ok := s.t.Find(key)
+	_, ok := s.t.Get(key)
 	s.RUnlock()
 	return ok
 }
@@ -55,11 +55,11 @@ func (s Store) Exists(key string) bool {
 func (s Store) Get(key string) KVPair {
 	s.RLock()
 	defer s.RUnlock()
-	node, ok := s.t.Find(key)
+	data, ok := s.t.Get(key)
 	if !ok {
 		return KVPair{}
 	}
-	return node.Meta().(KVPair)
+	return data.(KVPair)
 }
 
 // GetAll returns a KVPair for all nodes with keys matching pattern.
@@ -68,20 +68,21 @@ func (s Store) GetAll(pattern string) KVPairs {
 	ks := make(KVPairs, 0)
 	s.RLock()
 	defer s.RUnlock()
-	for _, k := range s.t.Keys() {
-		m, err := path.Match(pattern, k)
+
+	s.t.Walk(func(key string, value interface{}) bool {
+		m, err := path.Match(pattern, key)
 		if err != nil {
-			return nil
+			return true
 		}
-		kv := s.Get(k)
 		if m {
-			ks = append(ks, kv)
+			ks = append(ks, value.(KVPair))
 		}
-	}
+		return false
+	})
+
 	if len(ks) == 0 {
 		return nil
 	}
-	sort.Sort(ks)
 	return ks
 }
 
@@ -99,10 +100,11 @@ func (s Store) GetAllKVs() KVPairs {
 	ks := make(KVPairs, 0)
 	s.RLock()
 	defer s.RUnlock()
-	for _, k := range s.t.Keys() {
-		ks = append(ks, s.Get(k))
-	}
-	sort.Sort(ks)
+
+	s.t.Walk(func(key string, value interface{}) bool {
+		ks = append(ks, value.(KVPair))
+		return false
+	})
 	return ks
 }
 
@@ -127,15 +129,18 @@ func (s Store) list(filePath string, dir bool) []string {
 	filePath = path.Clean(filePath) + "/"
 	s.RLock()
 	defer s.RUnlock()
-	for _, k := range s.t.PrefixSearch(filePath) {
-		items := strings.Split(stripKey(k, filePath), "/")
+
+	s.t.WalkPrefix(filePath, func(key string, value interface{}) bool {
+		items := strings.Split(stripKey(key, filePath), "/")
 		if dir {
 			if len(items) < 2 {
-				continue
+				return false
 			}
 		}
 		m[items[0]] = true
-	}
+		return false
+	})
+
 	for k := range m {
 		vs = append(vs, k)
 	}
@@ -154,15 +159,16 @@ func (s Store) ListDir(filePath string) []string {
 // Set sets the KVPair entry associated with key to value.
 func (s Store) Set(key string, value string) {
 	s.Lock()
-	s.t.Add(key, KVPair{key, value})
+	s.t.Insert(key, KVPair{key, value})
 	s.Unlock()
 }
 
 func (s Store) Purge() {
 	s.Lock()
-	for _, k := range s.t.Keys() {
-		s.t.Remove(k)
-	}
+	s.t.Walk(func(key string, value interface{}) bool {
+		s.t.Delete(key)
+		return false
+	})
 	s.Unlock()
 }
 
