@@ -133,8 +133,7 @@ func (s *FilterSuite) TestResourceInit(t *C) {
 	}
 
 	r, err := cfg.Resource[0].Init(context.Background(), nil)
-	if err != nil {
-		t.Error(err)
-	}
+	t.Assert(err, IsNil)
+	t.Check(r, NotNil)
 	defer r.Close()
 }
