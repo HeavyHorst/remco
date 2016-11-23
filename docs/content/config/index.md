@@ -1,6 +1,4 @@
 ---
-date: 2016-10-05T17:24:57+02:00
-type: index
 title: Configuring remco
 ---
 
