@@ -183,6 +183,24 @@
 
 
 
+<a  title="Details" href="https://heavyhorst.github.io/remco/details/">
+	
+	Details
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
 <a  title="Configuring remco" href="https://heavyhorst.github.io/remco/config/">
 	
 	Configuring remco
@@ -646,6 +664,92 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 </ul>
 
 			
+				<h1>remco details </h1>
+
+				
+
+<h2 id="template-resource">Template resource</h2>
+
+<p>A template resource in remco consists of the following parts:</p>
+
+<ul>
+<li><strong>one optional exec command.</strong></li>
+<li><strong>one or many templates.</strong></li>
+<li><strong>one or many backends.</strong>
+<br /></li>
+</ul>
+
+<p>Please note that it is not possible to use the same backend more than once per template resource.
+It is for example not possible to use two different redis servers.</p>
+
+<h2 id="exec-mode">Exec mode</h2>
+
+<p>Remco has the ability to run one arbitary child process per template resource.
+When any of the provided templates change and the check command (if any) succeeds, remco will send the configurable reload signal to the child process.
+Remco will kill and restart the child process if no reload signal is provided.
+Additionally, every signal that remco receives will be forwarded to the child process.</p>
+
+<p>The template resource will fail if the child process dies. It will be automatically restarted after a random amount of time (0-30s).
+This also means that the child needs to remain in the foreground, otherwise the template resource will be restarted endlessly.</p>
+
+<p>The exec configuration parameters can be found here: <a href="../config/#exec-configuration-options">exec configuration</a>.</p>
+
+<h2 id="commands-reload-check">Commands (reload &amp; check)</h2>
+
+<p>Each template can have its own reload and check command. Both commands are executed in a sh-shell which means that operations like environment variable substitution or pipes should work correctly.</p>
+
+<p>In the check command its additionally possible to reference to the rendered source template with {{ .src }}.</p>
+
+<p>The check command must exit with status code 0 so that:</p>
+
+<ul>
+<li>the reload command runs</li>
+<li>the child process gets reloaded</li>
+</ul>
+
+<p>The template configuration parameters can be found here: <a href="../config/#template-configuration-options">template configuration</a>.</p>
+
+<h2 id="zombie-reaping-pid-1">Zombie reaping (pid 1)</h2>
+
+<p>See: <a href="https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/">https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/</a></p>
+
+<p>If Remco detects that it runs as pid 1 (for example in a Docker container) it will automatically reap zombie processes.
+No additional init system is needed.</p>
+
+<h2 id="backends">Backends</h2>
+
+<p>Remco can fetch configuration data from a bunch of different kv-stores.
+Some backends can be configured to watch for changes in the store to immediately react to these changes.
+The other way is to provide a backend polling interval.
+These two modes are not mutual exclusive, you can watch for changes and run the interval processor as a reconcilation loop.</p>
+
+<p>Every Backend needs to implement the <a href="https://github.com/HeavyHorst/easyKV">easyKV</a> interface.
+This is also the repository where the current implementations live.</p>
+
+<p>Currently supported are:</p>
+
+<ul>
+<li><strong>etcd 2 and 3</strong> (interval and watch)</li>
+<li><strong>consul</strong> (interval and watch)</li>
+<li><strong>zookeeper</strong> (interval and watch)</li>
+<li><strong>redis</strong> (only interval)</li>
+<li><strong>vault</strong> (only interval)</li>
+<li><strong>environment</strong> (only interval)</li>
+<li><strong>yaml/json files</strong> (interval and watch)</li>
+</ul>
+
+<p>The different coniguration parameters can be found here: <a href="../config/#backend-configuration-options">backend configuration</a>.</p>
+
+<h2 id="running-and-process-lifecycle">Running and Process Lifecycle</h2>
+
+<p>Remcos lifecycle can be controlled with several syscalls.</p>
+
+<ul>
+<li>os.Interrupt(SIGINT on linux) and SIGTERM: remco will gracefully shut down</li>
+<li>SIGHUP: remco will reload all configuration files.</li>
+</ul>
+
+			
 
 			<aside class="copyright" role="note">
 				
@@ -669,14 +773,14 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
   
   
   <div class="next">
-      <a href="https://heavyhorst.github.io/remco/config/" title="Configuring remco">
+      <a href="https://heavyhorst.github.io/remco/license/" title="LICENCE">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              Configuring remco
+              LICENCE
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">
