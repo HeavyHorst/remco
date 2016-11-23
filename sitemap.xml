@@ -17,11 +17,6 @@
   </url>
   
   <url>
-    <loc>https://heavyhorst.github.io/remco/config/</loc>
-    <lastmod>2016-10-05T17:24:57+02:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://heavyhorst.github.io/remco/config/sample/</loc>
     <lastmod>2016-10-05T17:24:57+02:00</lastmod>
   </url>
@@ -29,6 +24,10 @@
   <url>
     <loc>https://heavyhorst.github.io/remco/license/</loc>
     <lastmod>2016-10-05T17:11:10+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/config/</loc>
   </url>
   
   <url>

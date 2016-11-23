@@ -43,9 +43,74 @@
     </item>
     
     <item>
+      <title>Sample configuration file</title>
+      <link>https://heavyhorst.github.io/remco/config/sample/</link>
+      <pubDate>Wed, 05 Oct 2016 17:24:57 +0200</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/config/sample/</guid>
+      <description>&lt;pre&gt;&lt;code&gt;#remco.toml
+################################################################
+# Global configuration
+################################################################
+log_level   = &amp;quot;debug&amp;quot;
+log_format  = &amp;quot;json&amp;quot;
+include_dir = &amp;quot;/etc/remco/resource.d/&amp;quot;
+pid_file    = &amp;quot;/var/run/remco/remco.pid&amp;quot;
+log_file    = &amp;quot;/var/log/remco.log&amp;quot;
+
+
+################################################################
+# Resource configuration
+################################################################
+[[resource]]
+  name = &amp;quot;haproxy&amp;quot;
+  [[resource.template]]
+    src         = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
+    dst         = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
+    check_cmd   = &amp;quot;somecommand&amp;quot;
+    reload_cmd  = &amp;quot;somecommand&amp;quot;
+    mode        = &amp;quot;0644&amp;quot;
+
+  [resource.backend]
+    # you can use as many backends as you like
+	# in this example vault and file
+    [resource.backend.vault]
+      node           = &amp;quot;http://127.0.0.1:8200&amp;quot;
+      ## Token based auth backend
+      auth_type      = &amp;quot;token&amp;quot;
+      auth_token     = &amp;quot;vault_token&amp;quot;
+      ## AppID based auth backend
+      # auth_type    = &amp;quot;app-id&amp;quot;
+      # app_id       = &amp;quot;vault_app_id&amp;quot;
+      # user_id      = &amp;quot;vault_user_id&amp;quot;
+      ## userpass based auth backend
+      # auth_type    = &amp;quot;userpass&amp;quot;
+      # username     = &amp;quot;username&amp;quot;
+      # password     = &amp;quot;password&amp;quot;
+      client_cert    = &amp;quot;/path/to/client_cert&amp;quot;
+      client_key     = &amp;quot;/path/to/client_key&amp;quot;
+      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
+      
+	  # These values are valid in every backend
+      watch    = true
+      prefix   = &amp;quot;/&amp;quot;
+      onetime  = true
+      interval = 1
+      keys     = [&amp;quot;/&amp;quot;]
+
+    [resource.backend.file]
+      filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
+	  watch    = true
+	  keys     = [&amp;quot;/prefix&amp;quot;]
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Configuring remco</title>
       <link>https://heavyhorst.github.io/remco/config/</link>
-      <pubDate>Wed, 05 Oct 2016 17:24:57 +0200</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://heavyhorst.github.io/remco/config/</guid>
       <description>
@@ -393,71 +458,6 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Sample configuration file</title>
-      <link>https://heavyhorst.github.io/remco/config/sample/</link>
-      <pubDate>Wed, 05 Oct 2016 17:24:57 +0200</pubDate>
-      
-      <guid>https://heavyhorst.github.io/remco/config/sample/</guid>
-      <description>&lt;pre&gt;&lt;code&gt;#remco.toml
-################################################################
-# Global configuration
-################################################################
-log_level   = &amp;quot;debug&amp;quot;
-log_format  = &amp;quot;json&amp;quot;
-include_dir = &amp;quot;/etc/remco/resource.d/&amp;quot;
-pid_file    = &amp;quot;/var/run/remco/remco.pid&amp;quot;
-log_file    = &amp;quot;/var/log/remco.log&amp;quot;
-
-
-################################################################
-# Resource configuration
-################################################################
-[[resource]]
-  name = &amp;quot;haproxy&amp;quot;
-  [[resource.template]]
-    src         = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
-    dst         = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
-    check_cmd   = &amp;quot;somecommand&amp;quot;
-    reload_cmd  = &amp;quot;somecommand&amp;quot;
-    mode        = &amp;quot;0644&amp;quot;
-
-  [resource.backend]
-    # you can use as many backends as you like
-	# in this example vault and file
-    [resource.backend.vault]
-      node           = &amp;quot;http://127.0.0.1:8200&amp;quot;
-      ## Token based auth backend
-      auth_type      = &amp;quot;token&amp;quot;
-      auth_token     = &amp;quot;vault_token&amp;quot;
-      ## AppID based auth backend
-      # auth_type    = &amp;quot;app-id&amp;quot;
-      # app_id       = &amp;quot;vault_app_id&amp;quot;
-      # user_id      = &amp;quot;vault_user_id&amp;quot;
-      ## userpass based auth backend
-      # auth_type    = &amp;quot;userpass&amp;quot;
-      # username     = &amp;quot;username&amp;quot;
-      # password     = &amp;quot;password&amp;quot;
-      client_cert    = &amp;quot;/path/to/client_cert&amp;quot;
-      client_key     = &amp;quot;/path/to/client_key&amp;quot;
-      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
-      
-	  # These values are valid in every backend
-      watch    = true
-      prefix   = &amp;quot;/&amp;quot;
-      onetime  = true
-      interval = 1
-      keys     = [&amp;quot;/&amp;quot;]
-
-    [resource.backend.file]
-      filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
-	  watch    = true
-	  keys     = [&amp;quot;/prefix&amp;quot;]
-
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
