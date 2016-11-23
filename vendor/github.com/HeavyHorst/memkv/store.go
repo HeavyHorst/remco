@@ -164,12 +164,16 @@ func (s Store) Set(key string, value string) {
 }
 
 func (s Store) Purge() {
+	var keys []string
 	s.Lock()
 	s.t.Walk(func(key string, value interface{}) bool {
-		s.t.Delete(key)
+		keys = append(keys, key)
 		return false
 	})
 	s.Unlock()
+	for _, v := range keys {
+		s.t.Delete(v)
+	}
 }
 
 func stripKey(key, prefix string) string {

@@ -42,30 +42,35 @@ canonifyurls = true
 	github  = "heavyhorst"
 
 [[menu.main]]
+    name = "Details"
+	url = "details/"
+	weight = 10
+
+[[menu.main]]
 	name   = "Configuring remco"
 	url    = "config/"
-	weight = 10
+	weight = 20
 
 
 [[menu.main]]
 	name   = "Sample configuration"
 	url    = "config/sample"
-	weight = 20
+	weight = 30
 
 [[menu.main]]
 	name   = "Sample resource configuration"
 	url    = "config/sampleresource"
-    weight = 30
+    weight = 40
 
 [[menu.main]]
 	name   = "Template"
 	url    = "template/"
-	weight = 40
+	weight = 50
 
 [[menu.main]]
 	name   = "License"
 	url    = "license/"
-	weight = 50
+	weight = 60
 
 
 [blackfriday]
