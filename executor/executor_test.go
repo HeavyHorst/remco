@@ -181,7 +181,11 @@ func TestReload(t *testing.T) {
 		t.Error(err)
 	}
 
-	exitChan := exec.child.ExitCh()
+	// exitChan := exec.child.ExitCh()
+	exitChan, valid := exec.getExitChan()
+	if !valid {
+		t.Error("we should have a valid exitChan")
+	}
 
 	nc := make(chan bool)
 	ctx, cancel := context.WithCancel(context.Background())
@@ -205,7 +209,11 @@ func TestReload(t *testing.T) {
 	}
 
 	// should be different after the reload
-	nexitChan := exec.child.ExitCh()
+	//nexitChan := exec.child.ExitCh()
+	nexitChan, valid := exec.getExitChan()
+	if !valid {
+		t.Error("we should have a valid exitChan")
+	}
 	if exitChan == nexitChan {
 		t.Error("reload failed")
 	}

@@ -12,7 +12,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"sync"
 	"syscall"
 	"time"
 
@@ -22,16 +21,29 @@ import (
 	shellwords "github.com/mattn/go-shellwords"
 )
 
+type childSignal struct {
+	signal os.Signal
+	err    chan<- error
+}
+
+type exitC struct {
+	exitChan (<-chan int)
+	valid    bool
+}
+
 // Executor provides some methods to control a subprocess
 type Executor struct {
-	child        *child.Child
-	childLock    *sync.RWMutex
 	execCommand  string
 	reloadSignal os.Signal
 	killSignal   os.Signal
 	killTimeout  time.Duration
 	splay        time.Duration
 	logger       *logrus.Entry
+
+	stopChan   chan chan<- error
+	reloadChan chan chan<- error
+	signalChan chan childSignal
+	exitChan   chan chan exitC
 }
 
 // New creates a new Executor
@@ -61,27 +73,31 @@ func New(execCommand, reloadSignal, killSignal string, killTimeout, splay int, l
 	}
 
 	return Executor{
-		childLock:    &sync.RWMutex{},
 		execCommand:  execCommand,
 		reloadSignal: rs,
 		killSignal:   ks,
 		killTimeout:  time.Duration(killTimeout) * time.Second,
 		splay:        time.Duration(splay) * time.Second,
 		logger:       logger,
+		stopChan:     make(chan chan<- error),
+		reloadChan:   make(chan chan<- error),
+		signalChan:   make(chan childSignal),
+		exitChan:     make(chan chan exitC),
 	}
 }
 
 // SignalChild forwards the os.Signal to the child process
 func (e *Executor) SignalChild(s os.Signal) error {
-	e.childLock.RLock()
-	defer e.childLock.RUnlock()
+	err := make(chan error)
 
-	if e.child != nil {
-		if err := e.child.Signal(s); err != nil {
-			return err
-		}
+	signal := childSignal{
+		signal: s,
+		err:    err,
 	}
-	return nil
+
+	e.signalChan <- signal
+	return <-err
+
 }
 
 // StopChild stops the child process
@@ -89,20 +105,24 @@ func (e *Executor) SignalChild(s os.Signal) error {
 // the child will be killed if it takes longer than
 // killTimeout to stop it.
 func (e *Executor) StopChild() {
-	e.childLock.RLock()
-	defer e.childLock.RUnlock()
+	errchan := make(chan error)
+	e.stopChan <- errchan
+	<-errchan
+}
 
-	if e.child != nil {
-		e.child.Stop()
-	}
+// Reload reloads the child process.
+// If a reloadSignal is provided it will send this signal to the child.
+// The child process will be killed and restarted otherwise.
+func (e *Executor) Reload() error {
+	errchan := make(chan error)
+	e.reloadChan <- errchan
+	return <-errchan
 }
 
 // SpawnChild parses e.execCommand and starts the child process accordingly
 func (e *Executor) SpawnChild() error {
+	var c *child.Child
 	if e.execCommand != "" {
-		e.childLock.Lock()
-		defer e.childLock.Unlock()
-
 		p := shellwords.NewParser()
 		p.ParseBacktick = true
 		args, err := p.Parse(e.execCommand)
@@ -110,7 +130,7 @@ func (e *Executor) SpawnChild() error {
 			return err
 		}
 
-		child, err := child.New(&child.NewInput{
+		c, err = child.New(&child.NewInput{
 			Stdin:        os.Stdin,
 			Stdout:       os.Stdout,
 			Stderr:       os.Stderr,
@@ -126,29 +146,68 @@ func (e *Executor) SpawnChild() error {
 		if err != nil {
 			return fmt.Errorf("error creating child: %s", err)
 		}
-		e.child = child
-		if err := e.child.Start(); err != nil {
+		//e.child = child
+		if err := c.Start(); err != nil {
 			return fmt.Errorf("error starting child: %s", err)
 		}
-		return nil
 	}
+
+	go func() {
+		for {
+			select {
+			case errchan := <-e.stopChan:
+				if c != nil {
+					c.Stop()
+				}
+				errchan <- nil
+				return
+			case errchan := <-e.reloadChan:
+				var err error
+				if c != nil {
+					err = c.Reload()
+				}
+				errchan <- err
+			case s := <-e.signalChan:
+				var err error
+				if c != nil {
+					err = c.Signal(s.signal)
+				}
+				s.err <- err
+			case exit := <-e.exitChan:
+				if c != nil {
+					ex := exitC{
+						valid:    true,
+						exitChan: c.ExitCh(),
+					}
+					exit <- ex
+				} else {
+					ex := exitC{
+						valid: false,
+					}
+					exit <- ex
+				}
+			}
+		}
+	}()
+
 	return nil
+}
+
+func (e *Executor) getExitChan() (<-chan int, bool) {
+	ecc := make(chan exitC)
+	e.exitChan <- ecc
+	exit := <-ecc
+	return exit.exitChan, exit.valid
 }
 
 // Wait waits for the children to stop.
 // Returns true if the command stops.
 // Wait ignores reloads.
 func (e *Executor) Wait(ctx context.Context) bool {
-	var exitChan <-chan int
-
-	e.childLock.RLock()
-	notNil := (e.child != nil)
-	if !notNil {
-		e.childLock.RUnlock()
+	exitChan, valid := e.getExitChan()
+	if !valid {
 		return false
 	}
-	exitChan = e.child.ExitCh()
-	e.childLock.RUnlock()
 
 	for {
 		select {
@@ -158,32 +217,15 @@ func (e *Executor) Wait(ctx context.Context) bool {
 			// wait a little bit to give the process time to start
 			// in case of a reload
 			time.Sleep(1 * time.Second)
-			e.childLock.RLock()
-			nexitChan := e.child.ExitCh()
+			nexitChan, _ := e.getExitChan()
 			// the exitChan has changed which means the process was reloaded
 			// don't exit in this case
 			if nexitChan != exitChan {
 				exitChan = nexitChan
-				e.childLock.RUnlock()
 				continue
 			}
 			// the process exited - stop
-			e.childLock.RUnlock()
 			return true
 		}
 	}
-}
-
-// Reload reloads the child process.
-// If a reloadSignal is provided it will send this signal to the child.
-// The child process will be killed and restarted otherwise.
-func (e *Executor) Reload() error {
-	e.childLock.RLock()
-	defer e.childLock.RUnlock()
-	if e.child != nil {
-		if err := e.child.Reload(); err != nil {
-			return err
-		}
-	}
-	return nil
 }
