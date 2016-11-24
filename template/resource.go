@@ -44,7 +44,7 @@ import (
 type Resource struct {
 	backends []Backend
 	funcMap  map[string]interface{}
-	store    memkv.Store
+	store    *memkv.Store
 	sources  []*Renderer
 	logger   *logrus.Entry
 
@@ -85,7 +85,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec exec
 	// initialize the inidividual backend memkv Stores
 	for i := range tr.backends {
 		store := memkv.New()
-		tr.backends[i].store = &store
+		tr.backends[i].store = store
 
 		if tr.backends[i].Interval <= 0 && tr.backends[i].Onetime == false && tr.backends[i].Watch == false {
 			logger.Warning("Interval needs to be > 0: setting interval to 60")

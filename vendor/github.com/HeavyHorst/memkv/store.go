@@ -17,8 +17,8 @@ type Store struct {
 	t *radix.Tree
 }
 
-func New() Store {
-	s := Store{
+func New() *Store {
+	s := &Store{
 		t:       radix.New(),
 		RWMutex: &sync.RWMutex{},
 	}
@@ -36,14 +36,14 @@ func New() Store {
 }
 
 // Delete deletes the KVPair associated with key.
-func (s Store) Del(key string) {
+func (s *Store) Del(key string) {
 	s.Lock()
 	s.t.Delete(key)
 	s.Unlock()
 }
 
 // Exists checks for the existence of key in the store.
-func (s Store) Exists(key string) bool {
+func (s *Store) Exists(key string) bool {
 	s.RLock()
 	_, ok := s.t.Get(key)
 	s.RUnlock()
@@ -52,7 +52,7 @@ func (s Store) Exists(key string) bool {
 
 // Get gets the KVPair associated with key. If there is no KVPair
 // associated with key, Get returns KVPair{}.
-func (s Store) Get(key string) KVPair {
+func (s *Store) Get(key string) KVPair {
 	s.RLock()
 	defer s.RUnlock()
 	data, ok := s.t.Get(key)
@@ -64,7 +64,7 @@ func (s Store) Get(key string) KVPair {
 
 // GetAll returns a KVPair for all nodes with keys matching pattern.
 // The syntax of patterns is the same as in path.Match.
-func (s Store) GetAll(pattern string) KVPairs {
+func (s *Store) GetAll(pattern string) KVPairs {
 	ks := make(KVPairs, 0)
 	s.RLock()
 	defer s.RUnlock()
@@ -86,7 +86,7 @@ func (s Store) GetAll(pattern string) KVPairs {
 	return ks
 }
 
-func (s Store) GetAllValues(pattern string) []string {
+func (s *Store) GetAllValues(pattern string) []string {
 	vs := make([]string, 0)
 	for _, kv := range s.GetAll(pattern) {
 		vs = append(vs, kv.Value)
@@ -96,7 +96,7 @@ func (s Store) GetAllValues(pattern string) []string {
 }
 
 // GetAllKVs returns all KV-Pairs
-func (s Store) GetAllKVs() KVPairs {
+func (s *Store) GetAllKVs() KVPairs {
 	ks := make(KVPairs, 0)
 	s.RLock()
 	defer s.RUnlock()
@@ -110,7 +110,7 @@ func (s Store) GetAllKVs() KVPairs {
 
 // GetValue gets the value associated with key. If there are no values
 // associated with key, GetValue returns "".
-func (s Store) GetValue(key string, v ...string) string {
+func (s *Store) GetValue(key string, v ...string) string {
 	defaultValue := ""
 	if len(v) > 0 {
 		defaultValue = v[0]
@@ -122,7 +122,7 @@ func (s Store) GetValue(key string, v ...string) string {
 	return kv.Value
 }
 
-func (s Store) list(filePath string, dir bool) []string {
+func (s *Store) list(filePath string, dir bool) []string {
 	vs := make([]string, 0)
 	m := make(map[string]bool)
 	// The prefix search should only return dirs
@@ -148,32 +148,25 @@ func (s Store) list(filePath string, dir bool) []string {
 	return vs
 }
 
-func (s Store) List(filePath string) []string {
+func (s *Store) List(filePath string) []string {
 	return s.list(filePath, false)
 }
 
-func (s Store) ListDir(filePath string) []string {
+func (s *Store) ListDir(filePath string) []string {
 	return s.list(filePath, true)
 }
 
 // Set sets the KVPair entry associated with key to value.
-func (s Store) Set(key string, value string) {
+func (s *Store) Set(key string, value string) {
 	s.Lock()
 	s.t.Insert(key, KVPair{key, value})
 	s.Unlock()
 }
 
-func (s Store) Purge() {
-	var keys []string
+func (s *Store) Purge() {
 	s.Lock()
-	s.t.Walk(func(key string, value interface{}) bool {
-		keys = append(keys, key)
-		return false
-	})
+	s.t = radix.New()
 	s.Unlock()
-	for _, v := range keys {
-		s.t.Delete(v)
-	}
 }
 
 func stripKey(key, prefix string) string {
