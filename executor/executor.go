@@ -86,40 +86,8 @@ func New(execCommand, reloadSignal, killSignal string, killTimeout, splay int, l
 	}
 }
 
-// SignalChild forwards the os.Signal to the child process
-func (e *Executor) SignalChild(s os.Signal) error {
-	err := make(chan error)
-
-	signal := childSignal{
-		signal: s,
-		err:    err,
-	}
-
-	e.signalChan <- signal
-	return <-err
-
-}
-
-// StopChild stops the child process
-// it blocks until the child quits.
-// the child will be killed if it takes longer than
-// killTimeout to stop it.
-func (e *Executor) StopChild() {
-	errchan := make(chan error)
-	e.stopChan <- errchan
-	<-errchan
-}
-
-// Reload reloads the child process.
-// If a reloadSignal is provided it will send this signal to the child.
-// The child process will be killed and restarted otherwise.
-func (e *Executor) Reload() error {
-	errchan := make(chan error)
-	e.reloadChan <- errchan
-	return <-errchan
-}
-
 // SpawnChild parses e.execCommand and starts the child process accordingly
+// only call this once !
 func (e *Executor) SpawnChild() error {
 	var c *child.Child
 	if e.execCommand != "" {
@@ -191,6 +159,39 @@ func (e *Executor) SpawnChild() error {
 	}()
 
 	return nil
+}
+
+// SignalChild forwards the os.Signal to the child process
+func (e *Executor) SignalChild(s os.Signal) error {
+	err := make(chan error)
+
+	signal := childSignal{
+		signal: s,
+		err:    err,
+	}
+
+	e.signalChan <- signal
+	return <-err
+
+}
+
+// StopChild stops the child process
+// it blocks until the child quits.
+// the child will be killed if it takes longer than
+// killTimeout to stop it.
+func (e *Executor) StopChild() {
+	errchan := make(chan error)
+	e.stopChan <- errchan
+	<-errchan
+}
+
+// Reload reloads the child process.
+// If a reloadSignal is provided it will send this signal to the child.
+// The child process will be killed and restarted otherwise.
+func (e *Executor) Reload() error {
+	errchan := make(chan error)
+	e.reloadChan <- errchan
+	return <-errchan
 }
 
 func (e *Executor) getExitChan() (<-chan int, bool) {

@@ -23,15 +23,16 @@ import (
 	"github.com/pborman/uuid"
 )
 
+type reloadSignal struct {
+	c        config.Configuration
+	reloaded chan<- struct{}
+}
+
 // Runner runs
 type Runner struct {
-	stoppedW         chan struct{}
-	stopWatch        chan struct{}
-	stoppedWatchConf chan struct{}
-	reloadChan       chan config.Configuration
-	reloadComplete   chan struct{}
-	wg               sync.WaitGroup
-	mu               sync.Mutex
+	stopChan   chan struct{}
+	reloadChan chan reloadSignal
+	wg         sync.WaitGroup
 
 	signalChans      map[string]chan os.Signal
 	signalChansMutex sync.RWMutex
@@ -44,12 +45,10 @@ type Runner struct {
 // New creates a new Runner
 func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *Runner {
 	w := &Runner{
-		stoppedW:       make(chan struct{}),
-		stopWatch:      make(chan struct{}),
-		reloadChan:     make(chan config.Configuration),
-		reloadComplete: make(chan struct{}),
-		signalChans:    make(map[string]chan os.Signal),
-		reapLock:       reapLock,
+		stopChan:    make(chan struct{}),
+		reloadChan:  make(chan reloadSignal),
+		signalChans: make(map[string]chan os.Signal),
+		reapLock:    reapLock,
 	}
 
 	w.pidFile = cfg.PidFile
@@ -59,7 +58,10 @@ func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *
 		log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
 	}
 
-	go w.runConfig(cfg)
+	stopChan := make(chan struct{})
+	stoppedChan := make(chan struct{})
+
+	go w.runConfig(cfg, stopChan, stoppedChan)
 	w.wg.Add(1)
 	go func() {
 		defer w.wg.Done()
@@ -69,24 +71,28 @@ func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *
 		defer close(done)
 		for {
 			select {
-			case newConf := <-w.reloadChan:
+			case rs := <-w.reloadChan:
 				// write a new pidfile if the pid filepath has changed
-				if newConf.PidFile != w.pidFile {
+				if rs.c.PidFile != w.pidFile {
 					err := w.deletePid()
 					if err != nil {
 						log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
 					}
-					w.pidFile = newConf.PidFile
+					w.pidFile = rs.c.PidFile
 					err = w.writePid(pid)
 					if err != nil {
 						log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
 					}
 				}
-				w.stopWatch <- struct{}{}
-				<-w.stoppedW
-				go w.runConfig(newConf)
-				w.reloadComplete <- struct{}{}
-			case <-w.stoppedW:
+				stopChan <- struct{}{}
+				<-stoppedChan
+				go w.runConfig(rs.c, stopChan, stoppedChan)
+				rs.reloaded <- struct{}{}
+			case <-stoppedChan:
+				return
+			case <-w.stopChan:
+				stopChan <- struct{}{}
+				<-stoppedChan
 				return
 			}
 		}
@@ -154,9 +160,11 @@ func (ru *Runner) SendSignal(s os.Signal) {
 	}
 }
 
-func (ru *Runner) runConfig(c config.Configuration) {
+func (ru *Runner) runConfig(c config.Configuration, stop, stopped chan struct{}) {
 	defer func() {
-		ru.stoppedW <- struct{}{}
+		if stopped != nil {
+			stopped <- struct{}{}
+		}
 	}()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -168,12 +176,14 @@ func (ru *Runner) runConfig(c config.Configuration) {
 		wait.Add(1)
 		go func(r config.Resource) {
 			defer wait.Done()
+
 			res, err := r.Init(ctx, ru.reapLock)
 			if err != nil {
 				log.Error(err)
 				return
 			}
 			defer res.Close()
+
 			id := uuid.New()
 			ru.addSignalChan(id, res.SignalChan)
 			defer ru.removeSignalChan(id)
@@ -212,13 +222,14 @@ func (ru *Runner) runConfig(c config.Configuration) {
 
 	go func() {
 		// If there is no goroutine left - quit
+		// this is necessary for the onetime mode
 		wait.Wait()
 		close(done)
 	}()
 
 	for {
 		select {
-		case <-ru.stopWatch:
+		case <-stop:
 			cancel()
 			wait.Wait()
 			return
@@ -230,21 +241,17 @@ func (ru *Runner) runConfig(c config.Configuration) {
 
 // Reload rereads the configuration, stops the old Runner and starts a new one.
 func (ru *Runner) Reload(cfg config.Configuration) {
-	// lock the runner while we reload the config
-	ru.mu.Lock()
-	defer ru.mu.Unlock()
-
-	ru.reloadChan <- cfg
-	<-ru.reloadComplete
+	reloaded := make(chan struct{})
+	ru.reloadChan <- reloadSignal{
+		c:        cfg,
+		reloaded: reloaded,
+	}
+	<-reloaded
 }
 
 // Stop stops the Runner gracefully.
 func (ru *Runner) Stop() {
-	// lock the runner while we are shutting it down
-	ru.mu.Lock()
-	defer ru.mu.Unlock()
-
-	close(ru.stopWatch)
+	close(ru.stopChan)
 	// wait for the main routine to exit
 	ru.wg.Wait()
 
