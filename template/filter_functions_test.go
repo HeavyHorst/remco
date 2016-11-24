@@ -138,20 +138,12 @@ func (s *FilterSuite) TestFilterUnmarshalYAMLArray(t *C) {
 func (s *FilterSuite) TestFilterSortByLengthString(t *C) {
 	in := pongo2.AsValue([]string{"123", "foobar", "1234"})
 	expected := []string{"123", "1234", "foobar"}
-	expectedRev := []string{"foobar", "1234", "123"}
 	res, err := filterSortByLength(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
 	m1 := res.Interface().([]string)
 	t.Check(m1, DeepEquals, expected)
-
-	rev, err := filterReverse(res, nil)
-	if err != nil {
-		t.Error(err.ErrorMsg)
-	}
-	m2 := rev.Interface().([]string)
-	t.Check(m2, DeepEquals, expectedRev)
 }
 
 func (s *FilterSuite) TestFilterSortByLengthKVPair(t *C) {
@@ -160,20 +152,12 @@ func (s *FilterSuite) TestFilterSortByLengthKVPair(t *C) {
 	c := memkv.KVPair{Key: "foobar", Value: "Test"}
 	in := pongo2.AsValue(memkv.KVPairs{a, c, b})
 	expected := memkv.KVPairs{a, b, c}
-	expectedRev := memkv.KVPairs{c, b, a}
 	res, err := filterSortByLength(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
 	m1 := res.Interface().(memkv.KVPairs)
 	t.Check(m1, DeepEquals, expected)
-
-	rev, err := filterReverse(res, nil)
-	if err != nil {
-		t.Error(err.ErrorMsg)
-	}
-	m2 := rev.Interface().(memkv.KVPairs)
-	t.Check(m2, DeepEquals, expectedRev)
 }
 
 func (s *FilterSuite) TestFilterDecryptString(t *C) {

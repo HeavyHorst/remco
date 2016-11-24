@@ -26,7 +26,6 @@ import (
 )
 
 func init() {
-	pongo2.RegisterFilter("reverse", filterReverse)
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
 	pongo2.RegisterFilter("parseYAML", filterUnmarshalYAMLObject)
 	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAMLArray)
@@ -127,30 +126,6 @@ func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *
 	}
 
 	return in, nil
-}
-
-//Reverse returns the array in reversed order
-//works with []string and []KVPair
-func filterReverse(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	if !in.CanSlice() {
-		return in, nil
-	}
-
-	values := in.Interface()
-	switch values.(type) {
-	case []string:
-		v := values.([]string)
-		for left, right := 0, len(v)-1; left < right; left, right = left+1, right-1 {
-			v[left], v[right] = v[right], v[left]
-		}
-	case memkv.KVPairs:
-		v := values.(memkv.KVPairs)
-		for left, right := 0, len(v)-1; left < right; left, right = left+1, right-1 {
-			v[left], v[right] = v[right], v[left]
-		}
-	}
-
-	return pongo2.AsValue(values), nil
 }
 
 func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

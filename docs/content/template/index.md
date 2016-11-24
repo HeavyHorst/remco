@@ -207,17 +207,6 @@ Works with []string and []KVPair.
 </details>
 
 <details>
-<summary> **reverse** -- Returns the reversed array. </summary>
-
-Works with []string and []KVPair.
-```
-{% for dir in lsdir("/config") | sortByLength | reverse %}
-{{dir}}
-{% endfor %}
-```
-</details>
-
-<details>
 <summary> **decrypt** -- Decrypts the stored data. Data must follow the following format, `base64(gpg(gzip(data)))`. </summary>
 
 This is compatible with [crypt](https://github.com/xordataexchange/crypt/tree/master/bin/crypt).
