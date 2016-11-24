@@ -15,7 +15,7 @@ canonifyurls = true
 	provider = "GitHub"
 	repo_url = "https://github.com/HeavyHorst/remco"
 
-	version = "v0.7.0-alpha1"
+	version = "v0.7.0"
 	logo = "images/logo.png"
 	favicon = ""
 
