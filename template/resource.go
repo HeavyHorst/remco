@@ -239,6 +239,8 @@ retryloop:
 		t.logger.Error(err)
 		t.Failed = true
 		cancel()
+	} else {
+		defer t.exec.StopChild()
 	}
 
 	done := make(chan struct{})
@@ -307,10 +309,8 @@ retryloop:
 				}
 			}()
 			wg.Wait()
-			t.exec.StopChild()
 			return
 		case <-done:
-			t.exec.StopChild()
 			return
 		}
 	}
