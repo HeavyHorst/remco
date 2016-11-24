@@ -547,18 +547,6 @@ something
 <p></details></p>
 
 <p><details>
-<summary> <strong>reverse</strong> &ndash; Returns the reversed array. </summary></p>
-
-<p>Works with []string and []KVPair.</p>
-
-<pre><code>{% for dir in lsdir(&quot;/config&quot;) | sortByLength | reverse %}
-{{dir}}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
 <summary> <strong>decrypt</strong> &ndash; Decrypts the stored data. Data must follow the following format, <code>base64(gpg(gzip(data)))</code>. </summary></p>
 
 <p>This is compatible with <a href="https://github.com/xordataexchange/crypt/tree/master/bin/crypt">crypt</a>.</p>

@@ -279,18 +279,6 @@ something
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;reverse&lt;/strong&gt; &amp;ndash; Returns the reversed array. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;p&gt;Works with []string and []KVPair.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{% for dir in lsdir(&amp;quot;/config&amp;quot;) | sortByLength | reverse %}
-{{dir}}
-{% endfor %}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;decrypt&lt;/strong&gt; &amp;ndash; Decrypts the stored data. Data must follow the following format, &lt;code&gt;base64(gpg(gzip(data)))&lt;/code&gt;. &lt;/summary&gt;&lt;/p&gt;
 
 &lt;p&gt;This is compatible with &lt;a href=&#34;https://github.com/xordataexchange/crypt/tree/master/bin/crypt&#34;&gt;crypt&lt;/a&gt;.&lt;/p&gt;
