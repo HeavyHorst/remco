@@ -28,7 +28,7 @@ import (
 func init() {
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
 	pongo2.RegisterFilter("parseYAML", filterUnmarshalYAML)
-	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAMLArray)
+	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAML) //deprecated
 	pongo2.RegisterFilter("toJSON", filterToJSON)
 	pongo2.RegisterFilter("toPrettyJSON", filterToPrettyJSON)
 	pongo2.RegisterFilter("toYAML", filterToYAML)
@@ -94,16 +94,6 @@ func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, 
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
 	return pongo2.AsValue(ret), nil
-}
-
-// deprecated
-func filterUnmarshalYAMLObject(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	return filterUnmarshalYAML(in, param)
-}
-
-// deprecated
-func filterUnmarshalYAMLArray(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	return filterUnmarshalYAML(in, param)
 }
 
 func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

@@ -116,7 +116,7 @@ func (s *FilterSuite) TestFilterUnmarshalYAMLObject(t *C) {
 		"test2": "1",
 		"test3": "2.5",
 	}
-	res, err := filterUnmarshalYAMLObject(in, nil)
+	res, err := filterUnmarshalYAML(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
@@ -127,7 +127,7 @@ func (s *FilterSuite) TestFilterUnmarshalYAMLObject(t *C) {
 func (s *FilterSuite) TestFilterUnmarshalYAMLArray(t *C) {
 	in := pongo2.AsValue(`["a", "b", "c"]`)
 	expected := []interface{}{"a", "b", "c"}
-	res, err := filterUnmarshalYAMLArray(in, nil)
+	res, err := filterUnmarshalYAML(in, nil)
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
