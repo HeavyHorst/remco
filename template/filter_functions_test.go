@@ -111,7 +111,7 @@ test3: 2.5
 
 func (s *FilterSuite) TestFilterUnmarshalYAMLObject(t *C) {
 	in := pongo2.AsValue(`{"test":"bla","test2":"1","test3":"2.5"}`)
-	expected := map[string]interface{}{
+	expected := map[interface{}]interface{}{
 		"test":  "bla",
 		"test2": "1",
 		"test3": "2.5",
@@ -120,7 +120,7 @@ func (s *FilterSuite) TestFilterUnmarshalYAMLObject(t *C) {
 	if err != nil {
 		t.Error(err.ErrorMsg)
 	}
-	m1 := res.Interface().(map[string]interface{})
+	m1 := res.Interface().(map[interface{}]interface{})
 	t.Check(m1, DeepEquals, expected)
 }
 

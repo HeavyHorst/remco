@@ -27,7 +27,7 @@ import (
 
 func init() {
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
-	pongo2.RegisterFilter("parseYAML", filterUnmarshalYAMLObject)
+	pongo2.RegisterFilter("parseYAML", filterUnmarshalYAML)
 	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAMLArray)
 	pongo2.RegisterFilter("toJSON", filterToJSON)
 	pongo2.RegisterFilter("toPrettyJSON", filterToPrettyJSON)
@@ -84,28 +84,26 @@ func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	return pongo2.AsValue(string(b)), nil
 }
 
-func filterUnmarshalYAMLObject(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	if !in.IsString() {
 		return in, nil
 	}
 
-	var ret map[string]interface{}
+	var ret interface{}
 	if err := yaml.Unmarshal([]byte(in.String()), &ret); err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
 	return pongo2.AsValue(ret), nil
 }
 
-func filterUnmarshalYAMLArray(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	if !in.IsString() {
-		return in, nil
-	}
+// deprecated
+func filterUnmarshalYAMLObject(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	return filterUnmarshalYAML(in, param)
+}
 
-	var ret []interface{}
-	if err := yaml.Unmarshal([]byte(in.String()), &ret); err != nil {
-		return nil, &pongo2.Error{ErrorMsg: err.Error()}
-	}
-	return pongo2.AsValue(ret), nil
+// deprecated
+func filterUnmarshalYAMLArray(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	return filterUnmarshalYAML(in, param)
 }
 
 func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

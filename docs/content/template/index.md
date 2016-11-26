@@ -167,11 +167,7 @@ something
 </details>
 
 <details>
-<summary> **parseYAML** -- Returns an map[string]interface{} of the yaml/json value.</summary>
-</details>
-
-<details>
-<summary> **parseYAMLArray** -- Returns a []interface{} from a yaml/json array. </summary>
+<summary> **parseYAML** -- Returns an interface{} of the yaml/json value.</summary>
 </details>
 
 <details>
