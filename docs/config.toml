@@ -68,9 +68,14 @@ canonifyurls = true
 	weight = 50
 
 [[menu.main]]
+    name = "Plugins Example"
+	url  = "plugins/"
+	weight = 60
+
+[[menu.main]]
 	name   = "License"
 	url    = "license/"
-	weight = 60
+	weight = 70
 
 
 [blackfriday]

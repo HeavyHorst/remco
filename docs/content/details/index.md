@@ -70,6 +70,12 @@ Currently supported are:
 
 The different coniguration parameters can be found here: [backend configuration](../config/#backend-configuration-options).
 
+## Plugins
+
+Remco supports backends as plugins.
+
+Example: [env plugin](../plugins/).
+
 ## Running and Process Lifecycle
 
 Remcos lifecycle can be controlled with several syscalls.
