@@ -14,6 +14,7 @@ import (
 	"github.com/HeavyHorst/remco/backends/etcd"
 	"github.com/HeavyHorst/remco/backends/file"
 	"github.com/HeavyHorst/remco/backends/mock"
+	"github.com/HeavyHorst/remco/backends/plugin"
 	"github.com/HeavyHorst/remco/backends/redis"
 	"github.com/HeavyHorst/remco/backends/vault"
 	"github.com/HeavyHorst/remco/backends/zookeeper"
@@ -29,6 +30,7 @@ type Config struct {
 	Redis     *redis.Config
 	Zookeeper *zookeeper.Config
 	Mock      *mock.Config
+	Plugin    []plugin.Plugin
 }
 
 func (c *Config) GetBackends() []template.BackendConfig {

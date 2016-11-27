@@ -388,6 +388,12 @@
 			"revisionTime": "2016-10-03T16:37:55Z"
 		},
 		{
+			"checksumSHA1": "cObB/GNrnmBbziYIBnTrFLUViAA=",
+			"path": "github.com/natefinch/pie",
+			"revision": "13d3874dc4836d5db81d3a950aa5436b1eb23372",
+			"revisionTime": "2016-04-20T17:41:31Z"
+		},
+		{
 			"checksumSHA1": "mhvIMH8oAtOiEyg37zWKmgb+6v4=",
 			"path": "github.com/pborman/uuid",
 			"revision": "3d4f2ba23642d3cfd06bd4b54cf03d99d95c0f1b",

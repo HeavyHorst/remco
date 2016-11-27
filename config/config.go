@@ -140,10 +140,15 @@ func (c *Configuration) configureLogger() {
 
 func (r *Resource) Init(ctx context.Context, reapLock *sync.RWMutex) (*template.Resource, error) {
 	var backendList []template.Backend
+	backendConfigs := r.Backend.GetBackends()
+
+	for _, v := range r.Backend.Plugin {
+		backendConfigs = append(backendConfigs, &v)
+	}
 
 	// try to connect to all backends
 	// connection to all backends must succeed to continue
-	for _, config := range r.Backend.GetBackends() {
+	for _, config := range backendConfigs {
 	retryloop:
 		for {
 			select {
