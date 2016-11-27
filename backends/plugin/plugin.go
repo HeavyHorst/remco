@@ -17,9 +17,7 @@ import (
 
 	"github.com/HeavyHorst/easyKV"
 	berr "github.com/HeavyHorst/remco/backends/error"
-	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
-	"github.com/Sirupsen/logrus"
 	"github.com/natefinch/pie"
 )
 
@@ -46,13 +44,6 @@ func (p *Plugin) Connect() (template.Backend, error) {
 	client, err := pie.StartProviderCodec(jsonrpc.NewClientCodec, os.Stderr, p.Path)
 	if err != nil {
 		return p.Backend, err
-	}
-
-	if p.Backend.Watch {
-		log.WithFields(logrus.Fields{
-			"backend": p.Backend.Name,
-		}).Warn("Watch is not supported, using interval instead")
-		p.Backend.Watch = false
 	}
 
 	plugin := &plug{client}
@@ -83,7 +74,32 @@ func (p *plug) Close() {
 	p.client.Close()
 }
 
+type WatchConfig struct {
+	Prefix string
+	Opts   easyKV.WatchOptions
+}
+
 // WatchPrefix is not supported for now
 func (p *plug) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
-	return 0, easyKV.ErrWatchNotSupported
+	var result uint64
+
+	wc := WatchConfig{Prefix: prefix}
+	for _, option := range opts {
+		option(&wc.Opts)
+	}
+
+	errchan := make(chan error)
+	go func() {
+		select {
+		case errchan <- p.client.Call("Plugin.WatchPrefix", wc, &result):
+		case <-ctx.Done():
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return wc.Opts.WaitIndex, nil
+	case err := <-errchan:
+		return result, err
+	}
 }

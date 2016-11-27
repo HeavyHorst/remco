@@ -12,11 +12,13 @@ just compile it and move the executable to /etc/remco/plugins.
 package main
 
 import (
+	"context"
 	"log"
 	"net/rpc/jsonrpc"
 
 	"github.com/HeavyHorst/easyKV"
 	"github.com/HeavyHorst/easyKV/env"
+	"github.com/HeavyHorst/remco/backends/plugin"
 	"github.com/natefinch/pie"
 )
 
@@ -54,6 +56,12 @@ func (e *EnvRPCServer) GetValues(args []string, resp *map[string]string) error {
 func (e *EnvRPCServer) Close(args interface{}, resp *interface{}) error {
 	e.Impl.Close()
 	return nil
+}
+
+func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
+	var err error
+	*resp, err = e.Impl.WatchPrefix(args.Prefix, context.Background(), easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
+	return err
 }
 ```
 
