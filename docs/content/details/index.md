@@ -73,6 +73,8 @@ The different coniguration parameters can be found here: [backend configuration]
 ## Plugins
 
 Remco supports backends as plugins.
+There is no requirement that plugins be written in Go.
+Every language that can provide a JSON-RPC API is ok.
 
 Example: [env plugin](../plugins/).
 
