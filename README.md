@@ -7,9 +7,12 @@ Remcos main purposes are (like confd's):
   - reloading applications to pick up new config file changes
 
 ## Differences between remco and confd
-   - multiple source/destination pairs per template resource - useful for programs that need more than one config file
-   - multiple backends per template resource - get normal config values from etcd and secrets from vault
-   - [pongo2](https://github.com/flosch/pongo2) template engine instead of go's text/template
+   - Multiple source/destination pairs per template resource - useful for programs that need more than one config file
+   - Multiple backends per template resource - get normal config values from etcd and secrets from vault
+   - [Pongo2](https://github.com/flosch/pongo2) template engine instead of go's text/template
+   - Zombie reaping support (if remco runs as pid 1)
+   - Additional backends can be provided as plugins.
+   - [Exec](https://heavyhorst.github.io/remco/details/#exec-mode) mode similar to consul-template.
 
 ## Documentation 
 See: https://heavyhorst.github.io/remco/
