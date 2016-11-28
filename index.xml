@@ -235,11 +235,7 @@ something
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an map[string]interface{} of the yaml/json value.&lt;/summary&gt;
-&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;parseYAMLArray&lt;/strong&gt; &amp;ndash; Returns a []interface{} from a yaml/json array. &lt;/summary&gt;
+&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an interface{} of the yaml/json value.&lt;/summary&gt;
 &lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
@@ -749,6 +745,93 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
     </item>
     
     <item>
+      <title>plugins</title>
+      <link>https://heavyhorst.github.io/remco/plugins/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/plugins/</guid>
+      <description>
+
+&lt;h2 id=&#34;env-backend-as-plugin-example&#34;&gt;ENV backend as plugin [Example]&lt;/h2&gt;
+
+&lt;p&gt;This is the env backend as a plugin.
+If you want to try it yourself, then
+just compile it and move the executable to /etc/remco/plugins.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (
+	&amp;quot;context&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/rpc/jsonrpc&amp;quot;
+
+	&amp;quot;github.com/HeavyHorst/easyKV&amp;quot;
+	&amp;quot;github.com/HeavyHorst/easyKV/env&amp;quot;
+	&amp;quot;github.com/HeavyHorst/remco/backends/plugin&amp;quot;
+	&amp;quot;github.com/natefinch/pie&amp;quot;
+)
+
+func main() {
+	p := pie.NewProvider()
+	if err := p.RegisterName(&amp;quot;Plugin&amp;quot;, &amp;amp;EnvRPCServer{}); err != nil {
+		log.Fatalf(&amp;quot;failed to register Plugin: %s&amp;quot;, err)
+	}
+	p.ServeCodec(jsonrpc.NewServerCodec)
+}
+
+type EnvRPCServer struct {
+	// This is the real implementation
+	Impl easyKV.ReadWatcher
+}
+
+func (e *EnvRPCServer) Init(args map[string]interface{}, resp *bool) error {
+	// use the data in args to create the ReadWatcher
+	// env var doesn&#39;t need any data
+
+	var err error
+	e.Impl, err = env.New()
+	return err
+}
+
+func (e *EnvRPCServer) GetValues(args []string, resp *map[string]string) error {
+	erg, err := e.Impl.GetValues(args)
+	if err != nil {
+		return err
+	}
+	*resp = erg
+	return nil
+}
+
+func (e *EnvRPCServer) Close(args interface{}, resp *interface{}) error {
+	e.Impl.Close()
+	return nil
+}
+
+func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
+	var err error
+	*resp, err = e.Impl.WatchPrefix(args.Prefix, context.Background(), easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
+	return err
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then create a config file with this backend section.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-toml&#34;&gt;[backend]
+  [[backend.plugin]]
+    path = &amp;quot;/etc/remco/plugins/env&amp;quot;
+    keys = [&amp;quot;/&amp;quot;]
+    interval = 60
+	watch = false
+	[backend.plugin.config]
+	 # these parameters are not used in the env backend plugin
+	 # but other plugins may need some data (password, prefix ...)
+	 a = &amp;quot;hallo&amp;quot;
+	 b = &amp;quot;moin&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>remco details</title>
       <link>https://heavyhorst.github.io/remco/details/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -827,6 +910,14 @@ This is also the repository where the current implementations live.&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;../config/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;plugins&#34;&gt;Plugins&lt;/h2&gt;
+
+&lt;p&gt;Remco supports backends as plugins.
+There is no requirement that plugins be written in Go.
+Every language that can provide a JSON-RPC API is ok.&lt;/p&gt;
+
+&lt;p&gt;Example: &lt;a href=&#34;../plugins/&#34;&gt;env plugin&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;running-and-process-lifecycle&#34;&gt;Running and Process Lifecycle&lt;/h2&gt;
 

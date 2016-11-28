@@ -203,11 +203,7 @@ something
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an map[string]interface{} of the yaml/json value.&lt;/summary&gt;
-&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;parseYAMLArray&lt;/strong&gt; &amp;ndash; Returns a []interface{} from a yaml/json array. &lt;/summary&gt;
+&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an interface{} of the yaml/json value.&lt;/summary&gt;
 &lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;

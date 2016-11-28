@@ -9,18 +9,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>Templates - Remco Docs</title>
+    <title>plugins - Remco Docs</title>
     <meta name="generator" content="Hugo 0.17" />
 
     
     <meta name="description" content="remco is a lightweight configuration management tool">
     
-    <link rel="canonical" href="https://heavyhorst.github.io/remco/template/">
+    <link rel="canonical" href="https://heavyhorst.github.io/remco/plugins/">
     
     <meta name="author" content="The remco authors">
     
 
-    <meta property="og:url" content="https://heavyhorst.github.io/remco/template/">
+    <meta property="og:url" content="https://heavyhorst.github.io/remco/plugins/">
     <meta property="og:title" content="Remco Docs">
     <meta property="og:image" content="https://heavyhorst.github.io/remco/images/logo.png">
     <meta name="apple-mobile-web-app-title" content="Remco Docs">
@@ -97,7 +97,7 @@
     </div>
     <div class="stretch">
       <div class="title">
-        Templates
+        plugins
       </div>
     </div>
 
@@ -252,14 +252,11 @@
 
 
 
-<a class="current" title="Template" href="https://heavyhorst.github.io/remco/template/">
+<a  title="Template" href="https://heavyhorst.github.io/remco/template/">
 	
 	Template
 </a>
 
-
-<ul id="scrollspy">
-</ul>
 
 
   
@@ -273,11 +270,14 @@
 
 
 
-<a  title="Plugins Example" href="https://heavyhorst.github.io/remco/plugins/">
+<a class="current" title="Plugins Example" href="https://heavyhorst.github.io/remco/plugins/">
 	
 	Plugins Example
 </a>
 
+
+<ul id="scrollspy">
+</ul>
 
 
   
@@ -332,251 +332,86 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>Templates </h1>
+			<h1>plugins </h1>
 
 			
 
-<p>Templates are written in flosch&rsquo;s <a href="https://github.com/flosch/pongo2"><code>pongo2</code></a> template engine.</p>
+<h2 id="env-backend-as-plugin-example">ENV backend as plugin [Example]</h2>
 
-<blockquote>
-<p>For a documentation on how the templating language works you can <a href="https://docs.djangoproject.com/en/dev/topics/templates/">head over to the Django documentation</a>. pongo2 aims to be compatible with it.</p>
-</blockquote>
+<p>This is the env backend as a plugin.
+If you want to try it yourself, then
+just compile it and move the executable to /etc/remco/plugins.</p>
 
-<h2 id="template-functions">Template Functions</h2>
+<pre><code class="language-go">package main
 
-<p><details>
-<summary> <strong>exists</strong> &ndash; Checks if the key exists. Return false if key is not found.</summary></p>
+import (
+	&quot;context&quot;
+	&quot;log&quot;
+	&quot;net/rpc/jsonrpc&quot;
 
-<pre><code>{% if exists(&quot;/key&quot;) %}
-    value: {{ getv (&quot;/key&quot;) }}
-{% endif %}
+	&quot;github.com/HeavyHorst/easyKV&quot;
+	&quot;github.com/HeavyHorst/easyKV/env&quot;
+	&quot;github.com/HeavyHorst/remco/backends/plugin&quot;
+	&quot;github.com/natefinch/pie&quot;
+)
+
+func main() {
+	p := pie.NewProvider()
+	if err := p.RegisterName(&quot;Plugin&quot;, &amp;EnvRPCServer{}); err != nil {
+		log.Fatalf(&quot;failed to register Plugin: %s&quot;, err)
+	}
+	p.ServeCodec(jsonrpc.NewServerCodec)
+}
+
+type EnvRPCServer struct {
+	// This is the real implementation
+	Impl easyKV.ReadWatcher
+}
+
+func (e *EnvRPCServer) Init(args map[string]interface{}, resp *bool) error {
+	// use the data in args to create the ReadWatcher
+	// env var doesn't need any data
+
+	var err error
+	e.Impl, err = env.New()
+	return err
+}
+
+func (e *EnvRPCServer) GetValues(args []string, resp *map[string]string) error {
+	erg, err := e.Impl.GetValues(args)
+	if err != nil {
+		return err
+	}
+	*resp = erg
+	return nil
+}
+
+func (e *EnvRPCServer) Close(args interface{}, resp *interface{}) error {
+	e.Impl.Close()
+	return nil
+}
+
+func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
+	var err error
+	*resp, err = e.Impl.WatchPrefix(args.Prefix, context.Background(), easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
+	return err
+}
 </code></pre>
 
-<p></details></p>
+<p>Then create a config file with this backend section.</p>
 
-<p><details>
-<summary> <strong>get</strong> &ndash; Returns the KVPair where key matches its argument.</summary></p>
-
-<pre><code>{% with get(&quot;/key&quot;) as dat %}
-    key: {{dat.Key}}
-    value: {{dat.Value}}
-{% endwith %}
+<pre><code class="language-toml">[backend]
+  [[backend.plugin]]
+    path = &quot;/etc/remco/plugins/env&quot;
+    keys = [&quot;/&quot;]
+    interval = 60
+	watch = false
+	[backend.plugin.config]
+	 # these parameters are not used in the env backend plugin
+	 # but other plugins may need some data (password, prefix ...)
+	 a = &quot;hallo&quot;
+	 b = &quot;moin&quot;
 </code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>gets</strong> &ndash; Returns all KVPair, []KVPair, where key matches its argument.</summary></p>
-
-<pre><code>{% for i in gets(&quot;/*&quot;) %}
-    key: {{i.Key}}
-    value: {{i.Value}}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>getv</strong> &ndash; Returns the value as a string where key matches its argument or an optional default value.</summary></p>
-
-<pre><code>value: {{ getv(&quot;/key&quot;) }}
-</code></pre>
-
-<h4 id="with-a-default-value">With a default value</h4>
-
-<pre><code>value: {{ getv(&quot;/key&quot;, &quot;default_value&quot;) }}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>getvs</strong> &ndash; Returns all values, []string, where key matches its argument.</summary></p>
-
-<pre><code>{% for value in getvs(&quot;/*&quot;) %}
-    value: {{value}}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>getenv</strong> &ndash; Retrieves the value of the environment variable named by the key. It returns the value, which will be empty if the variable is not present. Optionally, you can give a default value that will be returned if the key is not present. </summary></p>
-
-<pre><code>export HOSTNAME=`hostname`
-</code></pre>
-
-<pre><code>hostname: {{getenv(&quot;HOSTNAME&quot;)}}
-</code></pre>
-
-<h4 id="with-a-default-value-1">With a default value</h4>
-
-<pre><code>ipaddr: {{ getenv(&quot;HOST_IP&quot;, &quot;127.0.0.1&quot;) }}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>ls</strong> &ndash; Returns all subkeys, []string, where path matches its argument. Returns an empty list if path is not found. </summary></p>
-
-<pre><code>{% for i in ls(&quot;/deis/services&quot;) %}
-   value: {{i}}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>lsdir</strong> &ndash; Returns all subkeys, []string, where path matches its argument. It only returns subkeys that also have subkeys. Returns an empty list if path is not found. </summary></p>
-
-<pre><code>{% for dir in lsdir(&quot;/deis/services&quot;) %}
-   value: {{dir}}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>replace</strong> &ndash; Alias for the <a href="https://golang.org/pkg/strings/#Replace">strings.Replace</a> function. </summary></p>
-
-<pre><code>backend = {{ replace(getv(&quot;/services/backend/nginx&quot;), &quot;-&quot;, &quot;_&quot;, -1) }}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>contains</strong> &ndash; Alias for the <a href="https://golang.org/pkg/strings/#Contains">strings.Contains</a> function. </summary></p>
-
-<pre><code>{% if contains(getv(&quot;/services/backend/nginx&quot;), &quot;something&quot;) %}
-something
-{% endif %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>printf</strong> &ndash; Alias for the <a href="https://golang.org/pkg/fmt/#Sprintf">fmt.Sprintf</a> function. </summary></p>
-
-<pre><code>{{ getv (printf (&quot;/config/%s/host_port&quot;, dir)) }}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>lookupIP</strong> &ndash; Wrapper for the <a href="https://golang.org/pkg/net/#LookupIP">net.LookupIP</a> function. The wrapper returns the IP addresses in alphabetical order. </summary></p>
-
-<pre><code>{% for ip in lookupIP(&quot;kube-master&quot;) %}
- {{ ip }}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>lookupSRV</strong> &ndash; Wrapper for the <a href="https://golang.org/pkg/net/#LookupSRV">net.LookupSRV</a> function. The wrapper returns the SRV records in alphabetical order. </summary></p>
-
-<pre><code>{% for srv in lookupSRV(&quot;xmpp-server&quot;, &quot;tcp&quot;, &quot;google.com&quot;) %}
-  target: {{ srv.Target }}
-  port: {{ srv.Port }}
-  priority: {{ srv.Priority }}
-  weight: {{ srv.Weight }}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<h2 id="template-filters">Template Filters</h2>
-
-<p><details>
-<summary> <strong>base64</strong> &ndash; Encodes a string as base64 </summary></p>
-
-<pre><code>{{ &quot;somestring&quot; | base64}}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>base</strong> &ndash; Alias for the <a href="https://golang.org/pkg/path/#Base">path.Base</a> function. </summary></p>
-
-<pre><code>{{ &quot;/home/user/test&quot; | base }}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>dir</strong> &ndash; Alias for the <a href="https://golang.org/pkg/path/#Dir">path.Dir</a> function. </summary></p>
-
-<pre><code>{{ &quot;/home/user/test&quot; | dir }}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>split</strong> &ndash; Alias for the <a href="https://golang.org/pkg/strings/#Split">strings.Split</a> function. </summary></p>
-
-<pre><code>{% for i in (&quot;/home/user/test&quot; | split:&quot;/&quot;) %}
-{{i}}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>parseYAML</strong> &ndash; Returns an interface{} of the yaml/json value.</summary>
-</details></p>
-
-<p><details>
-<summary> <strong>toJSON</strong> &ndash; Converts data, for example the result of gets or lsdir, into an JSON object. </summary></p>
-
-<pre><code>{{ gets(&quot;/myapp/database/*&quot;) | toJson}}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>toPrettyJSON</strong> &ndash; Converts data, for example the result of gets or lsdir, into an pretty-printed JSON object, indented by four spaces. </summary></p>
-
-<pre><code>{{ gets(&quot;/myapp/database/*&quot;) | toPrettyJson}}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>toYAML</strong> &ndash; Converts data, for example the result of gets or lsdir, into a YAML string. </summary></p>
-
-<pre><code>{{ gets(&quot;/myapp/database/*&quot;) | toJson}}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>sortByLength</strong> - Returns the sorted array. </summary></p>
-
-<p>Works with []string and []KVPair.</p>
-
-<pre><code>{% for dir in lsdir(&quot;/config&quot;) | sortByLength %}
-{{dir}}
-{% endfor %}
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary> <strong>decrypt</strong> &ndash; Decrypts the stored data. Data must follow the following format, <code>base64(gpg(gzip(data)))</code>. </summary></p>
-
-<p>This is compatible with <a href="https://github.com/xordataexchange/crypt/tree/master/bin/crypt">crypt</a>.</p>
-
-<p>Works with string, []string, KVPair, KVPairs</p>
-
-<pre><code>{{ getv(&quot;/test/data&quot;) | decrypt:&quot;/path/to/your/armored/private/key&quot; }}
-</code></pre>
-
-<h4 id="storing-data-using-gpg">Storing data using gpg</h4>
-
-<pre><code>data = `echo 'secret text' | gzip -c | gpg2 --compress-level 0 --encrypt --default-recipient &lt;your-recipient&gt; | base64`
-ETCDCTL_API=3 etcdctl put /test/data $data
-</code></pre>
-
-<p></details></p>
 
 
 			<aside class="copyright" role="note">
@@ -595,7 +430,7 @@ ETCDCTL_API=3 etcdctl put /test/data $data
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="https://heavyhorst.github.io/remco/config/sampleresource/" title="Sample resource file">
+      <a href="https://heavyhorst.github.io/remco/config/" title="Configuring remco">
         <span class="direction">
           Previous
         </span>
@@ -605,7 +440,7 @@ ETCDCTL_API=3 etcdctl put /test/data $data
           </div>
           <div class="stretch">
             <div class="title">
-              Sample resource file
+              Configuring remco
             </div>
           </div>
         </div>
@@ -615,14 +450,14 @@ ETCDCTL_API=3 etcdctl put /test/data $data
 
   <div class="next">
   
-      <a href="https://heavyhorst.github.io/remco/config/sample/" title="Sample configuration file">
+      <a href="https://heavyhorst.github.io/remco/details/" title="remco details">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              Sample configuration file
+              remco details
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

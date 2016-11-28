@@ -89,6 +89,14 @@ This is also the repository where the current implementations live.&lt;/p&gt;
 
 &lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;../config/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
 
+&lt;h2 id=&#34;plugins&#34;&gt;Plugins&lt;/h2&gt;
+
+&lt;p&gt;Remco supports backends as plugins.
+There is no requirement that plugins be written in Go.
+Every language that can provide a JSON-RPC API is ok.&lt;/p&gt;
+
+&lt;p&gt;Example: &lt;a href=&#34;../plugins/&#34;&gt;env plugin&lt;/a&gt;.&lt;/p&gt;
+
 &lt;h2 id=&#34;running-and-process-lifecycle&#34;&gt;Running and Process Lifecycle&lt;/h2&gt;
 
 &lt;p&gt;Remcos lifecycle can be controlled with several syscalls.&lt;/p&gt;
