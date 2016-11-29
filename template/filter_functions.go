@@ -27,6 +27,7 @@ import (
 func init() {
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
 	pongo2.RegisterFilter("parseYAML", filterUnmarshalYAML)
+	pongo2.RegisterFilter("parseJSON", filterUnmarshalYAML)      // just an alias
 	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAML) //deprecated
 	pongo2.RegisterFilter("toJSON", filterToJSON)
 	pongo2.RegisterFilter("toPrettyJSON", filterToPrettyJSON)
