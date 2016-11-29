@@ -381,6 +381,12 @@
 			"revisionTime": "2015-09-14T16:22:38Z"
 		},
 		{
+			"checksumSHA1": "mIKG7O0JxcM24B/xwMsi5uLwz98=",
+			"path": "github.com/mickep76/iodatafmt/yaml_mapstr",
+			"revision": "f18fde15e7294cc81a4bb52af69487751d34a9c4",
+			"revisionTime": "2016-05-02T20:01:18Z"
+		},
+		{
 			"checksumSHA1": "KCJhN9Dx329wAN/SeL4CxeypPyk=",
 			"origin": "github.com/kelseyhightower/confd/vendor/github.com/mitchellh/mapstructure",
 			"path": "github.com/mitchellh/mapstructure",

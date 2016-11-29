@@ -16,13 +16,12 @@ import (
 	"path"
 	"sort"
 
-	"gopkg.in/yaml.v2"
-
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/HeavyHorst/memkv"
 	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/log"
+	"github.com/mickep76/iodatafmt/yaml_mapstr"
 )
 
 func init() {
@@ -77,7 +76,7 @@ func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 }
 
 func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	b, err := yaml.Marshal(in.Interface())
+	b, err := yaml_mapstr.Marshal(in.Interface())
 	if err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
@@ -90,9 +89,10 @@ func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, 
 	}
 
 	var ret interface{}
-	if err := yaml.Unmarshal([]byte(in.String()), &ret); err != nil {
+	if err := yaml_mapstr.Unmarshal([]byte(in.String()), &ret); err != nil {
 		return nil, &pongo2.Error{ErrorMsg: err.Error()}
 	}
+
 	return pongo2.AsValue(ret), nil
 }
 
