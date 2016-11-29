@@ -93,6 +93,105 @@ func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
 	 a = &amp;quot;hallo&amp;quot;
 	 b = &amp;quot;moin&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;consul-service-plugin-example&#34;&gt;Consul-Service Plugin [Example]&lt;/h2&gt;
+
+&lt;p&gt;Here is another simple example plugin that speaks to the consul service endpoint instead of the consul kv-store like the built in consul backend.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (
+	&amp;quot;encoding/json&amp;quot;
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/rpc/jsonrpc&amp;quot;
+	&amp;quot;path&amp;quot;
+	&amp;quot;strconv&amp;quot;
+
+	&amp;quot;github.com/HeavyHorst/easyKV&amp;quot;
+	&amp;quot;github.com/HeavyHorst/remco/backends/plugin&amp;quot;
+	consul &amp;quot;github.com/hashicorp/consul/api&amp;quot;
+	&amp;quot;github.com/natefinch/pie&amp;quot;
+)
+
+func NewConsulClient(addr string) (*consul.Client, error) {
+	config := consul.DefaultConfig()
+	config.Address = addr
+	c, err := consul.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+type ConsulRPCServer struct {
+	client *consul.Client
+}
+
+func main() {
+	p := pie.NewProvider()
+	if err := p.RegisterName(&amp;quot;Plugin&amp;quot;, &amp;amp;ConsulRPCServer{}); err != nil {
+		log.Fatalf(&amp;quot;failed to register Plugin: %s&amp;quot;, err)
+	}
+	p.ServeCodec(jsonrpc.NewServerCodec)
+}
+
+func (c *ConsulRPCServer) Init(args map[string]string, resp *bool) error {
+	var err error
+	if addr, ok := args[&amp;quot;addr&amp;quot;]; ok {
+		c.client, err = NewConsulClient(addr)
+		if err != nil {
+			return err
+		}
+		*resp = true
+		return nil
+	}
+	return fmt.Errorf(&amp;quot;The provided address is not of type string&amp;quot;)
+}
+
+func (c *ConsulRPCServer) GetValues(args []string, resp *map[string]string) error {
+	r := make(map[string]string)
+	passingOnly := true
+	for _, v := range args {
+		addrs, _, err := c.client.Health().Service(v, &amp;quot;&amp;quot;, passingOnly, nil)
+		if len(addrs) == 0 &amp;amp;&amp;amp; err == nil {
+			log.Printf(&amp;quot;service ( %s ) was not found&amp;quot;, v)
+		}
+		if err != nil {
+			return err
+		}
+
+		for idx, addr := range addrs {
+			key := path.Join(&amp;quot;/&amp;quot;, &amp;quot;_consul&amp;quot;, &amp;quot;service&amp;quot;, addr.Service.Service, strconv.Itoa(idx))
+			service_json, _ := json.Marshal(addr)
+			r[key] = string(service_json)
+		}
+	}
+	*resp = r
+	return nil
+}
+
+func (c *ConsulRPCServer) Close(args interface{}, resp *interface{}) error {
+	// consul client doesn&#39;t need to be closed
+	return nil
+}
+
+func (c *ConsulRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
+	return easyKV.ErrWatchNotSupported
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The config backend section could look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[backend]
+  [[backend.plugin]]
+    path = &amp;quot;/etc/remco/plugins/consul-service&amp;quot;
+    keys = [&amp;quot;consul&amp;quot;]
+    interval = 60
+    onetime = false
+    [backend.plugin.config]
+	 addr = &amp;quot;localhost:8500&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
