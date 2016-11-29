@@ -465,7 +465,7 @@ func (c *ConsulRPCServer) Init(args map[string]string, resp *bool) error {
 		*resp = true
 		return nil
 	}
-	return fmt.Errorf(&quot;The provided address is not of type string&quot;)
+	return fmt.Errorf(&quot;I need an Address !&quot;)
 }
 
 func (c *ConsulRPCServer) GetValues(args []string, resp *map[string]string) error {
