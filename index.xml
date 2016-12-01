@@ -962,7 +962,7 @@ Additionally, every signal that remco receives will be forwarded to the child pr
 &lt;p&gt;The template resource will fail if the child process dies. It will be automatically restarted after a random amount of time (0-30s).
 This also means that the child needs to remain in the foreground, otherwise the template resource will be restarted endlessly.&lt;/p&gt;
 
-&lt;p&gt;The exec configuration parameters can be found here: &lt;a href=&#34;../config/#exec-configuration-options&#34;&gt;exec configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The exec configuration parameters can be found here: &lt;a href=&#34;./config/#exec-configuration-options&#34;&gt;exec configuration&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;commands-reload-check&#34;&gt;Commands (reload &amp;amp; check)&lt;/h2&gt;
 
@@ -977,7 +977,7 @@ This also means that the child needs to remain in the foreground, otherwise the 
 &lt;li&gt;the child process gets reloaded&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The template configuration parameters can be found here: &lt;a href=&#34;../config/#template-configuration-options&#34;&gt;template configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The template configuration parameters can be found here: &lt;a href=&#34;./config/#template-configuration-options&#34;&gt;template configuration&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;zombie-reaping-pid-1&#34;&gt;Zombie reaping (pid 1)&lt;/h2&gt;
 
@@ -1008,7 +1008,7 @@ This is also the repository where the current implementations live.&lt;/p&gt;
 &lt;li&gt;&lt;strong&gt;yaml/json files&lt;/strong&gt; (interval and watch)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;../config/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;./config/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;plugins&#34;&gt;Plugins&lt;/h2&gt;
 
@@ -1016,7 +1016,7 @@ This is also the repository where the current implementations live.&lt;/p&gt;
 There is no requirement that plugins be written in Go.
 Every language that can provide a JSON-RPC API is ok.&lt;/p&gt;
 
-&lt;p&gt;Example: &lt;a href=&#34;../plugins/&#34;&gt;env plugin&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Example: &lt;a href=&#34;./plugins/&#34;&gt;env plugin&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;running-and-process-lifecycle&#34;&gt;Running and Process Lifecycle&lt;/h2&gt;
 
