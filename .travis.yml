@@ -28,6 +28,7 @@ before_install:
 
 go:
   - 1.7
+  - tip
 
 env:
   - VAULT_ADDR='http://127.0.0.1:8200'
