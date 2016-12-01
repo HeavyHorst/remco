@@ -25,7 +25,7 @@ Additionally, every signal that remco receives will be forwarded to the child pr
 The template resource will fail if the child process dies. It will be automatically restarted after a random amount of time (0-30s).
 This also means that the child needs to remain in the foreground, otherwise the template resource will be restarted endlessly.
 
-The exec configuration parameters can be found here: [exec configuration](../config/#exec-configuration-options).
+The exec configuration parameters can be found here: [exec configuration](/config/#exec-configuration-options).
 
 ## Commands (reload & check)
 
@@ -38,7 +38,7 @@ The check command must exit with status code 0 so that:
   - the reload command runs
   - the child process gets reloaded
 
-The template configuration parameters can be found here: [template configuration](../config/#template-configuration-options).
+The template configuration parameters can be found here: [template configuration](/config/#template-configuration-options).
 
 ## Zombie reaping (pid 1)
 
@@ -68,7 +68,7 @@ Currently supported are:
   - **environment** (only interval)
   - **yaml/json files** (interval and watch)
 
-The different coniguration parameters can be found here: [backend configuration](../config/#backend-configuration-options).
+The different coniguration parameters can be found here: [backend configuration](/config/#backend-configuration-options).
 
 ## Plugins
 
@@ -76,7 +76,7 @@ Remco supports backends as plugins.
 There is no requirement that plugins be written in Go.
 Every language that can provide a JSON-RPC API is ok.
 
-Example: [env plugin](../plugins/).
+Example: [env plugin](/plugins/).
 
 ## Running and Process Lifecycle
 

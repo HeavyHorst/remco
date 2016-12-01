@@ -4,6 +4,7 @@ title = "Remco Docs"
 theme = "hugo-material-docs"
 metadataformat = "yaml"
 canonifyurls = true
+relativeURLs = true
 
 [params]
 	# General information
