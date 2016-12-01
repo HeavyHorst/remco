@@ -46,4 +46,6 @@ script:
   - bash integration/env/test.sh
   - bash integration/zookeeper/test.sh
 
-after_success: bash scripts/deploy-ghpages.sh
+after_success: 
+  - bash scripts/deploy-ghpages.sh
+  - bash <(curl -s https://codecov.io/bash)
