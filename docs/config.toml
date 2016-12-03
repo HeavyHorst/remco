@@ -1,12 +1,14 @@
 baseurl = "https://heavyhorst.github.io/remco/"
 languageCode = "en-us"
 title = "Remco Docs"
-theme = "hugo-material-docs"
+theme = "hugo-theme-learn"
 metadataformat = "yaml"
 canonifyurls = true
 relativeURLs = true
 
 [params]
+    menu = ["details", "config", "template", "plugins"]
+
 	# General information
 	author = "The remco authors"
 	description = "remco is a lightweight configuration management tool"
@@ -41,43 +43,6 @@ relativeURLs = true
 [social]
 	twitter = ""
 	github  = "heavyhorst"
-
-[[menu.main]]
-    name = "Details"
-	url = "details/"
-	weight = 10
-
-[[menu.main]]
-	name   = "Configuring remco"
-	url    = "config/"
-	weight = 20
-
-
-[[menu.main]]
-	name   = "Sample configuration"
-	url    = "config/sample"
-	weight = 30
-
-[[menu.main]]
-	name   = "Sample resource configuration"
-	url    = "config/sampleresource"
-    weight = 40
-
-[[menu.main]]
-	name   = "Template"
-	url    = "template/"
-	weight = 50
-
-[[menu.main]]
-    name = "Plugins Example"
-	url  = "plugins/"
-	weight = 60
-
-[[menu.main]]
-	name   = "License"
-	url    = "license/"
-	weight = 70
-
 
 [blackfriday]
 	smartypants	= true
