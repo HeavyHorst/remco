@@ -3,39 +3,102 @@
   
   <url>
     <loc>https://heavyhorst.github.io/remco/</loc>
-    <lastmod>2016-11-06T17:24:57+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://heavyhorst.github.io/remco/config/sampleresource/</loc>
-    <lastmod>2016-11-06T17:24:57+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://heavyhorst.github.io/remco/template/</loc>
-    <lastmod>2016-10-05T17:33:14+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://heavyhorst.github.io/remco/config/sample/</loc>
-    <lastmod>2016-10-05T17:24:57+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://heavyhorst.github.io/remco/license/</loc>
-    <lastmod>2016-10-05T17:11:10+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://heavyhorst.github.io/remco/config/</loc>
+    <lastmod>2016-12-03T15:11:07+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://heavyhorst.github.io/remco/plugins/</loc>
+    <lastmod>2016-12-03T15:11:07+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/template/</loc>
+    <lastmod>2016-12-03T15:02:45+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/config/</loc>
+    <lastmod>2016-12-03T14:37:29+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://heavyhorst.github.io/remco/details/</loc>
+    <lastmod>2016-12-03T14:19:23+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/plugins/env-plugin-example/</loc>
+    <lastmod>2016-12-03T15:13:50+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/template/template-functions/</loc>
+    <lastmod>2016-12-03T15:06:33+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/config/environment-variables/</loc>
+    <lastmod>2016-12-03T14:56:09+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/details/template-resource/</loc>
+    <lastmod>2016-12-03T14:20:57+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/plugins/consul-plugin-example/</loc>
+    <lastmod>2016-12-03T15:14:31+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/config/configuration-options/</loc>
+    <lastmod>2016-12-03T14:57:13+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/details/exec-mode/</loc>
+    <lastmod>2016-12-03T14:23:28+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/config/sample-config/</loc>
+    <lastmod>2016-12-03T14:59:49+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/details/commands/</loc>
+    <lastmod>2016-12-03T14:25:24+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/template/template-filters/</loc>
+    <lastmod>2016-12-03T15:07:41+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/config/sample-resource/</loc>
+    <lastmod>2016-12-03T15:01:23+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/details/zombie-reaping/</loc>
+    <lastmod>2016-12-03T14:30:27+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/details/backends/</loc>
+    <lastmod>2016-12-03T14:31:14+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/details/plugins/</loc>
+    <lastmod>2016-12-03T14:32:50+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/details/process-lifecycle/</loc>
+    <lastmod>2016-12-03T14:33:41+01:00</lastmod>
   </url>
   
 </urlset>

@@ -7,56 +7,164 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Released under the MIT license</copyright>
-    <lastBuildDate>Sun, 06 Nov 2016 17:24:57 +0200</lastBuildDate>
+    <lastBuildDate>Sat, 03 Dec 2016 15:11:07 +0100</lastBuildDate>
     <atom:link href="https://heavyhorst.github.io/remco/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Sample resource file</title>
-      <link>https://heavyhorst.github.io/remco/config/sampleresource/</link>
-      <pubDate>Sun, 06 Nov 2016 17:24:57 +0200</pubDate>
+      <title>Plugins</title>
+      <link>https://heavyhorst.github.io/remco/plugins/</link>
+      <pubDate>Sat, 03 Dec 2016 15:11:07 +0100</pubDate>
       
-      <guid>https://heavyhorst.github.io/remco/config/sampleresource/</guid>
-      <description>&lt;pre&gt;&lt;code&gt;[exec]
-  command       = &amp;quot;/path/to/program&amp;quot;
-  kill_signal   = &amp;quot;SIGTERM&amp;quot;
-  reload_signal = &amp;quot;SIGHUP&amp;quot;
-  kill_timeout  = 10
-  splay         = 10
+      <guid>https://heavyhorst.github.io/remco/plugins/</guid>
+      <description>
 
+&lt;h3 id=&#34;chapter-4&#34;&gt;Chapter 4&lt;/h3&gt;
 
-[[template]]
-  src           = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
-  dst           = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
-  reload_cmd 	= &amp;quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&amp;quot;
-  mode          = &amp;quot;0644&amp;quot;
+&lt;h1 id=&#34;plugins&#34;&gt;Plugins&lt;/h1&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Template</title>
+      <link>https://heavyhorst.github.io/remco/template/</link>
+      <pubDate>Sat, 03 Dec 2016 15:02:45 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/template/</guid>
+      <description>
 
-[backend]
-  [backend.etcd]
-    nodes    = [&amp;quot;http://localhost:2379&amp;quot;]
-    keys     = [&amp;quot;/service-registry&amp;quot;]
-    watch    = true
+&lt;h3 id=&#34;chapter-3&#34;&gt;Chapter 3&lt;/h3&gt;
+
+&lt;h1 id=&#34;templates&#34;&gt;Templates&lt;/h1&gt;
+
+&lt;p&gt;Templates are written in flosch&amp;rsquo;s &lt;a href=&#34;https://github.com/flosch/pongo2&#34;&gt;&lt;code&gt;pongo2&lt;/code&gt;&lt;/a&gt; template engine.&lt;/p&gt;
+
+&lt;div class=&#34;notices tip&#34; &gt;&lt;p&gt;For a documentation on how the templating language works you can &lt;a href=&#34;https://docs.djangoproject.com/en/dev/topics/templates/&#34;&gt;head over to the Django documentation&lt;/a&gt;. pongo2 aims to be compatible with it.&lt;/p&gt;
+&lt;/div&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>Configuration</title>
+      <link>https://heavyhorst.github.io/remco/config/</link>
+      <pubDate>Sat, 03 Dec 2016 14:37:29 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/config/</guid>
+      <description>
+
+&lt;h3 id=&#34;chapter-2&#34;&gt;Chapter 2&lt;/h3&gt;
+
+&lt;h1 id=&#34;configuration&#34;&gt;Configuration&lt;/h1&gt;
+
+&lt;p&gt;The configuration file is in TOML format.&lt;br&gt;
+TOML looks very similar to INI configuration formats, but with slightly more rich data structures and nesting support.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Details</title>
+      <link>https://heavyhorst.github.io/remco/details/</link>
+      <pubDate>Sat, 03 Dec 2016 14:19:23 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/</guid>
+      <description>
+
+&lt;h3 id=&#34;chapter-1&#34;&gt;Chapter 1&lt;/h3&gt;
+
+&lt;h1 id=&#34;details&#34;&gt;Details&lt;/h1&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>env plugin example</title>
+      <link>https://heavyhorst.github.io/remco/plugins/env-plugin-example/</link>
+      <pubDate>Sat, 03 Dec 2016 15:13:50 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/plugins/env-plugin-example/</guid>
+      <description>&lt;p&gt;This is the env backend as a plugin.
+If you want to try it yourself, then
+just compile it and move the executable to /etc/remco/plugins.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (
+	&amp;quot;context&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/rpc/jsonrpc&amp;quot;
+
+	&amp;quot;github.com/HeavyHorst/easyKV&amp;quot;
+	&amp;quot;github.com/HeavyHorst/easyKV/env&amp;quot;
+	&amp;quot;github.com/HeavyHorst/remco/backends/plugin&amp;quot;
+	&amp;quot;github.com/natefinch/pie&amp;quot;
+)
+
+func main() {
+	p := pie.NewProvider()
+	if err := p.RegisterName(&amp;quot;Plugin&amp;quot;, &amp;amp;EnvRPCServer{}); err != nil {
+		log.Fatalf(&amp;quot;failed to register Plugin: %s&amp;quot;, err)
+	}
+	p.ServeCodec(jsonrpc.NewServerCodec)
+}
+
+type EnvRPCServer struct {
+	// This is the real implementation
+	Impl easyKV.ReadWatcher
+}
+
+func (e *EnvRPCServer) Init(args map[string]interface{}, resp *bool) error {
+	// use the data in args to create the ReadWatcher
+	// env var doesn&#39;t need any data
+
+	var err error
+	e.Impl, err = env.New()
+	return err
+}
+
+func (e *EnvRPCServer) GetValues(args []string, resp *map[string]string) error {
+	erg, err := e.Impl.GetValues(args)
+	if err != nil {
+		return err
+	}
+	*resp = erg
+	return nil
+}
+
+func (e *EnvRPCServer) Close(args interface{}, resp *interface{}) error {
+	e.Impl.Close()
+	return nil
+}
+
+func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
+	var err error
+	*resp, err = e.Impl.WatchPrefix(args.Prefix, context.Background(), easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
+	return err
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then create a config file with this backend section.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-toml&#34;&gt;[backend]
+  [[backend.plugin]]
+    path = &amp;quot;/etc/remco/plugins/env&amp;quot;
+    keys = [&amp;quot;/&amp;quot;]
     interval = 60
-    version  = 3
-
+	watch = false
+	[backend.plugin.config]
+	 # these parameters are not used in the env backend plugin
+	 # but other plugins may need some data (password, prefix ...)
+	 a = &amp;quot;hallo&amp;quot;
+	 b = &amp;quot;moin&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
     <item>
-      <title>Templates</title>
-      <link>https://heavyhorst.github.io/remco/template/</link>
-      <pubDate>Wed, 05 Oct 2016 17:33:14 +0200</pubDate>
+      <title>template functions</title>
+      <link>https://heavyhorst.github.io/remco/template/template-functions/</link>
+      <pubDate>Sat, 03 Dec 2016 15:06:33 +0100</pubDate>
       
-      <guid>https://heavyhorst.github.io/remco/template/</guid>
+      <guid>https://heavyhorst.github.io/remco/template/template-functions/</guid>
       <description>
-
-&lt;p&gt;Templates are written in flosch&amp;rsquo;s &lt;a href=&#34;https://github.com/flosch/pongo2&#34;&gt;&lt;code&gt;pongo2&lt;/code&gt;&lt;/a&gt; template engine.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;For a documentation on how the templating language works you can &lt;a href=&#34;https://docs.djangoproject.com/en/dev/topics/templates/&#34;&gt;head over to the Django documentation&lt;/a&gt;. pongo2 aims to be compatible with it.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&#34;template-functions&#34;&gt;Template Functions&lt;/h2&gt;
 
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;exists&lt;/strong&gt; &amp;ndash; Checks if the key exists. Return false if key is not found.&lt;/summary&gt;&lt;/p&gt;
@@ -197,214 +305,154 @@ something
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;template-filters&#34;&gt;Template Filters&lt;/h2&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;base64&lt;/strong&gt; &amp;ndash; Encodes a string as base64 &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ &amp;quot;somestring&amp;quot; | base64}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;base&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/path/#Base&#34;&gt;path.Base&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ &amp;quot;/home/user/test&amp;quot; | base }}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;dir&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/path/#Dir&#34;&gt;path.Dir&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ &amp;quot;/home/user/test&amp;quot; | dir }}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;split&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/strings/#Split&#34;&gt;strings.Split&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{% for i in (&amp;quot;/home/user/test&amp;quot; | split:&amp;quot;/&amp;quot;) %}
-{{i}}
-{% endfor %}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an interface{} of the yaml/json value.&lt;/summary&gt;
-&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;toJSON&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into an JSON object. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toJson}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;toPrettyJSON&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into an pretty-printed JSON object, indented by four spaces. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toPrettyJson}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;toYAML&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into a YAML string. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toJson}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;sortByLength&lt;/strong&gt; - Returns the sorted array. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;p&gt;Works with []string and []KVPair.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{% for dir in lsdir(&amp;quot;/config&amp;quot;) | sortByLength %}
-{{dir}}
-{% endfor %}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;decrypt&lt;/strong&gt; &amp;ndash; Decrypts the stored data. Data must follow the following format, &lt;code&gt;base64(gpg(gzip(data)))&lt;/code&gt;. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;p&gt;This is compatible with &lt;a href=&#34;https://github.com/xordataexchange/crypt/tree/master/bin/crypt&#34;&gt;crypt&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Works with string, []string, KVPair, KVPairs&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ getv(&amp;quot;/test/data&amp;quot;) | decrypt:&amp;quot;/path/to/your/armored/private/key&amp;quot; }}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;storing-data-using-gpg&#34;&gt;Storing data using gpg&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;data = `echo &#39;secret text&#39; | gzip -c | gpg2 --compress-level 0 --encrypt --default-recipient &amp;lt;your-recipient&amp;gt; | base64`
-ETCDCTL_API=3 etcdctl put /test/data $data
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 </description>
     </item>
     
     <item>
-      <title>Sample configuration file</title>
-      <link>https://heavyhorst.github.io/remco/config/sample/</link>
-      <pubDate>Wed, 05 Oct 2016 17:24:57 +0200</pubDate>
+      <title>environment variables</title>
+      <link>https://heavyhorst.github.io/remco/config/environment-variables/</link>
+      <pubDate>Sat, 03 Dec 2016 14:56:09 +0100</pubDate>
       
-      <guid>https://heavyhorst.github.io/remco/config/sample/</guid>
-      <description>&lt;pre&gt;&lt;code&gt;#remco.toml
-################################################################
-# Global configuration
-################################################################
-log_level   = &amp;quot;debug&amp;quot;
-log_format  = &amp;quot;json&amp;quot;
-include_dir = &amp;quot;/etc/remco/resource.d/&amp;quot;
-pid_file    = &amp;quot;/var/run/remco/remco.pid&amp;quot;
-log_file    = &amp;quot;/var/log/remco.log&amp;quot;
-
-
-################################################################
-# Resource configuration
-################################################################
-[[resource]]
-  name = &amp;quot;haproxy&amp;quot;
-  [[resource.template]]
-    src         = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
-    dst         = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
-    check_cmd   = &amp;quot;somecommand&amp;quot;
-    reload_cmd  = &amp;quot;somecommand&amp;quot;
-    mode        = &amp;quot;0644&amp;quot;
-
-  [resource.backend]
-    # you can use as many backends as you like
-	# in this example vault and file
-    [resource.backend.vault]
-      node           = &amp;quot;http://127.0.0.1:8200&amp;quot;
-      ## Token based auth backend
-      auth_type      = &amp;quot;token&amp;quot;
-      auth_token     = &amp;quot;vault_token&amp;quot;
-      ## AppID based auth backend
-      # auth_type    = &amp;quot;app-id&amp;quot;
-      # app_id       = &amp;quot;vault_app_id&amp;quot;
-      # user_id      = &amp;quot;vault_user_id&amp;quot;
-      ## userpass based auth backend
-      # auth_type    = &amp;quot;userpass&amp;quot;
-      # username     = &amp;quot;username&amp;quot;
-      # password     = &amp;quot;password&amp;quot;
-      client_cert    = &amp;quot;/path/to/client_cert&amp;quot;
-      client_key     = &amp;quot;/path/to/client_key&amp;quot;
-      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
-      
-	  # These values are valid in every backend
-      watch    = true
-      prefix   = &amp;quot;/&amp;quot;
-      onetime  = true
-      interval = 1
-      keys     = [&amp;quot;/&amp;quot;]
-
-    [resource.backend.file]
-      filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
-	  watch    = true
-	  keys     = [&amp;quot;/prefix&amp;quot;]
-
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>LICENCE</title>
-      <link>https://heavyhorst.github.io/remco/license/</link>
-      <pubDate>Wed, 05 Oct 2016 17:11:10 +0200</pubDate>
-      
-      <guid>https://heavyhorst.github.io/remco/license/</guid>
-      <description>&lt;pre&gt;
-Copyright © 2013 Kelsey Hightower
-Copyright © 2016 The Remco Authors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the &#34;Software&#34;), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED &#34;AS IS&#34;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Configuring remco</title>
-      <link>https://heavyhorst.github.io/remco/config/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://heavyhorst.github.io/remco/config/</guid>
-      <description>
-
-&lt;p&gt;The configuration file is in TOML format.&lt;br&gt;
-TOML looks very similar to INI configuration formats, but with slightly more rich data structures and nesting support.&lt;/p&gt;
-
-&lt;h2 id=&#34;using-environment-variables&#34;&gt;Using Environment Variables&lt;/h2&gt;
-
-&lt;p&gt;If you wish to use environmental variables in your config files as a way
+      <guid>https://heavyhorst.github.io/remco/config/environment-variables/</guid>
+      <description>&lt;p&gt;If you wish to use environmental variables in your config files as a way
 to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and the text will be replaced with the value of the environmental variable VARIABLE_NAME.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>template resource</title>
+      <link>https://heavyhorst.github.io/remco/details/template-resource/</link>
+      <pubDate>Sat, 03 Dec 2016 14:20:57 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/template-resource/</guid>
+      <description>&lt;p&gt;A template resource in remco consists of the following parts:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;one optional exec command.&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;one or many templates.&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;one or many backends.&lt;/strong&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&#34;notices note&#34; &gt;&lt;p&gt;Please note that it is not possible to use the same backend more than once per template resource.
+It is for example not possible to use two different redis servers.&lt;/p&gt;
+&lt;/div&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>consul plugin example</title>
+      <link>https://heavyhorst.github.io/remco/plugins/consul-plugin-example/</link>
+      <pubDate>Sat, 03 Dec 2016 15:14:31 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/plugins/consul-plugin-example/</guid>
+      <description>&lt;p&gt;Here is another simple example plugin that speaks to the consul service endpoint instead of the consul kv-store like the built in consul backend.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (
+	&amp;quot;encoding/json&amp;quot;
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/rpc/jsonrpc&amp;quot;
+	&amp;quot;path&amp;quot;
+	&amp;quot;strconv&amp;quot;
+
+	&amp;quot;github.com/HeavyHorst/easyKV&amp;quot;
+	&amp;quot;github.com/HeavyHorst/remco/backends/plugin&amp;quot;
+	consul &amp;quot;github.com/hashicorp/consul/api&amp;quot;
+	&amp;quot;github.com/natefinch/pie&amp;quot;
+)
+
+func NewConsulClient(addr string) (*consul.Client, error) {
+	config := consul.DefaultConfig()
+	config.Address = addr
+	c, err := consul.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+type ConsulRPCServer struct {
+	client *consul.Client
+}
+
+func main() {
+	p := pie.NewProvider()
+	if err := p.RegisterName(&amp;quot;Plugin&amp;quot;, &amp;amp;ConsulRPCServer{}); err != nil {
+		log.Fatalf(&amp;quot;failed to register Plugin: %s&amp;quot;, err)
+	}
+	p.ServeCodec(jsonrpc.NewServerCodec)
+}
+
+func (c *ConsulRPCServer) Init(args map[string]string, resp *bool) error {
+	var err error
+	if addr, ok := args[&amp;quot;addr&amp;quot;]; ok {
+		c.client, err = NewConsulClient(addr)
+		if err != nil {
+			return err
+		}
+		*resp = true
+		return nil
+	}
+	return fmt.Errorf(&amp;quot;I need an Address !&amp;quot;)
+}
+
+func (c *ConsulRPCServer) GetValues(args []string, resp *map[string]string) error {
+	r := make(map[string]string)
+	passingOnly := true
+	for _, v := range args {
+		addrs, _, err := c.client.Health().Service(v, &amp;quot;&amp;quot;, passingOnly, nil)
+		if len(addrs) == 0 &amp;amp;&amp;amp; err == nil {
+			log.Printf(&amp;quot;service ( %s ) was not found&amp;quot;, v)
+		}
+		if err != nil {
+			return err
+		}
+
+		for idx, addr := range addrs {
+			key := path.Join(&amp;quot;/&amp;quot;, &amp;quot;_consul&amp;quot;, &amp;quot;service&amp;quot;, addr.Service.Service, strconv.Itoa(idx))
+			service_json, _ := json.Marshal(addr)
+			r[key] = string(service_json)
+		}
+	}
+	*resp = r
+	return nil
+}
+
+func (c *ConsulRPCServer) Close(args interface{}, resp *interface{}) error {
+	// consul client doesn&#39;t need to be closed
+	return nil
+}
+
+func (c *ConsulRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
+	return easyKV.ErrWatchNotSupported
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The config backend section could look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[backend]
+  [[backend.plugin]]
+    path = &amp;quot;/etc/remco/plugins/consul-service&amp;quot;
+    keys = [&amp;quot;consul&amp;quot;]
+    interval = 60
+    onetime = false
+    [backend.plugin.config]
+	 addr = &amp;quot;localhost:8500&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>configuration options</title>
+      <link>https://heavyhorst.github.io/remco/config/configuration-options/</link>
+      <pubDate>Sat, 03 Dec 2016 14:57:13 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/config/configuration-options/</guid>
+      <description>
 
 &lt;h2 id=&#34;global-configuration-options&#34;&gt;Global configuration options&lt;/h2&gt;
 
@@ -745,216 +793,12 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
     </item>
     
     <item>
-      <title>plugins</title>
-      <link>https://heavyhorst.github.io/remco/plugins/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <title>exec mode</title>
+      <link>https://heavyhorst.github.io/remco/details/exec-mode/</link>
+      <pubDate>Sat, 03 Dec 2016 14:23:28 +0100</pubDate>
       
-      <guid>https://heavyhorst.github.io/remco/plugins/</guid>
-      <description>
-
-&lt;h2 id=&#34;env-backend-as-plugin-example&#34;&gt;ENV backend as plugin [Example]&lt;/h2&gt;
-
-&lt;p&gt;This is the env backend as a plugin.
-If you want to try it yourself, then
-just compile it and move the executable to /etc/remco/plugins.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
-
-import (
-	&amp;quot;context&amp;quot;
-	&amp;quot;log&amp;quot;
-	&amp;quot;net/rpc/jsonrpc&amp;quot;
-
-	&amp;quot;github.com/HeavyHorst/easyKV&amp;quot;
-	&amp;quot;github.com/HeavyHorst/easyKV/env&amp;quot;
-	&amp;quot;github.com/HeavyHorst/remco/backends/plugin&amp;quot;
-	&amp;quot;github.com/natefinch/pie&amp;quot;
-)
-
-func main() {
-	p := pie.NewProvider()
-	if err := p.RegisterName(&amp;quot;Plugin&amp;quot;, &amp;amp;EnvRPCServer{}); err != nil {
-		log.Fatalf(&amp;quot;failed to register Plugin: %s&amp;quot;, err)
-	}
-	p.ServeCodec(jsonrpc.NewServerCodec)
-}
-
-type EnvRPCServer struct {
-	// This is the real implementation
-	Impl easyKV.ReadWatcher
-}
-
-func (e *EnvRPCServer) Init(args map[string]interface{}, resp *bool) error {
-	// use the data in args to create the ReadWatcher
-	// env var doesn&#39;t need any data
-
-	var err error
-	e.Impl, err = env.New()
-	return err
-}
-
-func (e *EnvRPCServer) GetValues(args []string, resp *map[string]string) error {
-	erg, err := e.Impl.GetValues(args)
-	if err != nil {
-		return err
-	}
-	*resp = erg
-	return nil
-}
-
-func (e *EnvRPCServer) Close(args interface{}, resp *interface{}) error {
-	e.Impl.Close()
-	return nil
-}
-
-func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
-	var err error
-	*resp, err = e.Impl.WatchPrefix(args.Prefix, context.Background(), easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
-	return err
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then create a config file with this backend section.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-toml&#34;&gt;[backend]
-  [[backend.plugin]]
-    path = &amp;quot;/etc/remco/plugins/env&amp;quot;
-    keys = [&amp;quot;/&amp;quot;]
-    interval = 60
-	watch = false
-	[backend.plugin.config]
-	 # these parameters are not used in the env backend plugin
-	 # but other plugins may need some data (password, prefix ...)
-	 a = &amp;quot;hallo&amp;quot;
-	 b = &amp;quot;moin&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;consul-service-plugin-example&#34;&gt;Consul-Service Plugin [Example]&lt;/h2&gt;
-
-&lt;p&gt;Here is another simple example plugin that speaks to the consul service endpoint instead of the consul kv-store like the built in consul backend.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
-
-import (
-	&amp;quot;encoding/json&amp;quot;
-	&amp;quot;fmt&amp;quot;
-	&amp;quot;log&amp;quot;
-	&amp;quot;net/rpc/jsonrpc&amp;quot;
-	&amp;quot;path&amp;quot;
-	&amp;quot;strconv&amp;quot;
-
-	&amp;quot;github.com/HeavyHorst/easyKV&amp;quot;
-	&amp;quot;github.com/HeavyHorst/remco/backends/plugin&amp;quot;
-	consul &amp;quot;github.com/hashicorp/consul/api&amp;quot;
-	&amp;quot;github.com/natefinch/pie&amp;quot;
-)
-
-func NewConsulClient(addr string) (*consul.Client, error) {
-	config := consul.DefaultConfig()
-	config.Address = addr
-	c, err := consul.NewClient(config)
-	if err != nil {
-		return nil, err
-	}
-	return c, nil
-}
-
-type ConsulRPCServer struct {
-	client *consul.Client
-}
-
-func main() {
-	p := pie.NewProvider()
-	if err := p.RegisterName(&amp;quot;Plugin&amp;quot;, &amp;amp;ConsulRPCServer{}); err != nil {
-		log.Fatalf(&amp;quot;failed to register Plugin: %s&amp;quot;, err)
-	}
-	p.ServeCodec(jsonrpc.NewServerCodec)
-}
-
-func (c *ConsulRPCServer) Init(args map[string]string, resp *bool) error {
-	var err error
-	if addr, ok := args[&amp;quot;addr&amp;quot;]; ok {
-		c.client, err = NewConsulClient(addr)
-		if err != nil {
-			return err
-		}
-		*resp = true
-		return nil
-	}
-	return fmt.Errorf(&amp;quot;I need an Address !&amp;quot;)
-}
-
-func (c *ConsulRPCServer) GetValues(args []string, resp *map[string]string) error {
-	r := make(map[string]string)
-	passingOnly := true
-	for _, v := range args {
-		addrs, _, err := c.client.Health().Service(v, &amp;quot;&amp;quot;, passingOnly, nil)
-		if len(addrs) == 0 &amp;amp;&amp;amp; err == nil {
-			log.Printf(&amp;quot;service ( %s ) was not found&amp;quot;, v)
-		}
-		if err != nil {
-			return err
-		}
-
-		for idx, addr := range addrs {
-			key := path.Join(&amp;quot;/&amp;quot;, &amp;quot;_consul&amp;quot;, &amp;quot;service&amp;quot;, addr.Service.Service, strconv.Itoa(idx))
-			service_json, _ := json.Marshal(addr)
-			r[key] = string(service_json)
-		}
-	}
-	*resp = r
-	return nil
-}
-
-func (c *ConsulRPCServer) Close(args interface{}, resp *interface{}) error {
-	// consul client doesn&#39;t need to be closed
-	return nil
-}
-
-func (c *ConsulRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
-	return easyKV.ErrWatchNotSupported
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The config backend section could look like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[backend]
-  [[backend.plugin]]
-    path = &amp;quot;/etc/remco/plugins/consul-service&amp;quot;
-    keys = [&amp;quot;consul&amp;quot;]
-    interval = 60
-    onetime = false
-    [backend.plugin.config]
-	 addr = &amp;quot;localhost:8500&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>remco details</title>
-      <link>https://heavyhorst.github.io/remco/details/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://heavyhorst.github.io/remco/details/</guid>
-      <description>
-
-&lt;h2 id=&#34;template-resource&#34;&gt;Template resource&lt;/h2&gt;
-
-&lt;p&gt;A template resource in remco consists of the following parts:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;one optional exec command.&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;one or many templates.&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;one or many backends.&lt;/strong&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Please note that it is not possible to use the same backend more than once per template resource.
-It is for example not possible to use two different redis servers.&lt;/p&gt;
-
-&lt;h2 id=&#34;exec-mode&#34;&gt;Exec mode&lt;/h2&gt;
-
-&lt;p&gt;Remco has the ability to run one arbitary child process per template resource.
+      <guid>https://heavyhorst.github.io/remco/details/exec-mode/</guid>
+      <description>&lt;p&gt;Remco has the ability to run one arbitary child process per template resource.
 When any of the provided templates change and the check command (if any) succeeds, remco will send the configurable reload signal to the child process.
 Remco will kill and restart the child process if no reload signal is provided.
 Additionally, every signal that remco receives will be forwarded to the child process.&lt;/p&gt;
@@ -962,11 +806,82 @@ Additionally, every signal that remco receives will be forwarded to the child pr
 &lt;p&gt;The template resource will fail if the child process dies. It will be automatically restarted after a random amount of time (0-30s).
 This also means that the child needs to remain in the foreground, otherwise the template resource will be restarted endlessly.&lt;/p&gt;
 
-&lt;p&gt;The exec configuration parameters can be found here: &lt;a href=&#34;./config/#exec-configuration-options&#34;&gt;exec configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The exec configuration parameters can be found here: &lt;a href=&#34;./config/configuration-options/#exec-configuration-options&#34;&gt;exec configuration&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>sample config file</title>
+      <link>https://heavyhorst.github.io/remco/config/sample-config/</link>
+      <pubDate>Sat, 03 Dec 2016 14:59:49 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/config/sample-config/</guid>
+      <description>&lt;pre&gt;&lt;code&gt;#remco.toml
+################################################################
+# Global configuration
+################################################################
+log_level   = &amp;quot;debug&amp;quot;
+log_format  = &amp;quot;json&amp;quot;
+include_dir = &amp;quot;/etc/remco/resource.d/&amp;quot;
+pid_file    = &amp;quot;/var/run/remco/remco.pid&amp;quot;
+log_file    = &amp;quot;/var/log/remco.log&amp;quot;
 
-&lt;h2 id=&#34;commands-reload-check&#34;&gt;Commands (reload &amp;amp; check)&lt;/h2&gt;
 
-&lt;p&gt;Each template can have its own reload and check command. Both commands are executed in a sh-shell which means that operations like environment variable substitution or pipes should work correctly.&lt;/p&gt;
+################################################################
+# Resource configuration
+################################################################
+[[resource]]
+  name = &amp;quot;haproxy&amp;quot;
+  [[resource.template]]
+    src         = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
+    dst         = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
+    check_cmd   = &amp;quot;somecommand&amp;quot;
+    reload_cmd  = &amp;quot;somecommand&amp;quot;
+    mode        = &amp;quot;0644&amp;quot;
+
+  [resource.backend]
+    # you can use as many backends as you like
+	# in this example vault and file
+    [resource.backend.vault]
+      node           = &amp;quot;http://127.0.0.1:8200&amp;quot;
+      ## Token based auth backend
+      auth_type      = &amp;quot;token&amp;quot;
+      auth_token     = &amp;quot;vault_token&amp;quot;
+      ## AppID based auth backend
+      # auth_type    = &amp;quot;app-id&amp;quot;
+      # app_id       = &amp;quot;vault_app_id&amp;quot;
+      # user_id      = &amp;quot;vault_user_id&amp;quot;
+      ## userpass based auth backend
+      # auth_type    = &amp;quot;userpass&amp;quot;
+      # username     = &amp;quot;username&amp;quot;
+      # password     = &amp;quot;password&amp;quot;
+      client_cert    = &amp;quot;/path/to/client_cert&amp;quot;
+      client_key     = &amp;quot;/path/to/client_key&amp;quot;
+      client_ca_keys = &amp;quot;/path/to/client_ca_keys&amp;quot;
+      
+	  # These values are valid in every backend
+      watch    = true
+      prefix   = &amp;quot;/&amp;quot;
+      onetime  = true
+      interval = 1
+      keys     = [&amp;quot;/&amp;quot;]
+
+    [resource.backend.file]
+      filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
+	  watch    = true
+	  keys     = [&amp;quot;/prefix&amp;quot;]
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>commands</title>
+      <link>https://heavyhorst.github.io/remco/details/commands/</link>
+      <pubDate>Sat, 03 Dec 2016 14:25:24 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/commands/</guid>
+      <description>&lt;p&gt;Each template can have its own reload and check command. Both commands are executed in a sh-shell which means that operations like environment variable substitution or pipes should work correctly.&lt;/p&gt;
 
 &lt;p&gt;In the check command its additionally possible to reference to the rendered source template with {{ .src }}.&lt;/p&gt;
 
@@ -977,55 +892,141 @@ This also means that the child needs to remain in the foreground, otherwise the 
 &lt;li&gt;the child process gets reloaded&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The template configuration parameters can be found here: &lt;a href=&#34;./config/#template-configuration-options&#34;&gt;template configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The template configuration parameters can be found here: &lt;a href=&#34;./config/configuration-options/#template-configuration-options&#34;&gt;template configuration&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>template filters</title>
+      <link>https://heavyhorst.github.io/remco/template/template-filters/</link>
+      <pubDate>Sat, 03 Dec 2016 15:07:41 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/template/template-filters/</guid>
+      <description>
 
-&lt;h2 id=&#34;zombie-reaping-pid-1&#34;&gt;Zombie reaping (pid 1)&lt;/h2&gt;
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;base64&lt;/strong&gt; &amp;ndash; Encodes a string as base64 &lt;/summary&gt;&lt;/p&gt;
 
-&lt;p&gt;See: &lt;a href=&#34;https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/&#34;&gt;https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{{ &amp;quot;somestring&amp;quot; | base64}}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;If Remco detects that it runs as pid 1 (for example in a Docker container) it will automatically reap zombie processes.
-No additional init system is needed.&lt;/p&gt;
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;backends&#34;&gt;Backends&lt;/h2&gt;
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;base&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/path/#Base&#34;&gt;path.Base&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
 
-&lt;p&gt;Remco can fetch configuration data from a bunch of different kv-stores.
-Some backends can be configured to watch for changes in the store to immediately react to these changes.
-The other way is to provide a backend polling interval.
-These two modes are not mutual exclusive, you can watch for changes and run the interval processor as a reconcilation loop.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{{ &amp;quot;/home/user/test&amp;quot; | base }}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Every Backend needs to implement the &lt;a href=&#34;https://github.com/HeavyHorst/easyKV&#34;&gt;easyKV&lt;/a&gt; interface.
-This is also the repository where the current implementations live.&lt;/p&gt;
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
-&lt;p&gt;Currently supported are:&lt;/p&gt;
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;dir&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/path/#Dir&#34;&gt;path.Dir&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;etcd 2 and 3&lt;/strong&gt; (interval and watch)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;consul&lt;/strong&gt; (interval and watch)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;zookeeper&lt;/strong&gt; (interval and watch)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;redis&lt;/strong&gt; (only interval)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;vault&lt;/strong&gt; (only interval)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;environment&lt;/strong&gt; (only interval)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;yaml/json files&lt;/strong&gt; (interval and watch)&lt;/li&gt;
-&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;{{ &amp;quot;/home/user/test&amp;quot; | dir }}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;./config/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;plugins&#34;&gt;Plugins&lt;/h2&gt;
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;split&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/strings/#Split&#34;&gt;strings.Split&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
 
-&lt;p&gt;Remco supports backends as plugins.
-There is no requirement that plugins be written in Go.
-Every language that can provide a JSON-RPC API is ok.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{% for i in (&amp;quot;/home/user/test&amp;quot; | split:&amp;quot;/&amp;quot;) %}
+{{i}}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Example: &lt;a href=&#34;./plugins/&#34;&gt;env plugin&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;running-and-process-lifecycle&#34;&gt;Running and Process Lifecycle&lt;/h2&gt;
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an interface{} of the yaml/json value.&lt;/summary&gt;
+&lt;/details&gt;&lt;/p&gt;
 
-&lt;p&gt;Remcos lifecycle can be controlled with several syscalls.&lt;/p&gt;
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;toJSON&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into an JSON object. &lt;/summary&gt;&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;os.Interrupt(SIGINT on linux) and SIGTERM: remco will gracefully shut down&lt;/li&gt;
-&lt;li&gt;SIGHUP: remco will reload all configuration files.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toJson}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;toPrettyJSON&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into an pretty-printed JSON object, indented by four spaces. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toPrettyJson}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;toYAML&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into a YAML string. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toJson}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;sortByLength&lt;/strong&gt; - Returns the sorted array. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;p&gt;Works with []string and []KVPair.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% for dir in lsdir(&amp;quot;/config&amp;quot;) | sortByLength %}
+{{dir}}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;decrypt&lt;/strong&gt; &amp;ndash; Decrypts the stored data. Data must follow the following format, &lt;code&gt;base64(gpg(gzip(data)))&lt;/code&gt;. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;p&gt;This is compatible with &lt;a href=&#34;https://github.com/xordataexchange/crypt/tree/master/bin/crypt&#34;&gt;crypt&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Works with string, []string, KVPair, KVPairs&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ getv(&amp;quot;/test/data&amp;quot;) | decrypt:&amp;quot;/path/to/your/armored/private/key&amp;quot; }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;storing-data-using-gpg&#34;&gt;Storing data using gpg&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;data = `echo &#39;secret text&#39; | gzip -c | gpg2 --compress-level 0 --encrypt --default-recipient &amp;lt;your-recipient&amp;gt; | base64`
+ETCDCTL_API=3 etcdctl put /test/data $data
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>sample resource</title>
+      <link>https://heavyhorst.github.io/remco/config/sample-resource/</link>
+      <pubDate>Sat, 03 Dec 2016 15:01:23 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/config/sample-resource/</guid>
+      <description>&lt;pre&gt;&lt;code&gt;[exec]
+  command       = &amp;quot;/path/to/program&amp;quot;
+  kill_signal   = &amp;quot;SIGTERM&amp;quot;
+  reload_signal = &amp;quot;SIGHUP&amp;quot;
+  kill_timeout  = 10
+  splay         = 10
+
+
+[[template]]
+  src           = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
+  dst           = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
+  reload_cmd 	= &amp;quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&amp;quot;
+  mode          = &amp;quot;0644&amp;quot;
+
+[backend]
+  [backend.etcd]
+    nodes    = [&amp;quot;http://localhost:2379&amp;quot;]
+    keys     = [&amp;quot;/service-registry&amp;quot;]
+    watch    = true
+    interval = 60
+    version  = 3
+
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

@@ -7,19 +7,30 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Released under the MIT license</copyright>
+    <lastBuildDate>Sat, 03 Dec 2016 14:19:23 +0100</lastBuildDate>
     <atom:link href="https://heavyhorst.github.io/remco/details/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>remco details</title>
+      <title>Details</title>
       <link>https://heavyhorst.github.io/remco/details/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 03 Dec 2016 14:19:23 +0100</pubDate>
       
       <guid>https://heavyhorst.github.io/remco/details/</guid>
       <description>
 
-&lt;h2 id=&#34;template-resource&#34;&gt;Template resource&lt;/h2&gt;
+&lt;h3 id=&#34;chapter-1&#34;&gt;Chapter 1&lt;/h3&gt;
 
-&lt;p&gt;A template resource in remco consists of the following parts:&lt;/p&gt;
+&lt;h1 id=&#34;details&#34;&gt;Details&lt;/h1&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>template resource</title>
+      <link>https://heavyhorst.github.io/remco/details/template-resource/</link>
+      <pubDate>Sat, 03 Dec 2016 14:20:57 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/template-resource/</guid>
+      <description>&lt;p&gt;A template resource in remco consists of the following parts:&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;one optional exec command.&lt;/strong&gt;&lt;/li&gt;
@@ -28,12 +39,20 @@
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Please note that it is not possible to use the same backend more than once per template resource.
+&lt;div class=&#34;notices note&#34; &gt;&lt;p&gt;Please note that it is not possible to use the same backend more than once per template resource.
 It is for example not possible to use two different redis servers.&lt;/p&gt;
+&lt;/div&gt;
 
-&lt;h2 id=&#34;exec-mode&#34;&gt;Exec mode&lt;/h2&gt;
-
-&lt;p&gt;Remco has the ability to run one arbitary child process per template resource.
+</description>
+    </item>
+    
+    <item>
+      <title>exec mode</title>
+      <link>https://heavyhorst.github.io/remco/details/exec-mode/</link>
+      <pubDate>Sat, 03 Dec 2016 14:23:28 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/exec-mode/</guid>
+      <description>&lt;p&gt;Remco has the ability to run one arbitary child process per template resource.
 When any of the provided templates change and the check command (if any) succeeds, remco will send the configurable reload signal to the child process.
 Remco will kill and restart the child process if no reload signal is provided.
 Additionally, every signal that remco receives will be forwarded to the child process.&lt;/p&gt;
@@ -41,11 +60,17 @@ Additionally, every signal that remco receives will be forwarded to the child pr
 &lt;p&gt;The template resource will fail if the child process dies. It will be automatically restarted after a random amount of time (0-30s).
 This also means that the child needs to remain in the foreground, otherwise the template resource will be restarted endlessly.&lt;/p&gt;
 
-&lt;p&gt;The exec configuration parameters can be found here: &lt;a href=&#34;../config/#exec-configuration-options&#34;&gt;exec configuration&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;commands-reload-check&#34;&gt;Commands (reload &amp;amp; check)&lt;/h2&gt;
-
-&lt;p&gt;Each template can have its own reload and check command. Both commands are executed in a sh-shell which means that operations like environment variable substitution or pipes should work correctly.&lt;/p&gt;
+&lt;p&gt;The exec configuration parameters can be found here: &lt;a href=&#34;../config/configuration-options/#exec-configuration-options&#34;&gt;exec configuration&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>commands</title>
+      <link>https://heavyhorst.github.io/remco/details/commands/</link>
+      <pubDate>Sat, 03 Dec 2016 14:25:24 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/commands/</guid>
+      <description>&lt;p&gt;Each template can have its own reload and check command. Both commands are executed in a sh-shell which means that operations like environment variable substitution or pipes should work correctly.&lt;/p&gt;
 
 &lt;p&gt;In the check command its additionally possible to reference to the rendered source template with {{ .src }}.&lt;/p&gt;
 
@@ -56,18 +81,30 @@ This also means that the child needs to remain in the foreground, otherwise the 
 &lt;li&gt;the child process gets reloaded&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The template configuration parameters can be found here: &lt;a href=&#34;../config/#template-configuration-options&#34;&gt;template configuration&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;zombie-reaping-pid-1&#34;&gt;Zombie reaping (pid 1)&lt;/h2&gt;
-
-&lt;p&gt;See: &lt;a href=&#34;https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/&#34;&gt;https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The template configuration parameters can be found here: &lt;a href=&#34;../config/configuration-options/#template-configuration-options&#34;&gt;template configuration&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>zombie reaping</title>
+      <link>https://heavyhorst.github.io/remco/details/zombie-reaping/</link>
+      <pubDate>Sat, 03 Dec 2016 14:30:27 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/zombie-reaping/</guid>
+      <description>&lt;p&gt;See: &lt;a href=&#34;https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/&#34;&gt;https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If Remco detects that it runs as pid 1 (for example in a Docker container) it will automatically reap zombie processes.
 No additional init system is needed.&lt;/p&gt;
-
-&lt;h2 id=&#34;backends&#34;&gt;Backends&lt;/h2&gt;
-
-&lt;p&gt;Remco can fetch configuration data from a bunch of different kv-stores.
+</description>
+    </item>
+    
+    <item>
+      <title>backends</title>
+      <link>https://heavyhorst.github.io/remco/details/backends/</link>
+      <pubDate>Sat, 03 Dec 2016 14:31:14 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/backends/</guid>
+      <description>&lt;p&gt;Remco can fetch configuration data from a bunch of different kv-stores.
 Some backends can be configured to watch for changes in the store to immediately react to these changes.
 The other way is to provide a backend polling interval.
 These two modes are not mutual exclusive, you can watch for changes and run the interval processor as a reconcilation loop.&lt;/p&gt;
@@ -87,19 +124,31 @@ This is also the repository where the current implementations live.&lt;/p&gt;
 &lt;li&gt;&lt;strong&gt;yaml/json files&lt;/strong&gt; (interval and watch)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;../config/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;plugins&#34;&gt;Plugins&lt;/h2&gt;
-
-&lt;p&gt;Remco supports backends as plugins.
+&lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;../config/configuration-options/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>plugins</title>
+      <link>https://heavyhorst.github.io/remco/details/plugins/</link>
+      <pubDate>Sat, 03 Dec 2016 14:32:50 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/plugins/</guid>
+      <description>&lt;p&gt;Remco supports backends as plugins.
 There is no requirement that plugins be written in Go.
 Every language that can provide a JSON-RPC API is ok.&lt;/p&gt;
 
-&lt;p&gt;Example: &lt;a href=&#34;../plugins/&#34;&gt;env plugin&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;running-and-process-lifecycle&#34;&gt;Running and Process Lifecycle&lt;/h2&gt;
-
-&lt;p&gt;Remcos lifecycle can be controlled with several syscalls.&lt;/p&gt;
+&lt;p&gt;Example: &lt;a href=&#34;../plugins/env-plugin-example/&#34;&gt;env plugin&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>process lifecycle</title>
+      <link>https://heavyhorst.github.io/remco/details/process-lifecycle/</link>
+      <pubDate>Sat, 03 Dec 2016 14:33:41 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/process-lifecycle/</guid>
+      <description>&lt;p&gt;Remcos lifecycle can be controlled with several syscalls.&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;os.Interrupt(SIGINT on linux) and SIGTERM: remco will gracefully shut down&lt;/li&gt;

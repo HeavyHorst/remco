@@ -7,19 +7,30 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Released under the MIT license</copyright>
+    <lastBuildDate>Sat, 03 Dec 2016 15:11:07 +0100</lastBuildDate>
     <atom:link href="https://heavyhorst.github.io/remco/plugins/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>plugins</title>
+      <title>Plugins</title>
       <link>https://heavyhorst.github.io/remco/plugins/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 03 Dec 2016 15:11:07 +0100</pubDate>
       
       <guid>https://heavyhorst.github.io/remco/plugins/</guid>
       <description>
 
-&lt;h2 id=&#34;env-backend-as-plugin-example&#34;&gt;ENV backend as plugin [Example]&lt;/h2&gt;
+&lt;h3 id=&#34;chapter-4&#34;&gt;Chapter 4&lt;/h3&gt;
 
-&lt;p&gt;This is the env backend as a plugin.
+&lt;h1 id=&#34;plugins&#34;&gt;Plugins&lt;/h1&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>env plugin example</title>
+      <link>https://heavyhorst.github.io/remco/plugins/env-plugin-example/</link>
+      <pubDate>Sat, 03 Dec 2016 15:13:50 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/plugins/env-plugin-example/</guid>
+      <description>&lt;p&gt;This is the env backend as a plugin.
 If you want to try it yourself, then
 just compile it and move the executable to /etc/remco/plugins.&lt;/p&gt;
 
@@ -93,10 +104,16 @@ func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
 	 a = &amp;quot;hallo&amp;quot;
 	 b = &amp;quot;moin&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;consul-service-plugin-example&#34;&gt;Consul-Service Plugin [Example]&lt;/h2&gt;
-
-&lt;p&gt;Here is another simple example plugin that speaks to the consul service endpoint instead of the consul kv-store like the built in consul backend.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>consul plugin example</title>
+      <link>https://heavyhorst.github.io/remco/plugins/consul-plugin-example/</link>
+      <pubDate>Sat, 03 Dec 2016 15:14:31 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/plugins/consul-plugin-example/</guid>
+      <description>&lt;p&gt;Here is another simple example plugin that speaks to the consul service endpoint instead of the consul kv-store like the built in consul backend.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
 

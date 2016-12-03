@@ -7,24 +7,36 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Released under the MIT license</copyright>
-    <lastBuildDate>Wed, 05 Oct 2016 17:33:14 +0200</lastBuildDate>
+    <lastBuildDate>Sat, 03 Dec 2016 15:02:45 +0100</lastBuildDate>
     <atom:link href="https://heavyhorst.github.io/remco/template/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Templates</title>
+      <title>Template</title>
       <link>https://heavyhorst.github.io/remco/template/</link>
-      <pubDate>Wed, 05 Oct 2016 17:33:14 +0200</pubDate>
+      <pubDate>Sat, 03 Dec 2016 15:02:45 +0100</pubDate>
       
       <guid>https://heavyhorst.github.io/remco/template/</guid>
       <description>
 
+&lt;h3 id=&#34;chapter-3&#34;&gt;Chapter 3&lt;/h3&gt;
+
+&lt;h1 id=&#34;templates&#34;&gt;Templates&lt;/h1&gt;
+
 &lt;p&gt;Templates are written in flosch&amp;rsquo;s &lt;a href=&#34;https://github.com/flosch/pongo2&#34;&gt;&lt;code&gt;pongo2&lt;/code&gt;&lt;/a&gt; template engine.&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;For a documentation on how the templating language works you can &lt;a href=&#34;https://docs.djangoproject.com/en/dev/topics/templates/&#34;&gt;head over to the Django documentation&lt;/a&gt;. pongo2 aims to be compatible with it.&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;div class=&#34;notices tip&#34; &gt;&lt;p&gt;For a documentation on how the templating language works you can &lt;a href=&#34;https://docs.djangoproject.com/en/dev/topics/templates/&#34;&gt;head over to the Django documentation&lt;/a&gt;. pongo2 aims to be compatible with it.&lt;/p&gt;
+&lt;/div&gt;
 
-&lt;h2 id=&#34;template-functions&#34;&gt;Template Functions&lt;/h2&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>template functions</title>
+      <link>https://heavyhorst.github.io/remco/template/template-functions/</link>
+      <pubDate>Sat, 03 Dec 2016 15:06:33 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/template/template-functions/</guid>
+      <description>
 
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;exists&lt;/strong&gt; &amp;ndash; Checks if the key exists. Return false if key is not found.&lt;/summary&gt;&lt;/p&gt;
@@ -165,8 +177,16 @@ something
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;template-filters&#34;&gt;Template Filters&lt;/h2&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>template filters</title>
+      <link>https://heavyhorst.github.io/remco/template/template-filters/</link>
+      <pubDate>Sat, 03 Dec 2016 15:07:41 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/template/template-filters/</guid>
+      <description>
 
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;base64&lt;/strong&gt; &amp;ndash; Encodes a string as base64 &lt;/summary&gt;&lt;/p&gt;
