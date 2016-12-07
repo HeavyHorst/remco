@@ -2,29 +2,29 @@ language: go
 
 before_install:
   # install consul
-  - wget https://releases.hashicorp.com/consul/0.7.0/consul_0.7.0_linux_amd64.zip
-  - unzip consul_0.7.0_linux_amd64.zip
+  - wget https://releases.hashicorp.com/consul/0.7.1/consul_0.7.1_linux_amd64.zip
+  - unzip consul_0.7.1_linux_amd64.zip
   - sudo mv consul /bin/
   - consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul &
   # install etcd
-  - curl -L https://github.com/coreos/etcd/releases/download/v3.0.9/etcd-v3.0.9-linux-amd64.tar.gz -o etcd-v3.0.9-linux-amd64.tar.gz
-  - tar xzf etcd-v3.0.9-linux-amd64.tar.gz
-  - sudo mv etcd-v3.0.9-linux-amd64/etcd /bin/
-  - sudo mv etcd-v3.0.9-linux-amd64/etcdctl /bin/
+  - curl -L https://github.com/coreos/etcd/releases/download/v3.0.15/etcd-v3.0.15-linux-amd64.tar.gz -o etcd-v3.0.15-linux-amd64.tar.gz
+  - tar xzf etcd-v3.0.15-linux-amd64.tar.gz
+  - sudo mv etcd-v3.0.15-linux-amd64/etcd /bin/
+  - sudo mv etcd-v3.0.15-linux-amd64/etcdctl /bin/
   - etcd &
   # Install vault
-  - wget https://releases.hashicorp.com/vault/0.6.1/vault_0.6.1_linux_amd64.zip
-  - unzip vault_0.6.1_linux_amd64.zip
+  - wget https://releases.hashicorp.com/vault/0.6.3/vault_0.6.3_linux_amd64.zip
+  - unzip vault_0.6.3_linux_amd64.zip
   - sudo mv vault /bin/
   - vault server -dev &
   # Install zookeeper
-  - wget http://www.eu.apache.org/dist/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz
-  - tar xzf zookeeper-3.4.8.tar.gz
-  - echo "tickTime=2000" > zookeeper-3.4.8/conf/zoo.cfg
-  - echo "dataDir=/tmp/zookeeper" >> zookeeper-3.4.8/conf/zoo.cfg
-  - echo "clientPort=2181" >> zookeeper-3.4.8/conf/zoo.cfg
+  - wget http://www.eu.apache.org/dist/zookeeper/zookeeper-3.4.9/zookeeper-3.4.9.tar.gz
+  - tar xzf zookeeper-3.4.9.tar.gz
+  - echo "tickTime=2000" > zookeeper-3.4.9/conf/zoo.cfg
+  - echo "dataDir=/tmp/zookeeper" >> zookeeper-3.4.9/conf/zoo.cfg
+  - echo "clientPort=2181" >> zookeeper-3.4.9/conf/zoo.cfg
   - mkdir /tmp/zookeeper
-  - zookeeper-3.4.8/bin/zkServer.sh start
+  - zookeeper-3.4.9/bin/zkServer.sh start
 
 go:
   - 1.7
