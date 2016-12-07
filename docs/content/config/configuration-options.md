@@ -58,16 +58,16 @@ weight: 10
 <details>
 <summary> **valid in every backend** </summary>
 
+ - **keys([]string):**
+   - The backend keys that the template requires to be rendered correctly. The child keys are also loaded.
  - **watch(bool, optional):**
    - Enable watch support. Default is false.
- - **prefix(string):**
+ - **prefix(string, optional):**
    - Key path prefix. Default is "".
- - **interval(int):**
+ - **interval(int, optional):**
    - The backend polling interval. Can be used as a reconcilation loop for watch or standalone.
  - **onetime(bool, optional):**
    - Render the config file and quit. Default is false.
- - **keys([]string):**
-   - The backend keys that the template requires to be rendered correctly. The child keys are also loaded.
 </details>
 
 <details>
@@ -75,6 +75,10 @@ weight: 10
 
  - **nodes([]string):**
    - List of backend nodes.
+ - **srv_record(string, optional):**
+   - A DNS server record to discover the etcd nodes.
+ - **scheme(string, optional):**
+   - The backend URI scheme (http or https). This is only used when the nodes are discovered via DNS srv records and the api level is 2. Default is http.
  - **client_cert(string, optional):**
    - The client cert file.
  - **client_key(string, optional):**
@@ -93,9 +97,11 @@ weight: 10
 <summary> **consul** </summary>
 
  - **nodes([]string):**
-    - List of backend nodes.
+   - List of backend nodes.
+ - **srv_record(string, optional):**
+   - A DNS server record to discover the consul nodes.
  - **scheme(string):**
-    - the backend URI scheme (http or https).
+   - The backend URI scheme (http or https).
  - **client_cert(string, optional):**
    - The client cert file.
  - **client_key(string, optional):**
@@ -116,6 +122,8 @@ weight: 10
 
  - **nodes([]string):**
    - List of backend nodes.
+ - **srv_record(string), optional:**
+   - A DNS server record to discover the redis nodes.
  - **password(string, optional):**
    - The redis password.
  - **database(int, optional):**
@@ -126,7 +134,7 @@ weight: 10
 <summary> **vault** </summary>
 
  - **node(string):**
-    - The backend node.
+   - The backend node.
  - **auth_type(string):**
    - The vault authentication type. (token, approle, app-id, userpass, github)
  - **auth_token(string):**
@@ -161,4 +169,6 @@ weight: 10
 
  - **nodes([]string):**
    - List of backend nodes.
+ - **srv_record(string, optional):**
+   - A DNS server record to discover the zookeeper nodes.
 </details>

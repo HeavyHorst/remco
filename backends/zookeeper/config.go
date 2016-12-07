@@ -11,6 +11,7 @@ package zookeeper
 import (
 	"github.com/HeavyHorst/easyKV/zookeeper"
 	berr "github.com/HeavyHorst/remco/backends/error"
+	"github.com/HeavyHorst/remco/backends/srvRecord"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
@@ -18,7 +19,8 @@ import (
 
 // Config represents the config for the consul backend.
 type Config struct {
-	Nodes []string
+	Nodes     []string
+	SRVRecord srvRecord.Record `toml:"srv_record"`
 	template.Backend
 }
 
@@ -29,6 +31,16 @@ func (c *Config) Connect() (template.Backend, error) {
 	}
 
 	c.Backend.Name = "zookeeper"
+
+	// No nodes are set but a SRVRecord is provided
+	if len(c.Nodes) == 0 && c.SRVRecord != "" {
+		var err error
+		c.Nodes, err = c.SRVRecord.GetNodesFromSRV("")
+		if err != nil {
+			return c.Backend, err
+		}
+	}
+
 	log.WithFields(logrus.Fields{
 		"backend": c.Backend.Name,
 		"nodes":   c.Nodes,

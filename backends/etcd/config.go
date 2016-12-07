@@ -11,6 +11,7 @@ package etcd
 import (
 	"github.com/HeavyHorst/easyKV/etcd"
 	berr "github.com/HeavyHorst/remco/backends/error"
+	"github.com/HeavyHorst/remco/backends/srvRecord"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
@@ -19,9 +20,11 @@ import (
 // Config represents the config for the etcd backend.
 type Config struct {
 	Nodes        []string
-	ClientCert   string `toml:"client_cert"`
-	ClientKey    string `toml:"client_key"`
-	ClientCaKeys string `toml:"client_ca_keys"`
+	Scheme       string           //only needed for etcdv2 with SRVRecord
+	ClientCert   string           `toml:"client_cert"`
+	ClientKey    string           `toml:"client_key"`
+	ClientCaKeys string           `toml:"client_ca_keys"`
+	SRVRecord    srvRecord.Record `toml:"srv_record"`
 	Username     string
 	Password     string
 	Version      int
@@ -43,6 +46,24 @@ func (c *Config) Connect() (template.Backend, error) {
 		c.Backend.Name = "etcdv3"
 	} else {
 		c.Backend.Name = "etcd"
+	}
+
+	// No nodes are set but a SRVRecord is provided
+	if len(c.Nodes) == 0 && c.SRVRecord != "" {
+		var err error
+		if c.Version != 2 {
+			// no scheme required for etcdv3
+			c.Scheme = ""
+		} else if c.Scheme == "" {
+			// etcd version is 2 and no scheme is provided
+			// use http as default value
+			c.Scheme = "http"
+		}
+		c.Nodes, err = c.SRVRecord.GetNodesFromSRV(c.Scheme)
+
+		if err != nil {
+			return c.Backend, err
+		}
 	}
 
 	log.WithFields(logrus.Fields{

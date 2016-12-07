@@ -11,6 +11,7 @@ package consul
 import (
 	"github.com/HeavyHorst/easyKV/consul"
 	berr "github.com/HeavyHorst/remco/backends/error"
+	"github.com/HeavyHorst/remco/backends/srvRecord"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
@@ -20,9 +21,10 @@ import (
 type Config struct {
 	Nodes        []string
 	Scheme       string
-	ClientCert   string `toml:"client_cert"`
-	ClientKey    string `toml:"client_key"`
-	ClientCaKeys string `toml:"client_ca_keys"`
+	SRVRecord    srvRecord.Record `toml:"srv_record"`
+	ClientCert   string           `toml:"client_cert"`
+	ClientKey    string           `toml:"client_key"`
+	ClientCaKeys string           `toml:"client_ca_keys"`
 	template.Backend
 }
 
@@ -32,6 +34,16 @@ func (c *Config) Connect() (template.Backend, error) {
 		return template.Backend{}, berr.ErrNilConfig
 	}
 	c.Backend.Name = "consul"
+
+	// No nodes are set but a SRVRecord is provided
+	if len(c.Nodes) == 0 && c.SRVRecord != "" {
+		var err error
+		c.Nodes, err = c.SRVRecord.GetNodesFromSRV("")
+		if err != nil {
+			return c.Backend, err
+		}
+	}
+
 	log.WithFields(logrus.Fields{
 		"backend": c.Backend.Name,
 		"nodes":   c.Nodes,
