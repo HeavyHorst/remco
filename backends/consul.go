@@ -6,30 +6,29 @@
  * file that was distributed with this source code.
  */
 
-package consul
+package backends
 
 import (
 	"github.com/HeavyHorst/easyKV/consul"
 	berr "github.com/HeavyHorst/remco/backends/error"
-	"github.com/HeavyHorst/remco/backends/srvRecord"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
 )
 
-// Config represents the config for the consul backend.
-type Config struct {
+// ConsulConfig represents the config for the consul backend.
+type ConsulConfig struct {
 	Nodes        []string
 	Scheme       string
-	SRVRecord    srvRecord.Record `toml:"srv_record"`
-	ClientCert   string           `toml:"client_cert"`
-	ClientKey    string           `toml:"client_key"`
-	ClientCaKeys string           `toml:"client_ca_keys"`
+	SRVRecord    SRVRecord `toml:"srv_record"`
+	ClientCert   string    `toml:"client_cert"`
+	ClientKey    string    `toml:"client_key"`
+	ClientCaKeys string    `toml:"client_ca_keys"`
 	template.Backend
 }
 
 // Connect creates a new consulClient and fills the underlying template.Backend with the consul-Backend specific data.
-func (c *Config) Connect() (template.Backend, error) {
+func (c *ConsulConfig) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}

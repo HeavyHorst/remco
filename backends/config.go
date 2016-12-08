@@ -9,27 +9,20 @@
 package backends
 
 import (
-	"github.com/HeavyHorst/remco/backends/consul"
-	"github.com/HeavyHorst/remco/backends/env"
-	"github.com/HeavyHorst/remco/backends/etcd"
-	"github.com/HeavyHorst/remco/backends/file"
-	"github.com/HeavyHorst/remco/backends/mock"
 	"github.com/HeavyHorst/remco/backends/plugin"
-	"github.com/HeavyHorst/remco/backends/redis"
-	"github.com/HeavyHorst/remco/backends/vault"
-	"github.com/HeavyHorst/remco/backends/zookeeper"
+
 	"github.com/HeavyHorst/remco/template"
 )
 
 type Config struct {
-	Etcd      *etcd.Config
-	File      *file.Config
-	Env       *env.Config
-	Consul    *consul.Config
-	Vault     *vault.Config
-	Redis     *redis.Config
-	Zookeeper *zookeeper.Config
-	Mock      *mock.Config
+	Etcd      *EtcdConfig
+	File      *FileConfig
+	Env       *EnvConfig
+	Consul    *ConsulConfig
+	Vault     *VaultConfig
+	Redis     *RedisConfig
+	Zookeeper *ZookeeperConfig
+	Mock      *MockConfig
 	Plugin    []plugin.Plugin
 }
 

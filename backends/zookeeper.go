@@ -6,26 +6,25 @@
  * file that was distributed with this source code.
  */
 
-package zookeeper
+package backends
 
 import (
 	"github.com/HeavyHorst/easyKV/zookeeper"
 	berr "github.com/HeavyHorst/remco/backends/error"
-	"github.com/HeavyHorst/remco/backends/srvRecord"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
 )
 
-// Config represents the config for the consul backend.
-type Config struct {
+// ZookeeperConfig represents the config for the consul backend.
+type ZookeeperConfig struct {
 	Nodes     []string
-	SRVRecord srvRecord.Record `toml:"srv_record"`
+	SRVRecord SRVRecord `toml:"srv_record"`
 	template.Backend
 }
 
 // Connect creates a new zookeeperClient and fills the underlying template.Backend with the zookeeper-Backend specific data.
-func (c *Config) Connect() (template.Backend, error) {
+func (c *ZookeeperConfig) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}

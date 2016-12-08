@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-package file
+package backends
 
 import (
 	"github.com/HeavyHorst/easyKV/file"
@@ -16,14 +16,14 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// Config represents the config for the file backend.
-type Config struct {
+// FileConfig represents the config for the file backend.
+type FileConfig struct {
 	Filepath string
 	template.Backend
 }
 
 // Connect creates a new fileClient and fills the underlying template.Backend with the file-Backend specific data.
-func (c *Config) Connect() (template.Backend, error) {
+func (c *FileConfig) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}

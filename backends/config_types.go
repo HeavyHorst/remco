@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-package srvRecord
+package backends
 
 import (
 	"fmt"
@@ -14,12 +14,12 @@ import (
 	"strings"
 )
 
-// Record is a SRV-Record string
+// SRVRecord is a SRV-Record string
 // for example _etcd-client._tcp.example.com.
-type Record string
+type SRVRecord string
 
 // GetNodesFromSRV returns the nodes stored in the record
-func (r Record) GetNodesFromSRV(scheme string) ([]string, error) {
+func (r SRVRecord) GetNodesFromSRV(scheme string) ([]string, error) {
 	var nodes []string
 	_, addrs, err := net.LookupSRV("", "", string(r))
 	if err != nil {

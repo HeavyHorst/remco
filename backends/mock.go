@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-package mock
+package backends
 
 import (
 	"github.com/HeavyHorst/easyKV/mock"
@@ -14,14 +14,14 @@ import (
 	"github.com/HeavyHorst/remco/template"
 )
 
-// Config represents the config for the consul backend.
-type Config struct {
+// MockConfig represents the config for the consul backend.
+type MockConfig struct {
 	Error error
 	template.Backend
 }
 
 // Connect creates a new mockClient
-func (c *Config) Connect() (template.Backend, error) {
+func (c *MockConfig) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}

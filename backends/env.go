@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-package env
+package backends
 
 import (
 	"github.com/HeavyHorst/easyKV/env"
@@ -14,13 +14,13 @@ import (
 	"github.com/HeavyHorst/remco/template"
 )
 
-//Config represents the config for the env backend
-type Config struct {
+//EnvConfig represents the config for the env backend
+type EnvConfig struct {
 	template.Backend
 }
 
 // Connect creates a new envClient and fills the underlying template.Backend with the file-Backend specific data.
-func (c *Config) Connect() (template.Backend, error) {
+func (c *EnvConfig) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}

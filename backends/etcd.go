@@ -6,25 +6,24 @@
  * file that was distributed with this source code.
  */
 
-package etcd
+package backends
 
 import (
 	"github.com/HeavyHorst/easyKV/etcd"
 	berr "github.com/HeavyHorst/remco/backends/error"
-	"github.com/HeavyHorst/remco/backends/srvRecord"
 	"github.com/HeavyHorst/remco/log"
 	"github.com/HeavyHorst/remco/template"
 	"github.com/Sirupsen/logrus"
 )
 
-// Config represents the config for the etcd backend.
-type Config struct {
+// EtcdConfig represents the config for the etcd backend.
+type EtcdConfig struct {
 	Nodes        []string
-	Scheme       string           //only needed for etcdv2 with SRVRecord
-	ClientCert   string           `toml:"client_cert"`
-	ClientKey    string           `toml:"client_key"`
-	ClientCaKeys string           `toml:"client_ca_keys"`
-	SRVRecord    srvRecord.Record `toml:"srv_record"`
+	Scheme       string    //only needed for etcdv2 with SRVRecord
+	ClientCert   string    `toml:"client_cert"`
+	ClientKey    string    `toml:"client_key"`
+	ClientCaKeys string    `toml:"client_ca_keys"`
+	SRVRecord    SRVRecord `toml:"srv_record"`
 	Username     string
 	Password     string
 	Version      int
@@ -32,7 +31,7 @@ type Config struct {
 }
 
 // Connect creates a new etcd{2,3}Client and fills the underlying template.Backend with the etcd-Backend specific data.
-func (c *Config) Connect() (template.Backend, error) {
+func (c *EtcdConfig) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}

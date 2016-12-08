@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-package vault
+package backends
 
 import (
 	"github.com/HeavyHorst/easyKV/vault"
@@ -16,8 +16,8 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// Config represents the config for the vault backend.
-type Config struct {
+// VaultConfig represents the config for the vault backend.
+type VaultConfig struct {
 	Node         string
 	AuthType     string `toml:"auth_type"`
 	AppID        string `toml:"app_id"`
@@ -34,7 +34,7 @@ type Config struct {
 }
 
 // Connect creates a new vaultClient and fills the underlying template.Backend with the vault-Backend specific data.
-func (c *Config) Connect() (template.Backend, error) {
+func (c *VaultConfig) Connect() (template.Backend, error) {
 	if c == nil {
 		return template.Backend{}, berr.ErrNilConfig
 	}
