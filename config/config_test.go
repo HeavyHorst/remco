@@ -15,7 +15,6 @@ import (
 	"testing"
 
 	"github.com/HeavyHorst/remco/backends"
-	"github.com/HeavyHorst/remco/backends/mock"
 	"github.com/HeavyHorst/remco/template"
 
 	. "gopkg.in/check.v1"
@@ -52,7 +51,7 @@ var expectedTemplates = []*template.Renderer{
 }
 
 var expectedBackend = backends.Config{
-	Mock: &mock.Config{
+	Mock: &backends.MockConfig{
 		Backend: template.Backend{
 			Watch:    false,
 			Keys:     []string{"/"},

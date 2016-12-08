@@ -13,7 +13,6 @@ import (
 	"testing"
 
 	"github.com/HeavyHorst/remco/backends"
-	"github.com/HeavyHorst/remco/backends/mock"
 	"github.com/HeavyHorst/remco/config"
 	"github.com/HeavyHorst/remco/template"
 
@@ -29,7 +28,7 @@ var exampleTemplates = []*template.Renderer{
 }
 
 var exampleBackend = backends.Config{
-	Mock: &mock.Config{
+	Mock: &backends.MockConfig{
 		Backend: template.Backend{
 			Watch:    false,
 			Keys:     []string{"/"},
