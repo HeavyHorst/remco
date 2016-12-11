@@ -163,17 +163,22 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;summary&gt; &lt;strong&gt;valid in every backend&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
 
 &lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;keys([]string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The backend keys that the template requires to be rendered correctly. The child keys are also loaded.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;watch(bool, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Enable watch support. Default is false.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;prefix(string):&lt;/strong&gt;
+&lt;li&gt;&lt;strong&gt;prefix(string, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Key path prefix. Default is &amp;ldquo;&amp;rdquo;.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;interval(int):&lt;/strong&gt;
+&lt;li&gt;&lt;strong&gt;interval(int, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
 &lt;li&gt;The backend polling interval. Can be used as a reconcilation loop for watch or standalone.&lt;/li&gt;
@@ -181,12 +186,7 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;onetime(bool, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Render the config file and quit. Default is false.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;keys([]string):&lt;/strong&gt;
-
-&lt;ul&gt;
-&lt;li&gt;The backend keys that the template requires to be rendered correctly. The child keys are also loaded.
+&lt;li&gt;Render the config file and quit. Default is false.
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -199,6 +199,16 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 
 &lt;ul&gt;
 &lt;li&gt;List of backend nodes.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;srv_record(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A DNS server record to discover the etcd nodes.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;scheme(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The backend URI scheme (http or https). This is only used when the nodes are discovered via DNS srv records and the api level is 2. Default is http.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;client_cert(string, optional):&lt;/strong&gt;
 
@@ -242,10 +252,15 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;ul&gt;
 &lt;li&gt;List of backend nodes.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;srv_record(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A DNS server record to discover the consul nodes.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;scheme(string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;the backend URI scheme (http or https).&lt;/li&gt;
+&lt;li&gt;The backend URI scheme (http or https).&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;client_cert(string, optional):&lt;/strong&gt;
 
@@ -285,6 +300,11 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 
 &lt;ul&gt;
 &lt;li&gt;List of backend nodes.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;srv_record(string), optional:&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A DNS server record to discover the redis nodes.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;password(string, optional):&lt;/strong&gt;
 
@@ -377,7 +397,12 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;nodes([]string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;List of backend nodes.
+&lt;li&gt;List of backend nodes.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;srv_record(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A DNS server record to discover the zookeeper nodes.
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
