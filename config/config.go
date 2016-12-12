@@ -33,7 +33,6 @@ type Configuration struct {
 	IncludeDir string `toml:"include_dir"`
 	PidFile    string `toml:"pid_file"`
 	LogFile    string `toml:"log_file"`
-	Http       string
 	Resource   []Resource
 }
 
@@ -87,8 +86,6 @@ func NewConfiguration(path string) (Configuration, error) {
 		}
 	}
 
-	c.configureLogger()
-
 	if c.IncludeDir != "" {
 		files, err := ioutil.ReadDir(c.IncludeDir)
 		if err != nil {
@@ -120,6 +117,9 @@ func NewConfiguration(path string) (Configuration, error) {
 			}
 		}
 	}
+
+	c.configureLogger()
+
 	return c, nil
 }
 

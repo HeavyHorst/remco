@@ -61,7 +61,7 @@ func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *
 	stopChan := make(chan struct{})
 	stoppedChan := make(chan struct{})
 
-	go w.runConfig(cfg, stopChan, stoppedChan)
+	go w.runResource(cfg.Resource, stopChan, stoppedChan)
 	w.wg.Add(1)
 	go func() {
 		defer w.wg.Done()
@@ -86,7 +86,7 @@ func New(cfg config.Configuration, reapLock *sync.RWMutex, done chan struct{}) *
 				}
 				stopChan <- struct{}{}
 				<-stoppedChan
-				go w.runConfig(rs.c, stopChan, stoppedChan)
+				go w.runResource(rs.c.Resource, stopChan, stoppedChan)
 				rs.reloaded <- struct{}{}
 			case <-stoppedChan:
 				return
@@ -160,7 +160,7 @@ func (ru *Runner) SendSignal(s os.Signal) {
 	}
 }
 
-func (ru *Runner) runConfig(c config.Configuration, stop, stopped chan struct{}) {
+func (ru *Runner) runResource(r []config.Resource, stop, stopped chan struct{}) {
 	defer func() {
 		if stopped != nil {
 			stopped <- struct{}{}
@@ -172,7 +172,7 @@ func (ru *Runner) runConfig(c config.Configuration, stop, stopped chan struct{})
 	done := make(chan struct{})
 
 	wait := sync.WaitGroup{}
-	for _, v := range c.Resource {
+	for _, v := range r {
 		wait.Add(1)
 		go func(r config.Resource) {
 			defer wait.Done()
