@@ -7,7 +7,7 @@ canonifyurls = true
 relativeURLs = true
 
 [params]
-    menu = ["details", "config", "template", "plugins"]
+    menu = ["details", "config", "template", "plugins", "examples"]
 
 	# General information
 	author = "The remco authors"
