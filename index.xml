@@ -76,6 +76,22 @@ TOML looks very similar to INI configuration formats, but with slightly more ric
     </item>
     
     <item>
+      <title>Examples</title>
+      <link>https://heavyhorst.github.io/remco/examples/</link>
+      <pubDate>Sat, 03 Dec 2016 14:19:23 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/examples/</guid>
+      <description>
+
+&lt;h3 id=&#34;chapter-5&#34;&gt;Chapter 5&lt;/h3&gt;
+
+&lt;h1 id=&#34;examples&#34;&gt;Examples&lt;/h1&gt;
+
+&lt;p&gt;This is a collection of different examples.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>env plugin example</title>
       <link>https://heavyhorst.github.io/remco/plugins/env-plugin-example/</link>
       <pubDate>Sat, 03 Dec 2016 15:13:50 +0100</pubDate>
@@ -305,6 +321,228 @@ something
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Dynamic haproxy configuration with docker, registrator and etcd</title>
+      <link>https://heavyhorst.github.io/remco/examples/haproxy/</link>
+      <pubDate>Sat, 03 Dec 2016 14:56:09 +0100</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/examples/haproxy/</guid>
+      <description>
+
+&lt;h2 id=&#34;the-haproxy-template&#34;&gt;The haproxy template&lt;/h2&gt;
+
+&lt;p&gt;We expect registrator to write the services in this format (to etcd for example):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/services/&amp;lt;service-name&amp;gt;/&amp;lt;service-id&amp;gt; = &amp;lt;ip&amp;gt;:&amp;lt;port&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The scheme (tcp, http) and the host_port is configurable over the following keys:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/config/&amp;lt;service-name&amp;gt;/scheme
+/config/&amp;lt;service-name&amp;gt;/host_port
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We create the template for the haproxy configuration file first.
+Create the file &lt;strong&gt;haproxy.tmpl&lt;/strong&gt; and add the following config blocks:&lt;/p&gt;
+
+&lt;p&gt;Some default configuration parameters:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;global
+    daemon
+    maxconn 2048
+
+defaults
+    timeout connect 5000ms
+    timeout client 500000ms
+    timeout server 500000ms
+    log global
+
+frontend name_resolver_http
+    bind *:80
+    mode http
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;This block creates the &lt;em&gt;http&lt;/em&gt; acl&amp;rsquo;s.
+We itarate over all directories under /config  (the services) and create a &lt;strong&gt;url_beg&lt;/strong&gt; and a &lt;strong&gt;hdr_beg(host)&lt;/strong&gt; acl if the service has a scheme configured.
+Note that we sort the services by length and iterate in reversed order (longest services first). That way we can have services with the same prefix, for example redis_test, and redis.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% for dir in lsdir(&amp;quot;/config&amp;quot;) | sortByLength reversed %}
+  {% if exists(printf(&amp;quot;/config/%s/scheme&amp;quot;, dir)) %}
+    {% if getv(printf(&amp;quot;/config/%s/scheme&amp;quot;, dir)) == &amp;quot;http&amp;quot; %}
+      {% if ls(printf(&amp;quot;/services/%s&amp;quot;, dir)) %}
+        acl is_{{ dir }} url_beg /{{ dir }}
+        acl is_{{ dir }} hdr_beg(host) {{ dir }}
+        use_backend {{ dir }}_servers if is_{{ dir }}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we had one service named redis we would get:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;acl is_redis url_beg /redis 
+acl is_redis hdr_beg(host) redis
+use_backend redis_servers if is_redis
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;Optional template block to expose a service on an host port:
+We iterate over all services under /config, test if a scheme and the host_port is configured and create the host port configuration.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% for dir in lsdir(&amp;quot;/config&amp;quot;) %}
+  {% if exists (printf (&amp;quot;/config/%s/scheme&amp;quot;, dir )) %}
+    {% if exists (printf(&amp;quot;/config/%s/host_port&amp;quot;, dir )) %}
+      {% if ls(printf(&amp;quot;/services/%s&amp;quot;, dir)) %}
+                frontend {{ dir }}_port
+                mode {{ getv (printf(&amp;quot;/config/%s/scheme&amp;quot;, dir)) }}
+                bind *:{{ getv (printf (&amp;quot;/config/%s/host_port&amp;quot;, dir)) }}
+                default_backend {{ dir }}_servers
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we had one service named redis with scheme=tcp and host_port=6379 we would get:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;frontend redis_port
+mode tcp
+bind *:6379 
+default_backend redis_servers
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;The last block creates the haproxy backends.
+We iterate over all services and, if a scheme is set, create the backend &lt;em&gt;{service_name}_servers&lt;/em&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% for dir in lsdir(&amp;quot;/services&amp;quot;) %}
+  {% if exists(printf(&amp;quot;/config/%s/scheme&amp;quot;, dir)) %}
+backend {{ dir }}_servers
+        mode {{ getv (printf (&amp;quot;/config/%s/scheme&amp;quot;, dir)) }}
+        {% for i in gets (printf(&amp;quot;/services/%s/*&amp;quot;, dir)) %}
+            server server_{{ dir }}_{{ base (i.Key) }} {{ i.Value }}
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we had one service named redis with scheme=tcp we could get for example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;backend redis_servers   
+  mode tcp
+    server server_redis_1 192.168.0.10:32012
+    server server_redis_2 192.168.0.10:35013
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id=&#34;the-remco-configuration-file&#34;&gt;The remco configuration file&lt;/h2&gt;
+
+&lt;p&gt;We also need to create the remco configuration file.
+Create a file named &lt;strong&gt;config&lt;/strong&gt; and insert the following toml configuration.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-toml&#34;&gt;################################################################
+# Global configuration
+################################################################
+log_level = &amp;quot;debug&amp;quot;
+log_format = &amp;quot;text&amp;quot;
+
+[[resource]]
+name = &amp;quot;haproxy&amp;quot;
+
+[[resource.template]]
+  src = &amp;quot;/etc/remco/templates/haproxy.tmpl&amp;quot;
+  dst = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
+  reload_cmd 	  = &amp;quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&amp;quot;
+
+  [resource.backend]
+    [resource.backend.etcd]
+      nodes = [&amp;quot;${ETCD_NODE}&amp;quot;]
+      keys = [&amp;quot;/services&amp;quot;, &amp;quot;/config&amp;quot;]
+      watch = true
+      interval = 60
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;the-dockerfile&#34;&gt;The Dockerfile&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM alpine:3.4
+
+ENV REMCO_VER 0.8.0
+
+RUN apk --update add --no-cache haproxy bash ca-certificates
+RUN wget https://github.com/HeavyHorst/remco/releases/download/v${REMCO_VER}/remco_${REMCO_VER}_linux_amd64.zip &amp;amp;&amp;amp; \
+    unzip remco_${REMCO_VER}_linux_amd64.zip &amp;amp;&amp;amp; rm remco_${REMCO_VER}_linux_amd64.zip &amp;amp;&amp;amp; \
+    mv remco_linux /bin/remco
+
+COPY config /etc/remco/config
+COPY haproxy.tmpl /etc/remco/templates/haproxy.tmpl
+
+ENTRYPOINT [&amp;quot;remco&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;build-and-run-the-container&#34;&gt;Build and Run the container&lt;/h2&gt;
+
+&lt;p&gt;You should have three files at this point:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.
+├── config
+├── Dockerfile
+└── haproxy.tmpl
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;build-the-docker-container&#34;&gt;Build the docker container:&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;sudo docker build -t remcohaproxy .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;optionally-test-the-container&#34;&gt;Optionally test the container:&lt;/h3&gt;
+
+&lt;h4 id=&#34;put-some-data-into-etcd&#34;&gt;put some data into etcd:&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;etcdctl set /services/exampleService/1 someip:port
+etcdctl set /config/exampleService/scheme http
+etcdctl set /config/exampleService/host_port 1234
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In his example we connect to a local etcd cluster.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;sudo docker run --rm -ti --net=host -e ETCD_NODE=http://localhost:2379 remcohaproxy
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You should see something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[Dec 16 18:26:20]  INFO remco[1]: Target config out of sync config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66
+[Dec 16 18:26:20] DEBUG remco[1]: Overwriting target config config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66
+[Dec 16 18:26:20] DEBUG remco[1]: Running haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid` resource=haproxy source=resource.go:66
+[Dec 16 18:26:20] DEBUG remco[1]: &amp;quot;&amp;quot; resource=haproxy source=resource.go:66
+[Dec 16 18:26:20]  INFO remco[1]: Target config has been updated config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66
+[Dec 16 18:26:20] DEBUG remco[1]: [Reaped child process 60] source=main.go:87
+[Dec 16 18:26:24] DEBUG remco[1]: Retrieving keys backend=etcd key_prefix= resource=haproxy source=resource.go:66
+[Dec 16 18:26:24] DEBUG remco[1]: Compiling source template resource=haproxy source=resource.go:66 template=/etc/remco/templates/haproxy.tmpl
+[Dec 16 18:26:24] DEBUG remco[1]: Comparing staged and dest config files dest=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66 staged=.haproxy.cfg389124299
+[Dec 16 18:26:24] DEBUG remco[1]: Target config in sync config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;run-registrator&#34;&gt;Run registrator&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo docker run -d \
+    --name=registrator \
+    --net=host \
+    --volume=/var/run/docker.sock:/tmp/docker.sock \
+    gliderlabs/registrator:latest \
+      etcd://localhost:2379/services
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now every container get automatically registered under /services.
+You can then configure the scheme and optionally the host_port of each service that you want to expose.&lt;/p&gt;
 </description>
     </item>
     
@@ -918,140 +1156,6 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
 &lt;/ul&gt;
 
 &lt;p&gt;The template configuration parameters can be found here: &lt;a href=&#34;./config/configuration-options/#template-configuration-options&#34;&gt;template configuration&lt;/a&gt;.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>template filters</title>
-      <link>https://heavyhorst.github.io/remco/template/template-filters/</link>
-      <pubDate>Sat, 03 Dec 2016 15:07:41 +0100</pubDate>
-      
-      <guid>https://heavyhorst.github.io/remco/template/template-filters/</guid>
-      <description>
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;base64&lt;/strong&gt; &amp;ndash; Encodes a string as base64 &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ &amp;quot;somestring&amp;quot; | base64}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;base&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/path/#Base&#34;&gt;path.Base&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ &amp;quot;/home/user/test&amp;quot; | base }}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;dir&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/path/#Dir&#34;&gt;path.Dir&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ &amp;quot;/home/user/test&amp;quot; | dir }}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;split&lt;/strong&gt; &amp;ndash; Alias for the &lt;a href=&#34;https://golang.org/pkg/strings/#Split&#34;&gt;strings.Split&lt;/a&gt; function. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{% for i in (&amp;quot;/home/user/test&amp;quot; | split:&amp;quot;/&amp;quot;) %}
-{{i}}
-{% endfor %}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an interface{} of the yaml/json value.&lt;/summary&gt;
-&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;toJSON&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into an JSON object. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toJson}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;toPrettyJSON&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into an pretty-printed JSON object, indented by four spaces. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toPrettyJson}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;toYAML&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into a YAML string. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toJson}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;sortByLength&lt;/strong&gt; - Returns the sorted array. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;p&gt;Works with []string and []KVPair.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{% for dir in lsdir(&amp;quot;/config&amp;quot;) | sortByLength %}
-{{dir}}
-{% endfor %}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;decrypt&lt;/strong&gt; &amp;ndash; Decrypts the stored data. Data must follow the following format, &lt;code&gt;base64(gpg(gzip(data)))&lt;/code&gt;. &lt;/summary&gt;&lt;/p&gt;
-
-&lt;p&gt;This is compatible with &lt;a href=&#34;https://github.com/xordataexchange/crypt/tree/master/bin/crypt&#34;&gt;crypt&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Works with string, []string, KVPair, KVPairs&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{{ getv(&amp;quot;/test/data&amp;quot;) | decrypt:&amp;quot;/path/to/your/armored/private/key&amp;quot; }}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;storing-data-using-gpg&#34;&gt;Storing data using gpg&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;data = `echo &#39;secret text&#39; | gzip -c | gpg2 --compress-level 0 --encrypt --default-recipient &amp;lt;your-recipient&amp;gt; | base64`
-ETCDCTL_API=3 etcdctl put /test/data $data
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>sample resource</title>
-      <link>https://heavyhorst.github.io/remco/config/sample-resource/</link>
-      <pubDate>Sat, 03 Dec 2016 15:01:23 +0100</pubDate>
-      
-      <guid>https://heavyhorst.github.io/remco/config/sample-resource/</guid>
-      <description>&lt;pre&gt;&lt;code&gt;[exec]
-  command       = &amp;quot;/path/to/program&amp;quot;
-  kill_signal   = &amp;quot;SIGTERM&amp;quot;
-  reload_signal = &amp;quot;SIGHUP&amp;quot;
-  kill_timeout  = 10
-  splay         = 10
-
-
-[[template]]
-  src           = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
-  dst           = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
-  reload_cmd 	= &amp;quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&amp;quot;
-  mode          = &amp;quot;0644&amp;quot;
-
-[backend]
-  [backend.etcd]
-    nodes    = [&amp;quot;http://localhost:2379&amp;quot;]
-    keys     = [&amp;quot;/service-registry&amp;quot;]
-    watch    = true
-    interval = 60
-    version  = 3
-
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

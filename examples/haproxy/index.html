@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="../../images/favicon.png" type="image/x-icon" />
 
     
-    <title>exec mode</title>
+    <title>Dynamic haproxy configuration with docker, registrator and etcd</title>
     <link href="../../css/nucleus.css" rel="stylesheet">
     <link href="../../css/font-awesome.min.css" rel="stylesheet">
     <link href="../../css/hybrid.css" rel="stylesheet">
@@ -25,7 +25,7 @@
     
 <link href="../../style.css" rel="stylesheet">
   </head>
-  <body class="" data-url="/details/exec-mode/">
+  <body class="" data-url="/examples/haproxy/">
     <nav id="sidebar">
   <div id="header-wrapper">
     <div id="header">
@@ -72,7 +72,7 @@
       
       
 
-      <li class="dd-item  parent" data-nav-id="/details/">
+      <li class="dd-item  " data-nav-id="/details/">
         <a href="../../details/">
           <span>
             
@@ -96,7 +96,7 @@
           
           
           
-            <li class="dd-item active" data-nav-id="/details/exec-mode/">
+            <li class="dd-item " data-nav-id="/details/exec-mode/">
               <a href="../../details/exec-mode/">
                 <span>exec mode     </i></span>
               </a>
@@ -304,7 +304,7 @@
       
       
 
-      <li class="dd-item  " data-nav-id="/examples/">
+      <li class="dd-item  parent" data-nav-id="/examples/">
         <a href="../../examples/">
           <span>
             
@@ -320,7 +320,7 @@
           
           
           
-            <li class="dd-item " data-nav-id="/examples/haproxy/">
+            <li class="dd-item active" data-nav-id="/examples/haproxy/">
               <a href="../../examples/haproxy/">
                 <span>Dynamic haproxy configuration with docker, registrator and etcd     </i></span>
               </a>
@@ -363,9 +363,11 @@
                   
                 
                   
+                
+                  
                     
                     
-                <a href="../../details/" itemprop="url"><span itemprop="title">Details</span></a> <i class="fa fa-angle-right"></i>
+                <a href="../../examples/" itemprop="url"><span itemprop="title">Examples</span></a> <i class="fa fa-angle-right"></i>
                     
                   
                 
@@ -373,14 +375,30 @@
                 
                   
                 
-                  
-                
-                <span itemprop="title"> exec mode</span>
+                <span itemprop="title"> Dynamic haproxy configuration with docker, registrator and etcd</span>
               </div>
               
                   <div class="progress">
     <div class="wrapper">
-
+<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#the-haproxy-template">The haproxy template</a></li>
+<li><a href="#the-remco-configuration-file">The remco configuration file</a></li>
+<li><a href="#the-dockerfile">The Dockerfile</a></li>
+<li><a href="#build-and-run-the-container">Build and Run the container</a>
+<ul>
+<li><a href="#build-the-docker-container">Build the docker container:</a></li>
+<li><a href="#optionally-test-the-container">Optionally test the container:</a>
+<ul>
+<li><a href="#put-some-data-into-etcd">put some data into etcd:</a></li>
+</ul></li>
+<li><a href="#run-registrator">Run registrator</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
     </div>
 </div>
 
@@ -390,18 +408,222 @@
             
     	        <div id="body-inner">
                 
-                <h1>exec mode</h1>
+                <h1>Dynamic haproxy configuration with docker, registrator and etcd</h1>
                 
 
-<p>Remco has the ability to run one arbitary child process per template resource.
-When any of the provided templates change and the check command (if any) succeeds, remco will send the configurable reload signal to the child process.
-Remco will kill and restart the child process if no reload signal is provided.
-Additionally, every signal that remco receives will be forwarded to the child process.</p>
 
-<p>The template resource will fail if the child process dies. It will be automatically restarted after a random amount of time (0-30s).
-This also means that the child needs to remain in the foreground, otherwise the template resource will be restarted endlessly.</p>
 
-<p>The exec configuration parameters can be found here: <a href="../../config/configuration-options/#exec-configuration-options">exec configuration</a>.</p>
+<h2 id="the-haproxy-template">The haproxy template</h2>
+
+<p>We expect registrator to write the services in this format (to etcd for example):</p>
+
+<pre><code>/services/&lt;service-name&gt;/&lt;service-id&gt; = &lt;ip&gt;:&lt;port&gt;
+</code></pre>
+
+<p>The scheme (tcp, http) and the host_port is configurable over the following keys:</p>
+
+<pre><code>/config/&lt;service-name&gt;/scheme
+/config/&lt;service-name&gt;/host_port
+</code></pre>
+
+<p>We create the template for the haproxy configuration file first.
+Create the file <strong>haproxy.tmpl</strong> and add the following config blocks:</p>
+
+<p>Some default configuration parameters:</p>
+
+<pre><code>global
+    daemon
+    maxconn 2048
+
+defaults
+    timeout connect 5000ms
+    timeout client 500000ms
+    timeout server 500000ms
+    log global
+
+frontend name_resolver_http
+    bind *:80
+    mode http
+</code></pre>
+
+<hr>
+
+<p>This block creates the <em>http</em> acl&rsquo;s.
+We itarate over all directories under /config  (the services) and create a <strong>url_beg</strong> and a <strong>hdr_beg(host)</strong> acl if the service has a scheme configured.
+Note that we sort the services by length and iterate in reversed order (longest services first). That way we can have services with the same prefix, for example redis_test, and redis.</p>
+
+<pre><code>{% for dir in lsdir(&quot;/config&quot;) | sortByLength reversed %}
+  {% if exists(printf(&quot;/config/%s/scheme&quot;, dir)) %}
+    {% if getv(printf(&quot;/config/%s/scheme&quot;, dir)) == &quot;http&quot; %}
+      {% if ls(printf(&quot;/services/%s&quot;, dir)) %}
+        acl is_{{ dir }} url_beg /{{ dir }}
+        acl is_{{ dir }} hdr_beg(host) {{ dir }}
+        use_backend {{ dir }}_servers if is_{{ dir }}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+</code></pre>
+
+<p>If we had one service named redis we would get:</p>
+
+<pre><code>acl is_redis url_beg /redis 
+acl is_redis hdr_beg(host) redis
+use_backend redis_servers if is_redis
+</code></pre>
+
+<hr>
+
+<p>Optional template block to expose a service on an host port:
+We iterate over all services under /config, test if a scheme and the host_port is configured and create the host port configuration.</p>
+
+<pre><code>{% for dir in lsdir(&quot;/config&quot;) %}
+  {% if exists (printf (&quot;/config/%s/scheme&quot;, dir )) %}
+    {% if exists (printf(&quot;/config/%s/host_port&quot;, dir )) %}
+      {% if ls(printf(&quot;/services/%s&quot;, dir)) %}
+                frontend {{ dir }}_port
+                mode {{ getv (printf(&quot;/config/%s/scheme&quot;, dir)) }}
+                bind *:{{ getv (printf (&quot;/config/%s/host_port&quot;, dir)) }}
+                default_backend {{ dir }}_servers
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+</code></pre>
+
+<p>If we had one service named redis with scheme=tcp and host_port=6379 we would get:</p>
+
+<pre><code>frontend redis_port
+mode tcp
+bind *:6379 
+default_backend redis_servers
+</code></pre>
+
+<hr>
+
+<p>The last block creates the haproxy backends.
+We iterate over all services and, if a scheme is set, create the backend <em>{service_name}_servers</em>.</p>
+
+<pre><code>{% for dir in lsdir(&quot;/services&quot;) %}
+  {% if exists(printf(&quot;/config/%s/scheme&quot;, dir)) %}
+backend {{ dir }}_servers
+        mode {{ getv (printf (&quot;/config/%s/scheme&quot;, dir)) }}
+        {% for i in gets (printf(&quot;/services/%s/*&quot;, dir)) %}
+            server server_{{ dir }}_{{ base (i.Key) }} {{ i.Value }}
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+</code></pre>
+
+<p>If we had one service named redis with scheme=tcp we could get for example:</p>
+
+<pre><code>backend redis_servers   
+  mode tcp
+    server server_redis_1 192.168.0.10:32012
+    server server_redis_2 192.168.0.10:35013
+</code></pre>
+
+<hr>
+
+<h2 id="the-remco-configuration-file">The remco configuration file</h2>
+
+<p>We also need to create the remco configuration file.
+Create a file named <strong>config</strong> and insert the following toml configuration.</p>
+
+<pre><code class="language-toml">################################################################
+# Global configuration
+################################################################
+log_level = &quot;debug&quot;
+log_format = &quot;text&quot;
+
+[[resource]]
+name = &quot;haproxy&quot;
+
+[[resource.template]]
+  src = &quot;/etc/remco/templates/haproxy.tmpl&quot;
+  dst = &quot;/etc/haproxy/haproxy.cfg&quot;
+  reload_cmd 	  = &quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&quot;
+
+  [resource.backend]
+    [resource.backend.etcd]
+      nodes = [&quot;${ETCD_NODE}&quot;]
+      keys = [&quot;/services&quot;, &quot;/config&quot;]
+      watch = true
+      interval = 60
+</code></pre>
+
+<h2 id="the-dockerfile">The Dockerfile</h2>
+
+<pre><code>FROM alpine:3.4
+
+ENV REMCO_VER 0.8.0
+
+RUN apk --update add --no-cache haproxy bash ca-certificates
+RUN wget https://github.com/HeavyHorst/remco/releases/download/v${REMCO_VER}/remco_${REMCO_VER}_linux_amd64.zip &amp;&amp; \
+    unzip remco_${REMCO_VER}_linux_amd64.zip &amp;&amp; rm remco_${REMCO_VER}_linux_amd64.zip &amp;&amp; \
+    mv remco_linux /bin/remco
+
+COPY config /etc/remco/config
+COPY haproxy.tmpl /etc/remco/templates/haproxy.tmpl
+
+ENTRYPOINT [&quot;remco&quot;]
+</code></pre>
+
+<h2 id="build-and-run-the-container">Build and Run the container</h2>
+
+<p>You should have three files at this point:</p>
+
+<pre><code>.
+├── config
+├── Dockerfile
+└── haproxy.tmpl
+</code></pre>
+
+<h3 id="build-the-docker-container">Build the docker container:</h3>
+
+<pre><code class="language-bash">sudo docker build -t remcohaproxy .
+</code></pre>
+
+<h3 id="optionally-test-the-container">Optionally test the container:</h3>
+
+<h4 id="put-some-data-into-etcd">put some data into etcd:</h4>
+
+<pre><code class="language-bash">etcdctl set /services/exampleService/1 someip:port
+etcdctl set /config/exampleService/scheme http
+etcdctl set /config/exampleService/host_port 1234
+</code></pre>
+
+<p>In his example we connect to a local etcd cluster.</p>
+
+<pre><code class="language-bash">sudo docker run --rm -ti --net=host -e ETCD_NODE=http://localhost:2379 remcohaproxy
+</code></pre>
+
+<p>You should see something like this:</p>
+
+<pre><code>[Dec 16 18:26:20]  INFO remco[1]: Target config out of sync config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66
+[Dec 16 18:26:20] DEBUG remco[1]: Overwriting target config config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66
+[Dec 16 18:26:20] DEBUG remco[1]: Running haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid` resource=haproxy source=resource.go:66
+[Dec 16 18:26:20] DEBUG remco[1]: &quot;&quot; resource=haproxy source=resource.go:66
+[Dec 16 18:26:20]  INFO remco[1]: Target config has been updated config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66
+[Dec 16 18:26:20] DEBUG remco[1]: [Reaped child process 60] source=main.go:87
+[Dec 16 18:26:24] DEBUG remco[1]: Retrieving keys backend=etcd key_prefix= resource=haproxy source=resource.go:66
+[Dec 16 18:26:24] DEBUG remco[1]: Compiling source template resource=haproxy source=resource.go:66 template=/etc/remco/templates/haproxy.tmpl
+[Dec 16 18:26:24] DEBUG remco[1]: Comparing staged and dest config files dest=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66 staged=.haproxy.cfg389124299
+[Dec 16 18:26:24] DEBUG remco[1]: Target config in sync config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66
+</code></pre>
+
+<h3 id="run-registrator">Run registrator</h3>
+
+<pre><code>sudo docker run -d \
+    --name=registrator \
+    --net=host \
+    --volume=/var/run/docker.sock:/tmp/docker.sock \
+    gliderlabs/registrator:latest \
+      etcd://localhost:2379/services
+</code></pre>
+
+<p>Now every container get automatically registered under /services.
+You can then configure the scheme and optionally the host_port of each service that you want to expose.</p>
 
 
       
@@ -409,8 +631,8 @@ This also means that the child needs to remain in the foreground, otherwise the 
     </div>
 
     <div id="navigation">
-        <a class="nav nav-prev" href="../../details/template-resource/"> <i class="fa fa-chevron-left"></i></a>
-        <a class="nav nav-next" href="../../details/commands/" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+        <a class="nav nav-prev" href="../../examples/"> <i class="fa fa-chevron-left"></i></a>
+        
     </div>
 
     </section>

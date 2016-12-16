@@ -27,6 +27,11 @@
   </url>
   
   <url>
+    <loc>https://heavyhorst.github.io/remco/examples/</loc>
+    <lastmod>2016-12-03T14:19:23+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://heavyhorst.github.io/remco/plugins/env-plugin-example/</loc>
     <lastmod>2016-12-03T15:13:50+01:00</lastmod>
   </url>
@@ -34,6 +39,11 @@
   <url>
     <loc>https://heavyhorst.github.io/remco/template/template-functions/</loc>
     <lastmod>2016-12-03T15:06:33+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://heavyhorst.github.io/remco/examples/haproxy/</loc>
+    <lastmod>2016-12-03T14:56:09+01:00</lastmod>
   </url>
   
   <url>
