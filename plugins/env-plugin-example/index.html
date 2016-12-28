@@ -448,7 +448,7 @@ func (e *EnvRPCServer) Close(args interface{}, resp *interface{}) error {
 
 func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
 	var err error
-	*resp, err = e.Impl.WatchPrefix(args.Prefix, context.Background(), easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
+	*resp, err = e.Impl.WatchPrefix(context.Background(), args.Prefix, easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
 	return err
 }
 </code></pre>

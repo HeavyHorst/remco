@@ -152,7 +152,7 @@ func (e *EnvRPCServer) Close(args interface{}, resp *interface{}) error {
 
 func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {
 	var err error
-	*resp, err = e.Impl.WatchPrefix(args.Prefix, context.Background(), easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
+	*resp, err = e.Impl.WatchPrefix(context.Background(), args.Prefix, easyKV.WithKeys(args.Opts.Keys), easyKV.WithWaitIndex(args.Opts.WaitIndex))
 	return err
 }
 &lt;/code&gt;&lt;/pre&gt;
@@ -933,7 +933,7 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;filepath(string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The filepath to a yaml or json file containing the key-value pairs.
+&lt;li&gt;The filepath to a yaml or json file containing the key-value pairs. This can be a local file or a remote http/https location.
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;

@@ -287,7 +287,7 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;filepath(string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The filepath to a yaml or json file containing the key-value pairs.
+&lt;li&gt;The filepath to a yaml or json file containing the key-value pairs. This can be a local file or a remote http/https location.
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
