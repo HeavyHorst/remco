@@ -164,6 +164,6 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 }
 
 // WatchPrefix is not yet implemented.
-func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easyKV.WatchOption) (uint64, error) {
 	return 0, easyKV.ErrWatchNotSupported
 }

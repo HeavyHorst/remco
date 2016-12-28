@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/HeavyHorst/easyKV.svg?branch=master)](https://travis-ci.org/HeavyHorst/easyKV) [![Go Report Card](https://goreportcard.com/badge/github.com/HeavyHorst/easyKV)](https://goreportcard.com/report/github.com/HeavyHorst/easyKV) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/HeavyHorst/easyKV/master/LICENCE)
-[![](https://godoc.org/github.com/HeavyHorst/easyKV?status.svg)](http://godoc.org/github.com/HeavyHorst/easyKV)
+[![](https://godoc.org/github.com/HeavyHorst/easyKV?status.svg)](http://godoc.org/github.com/HeavyHorst/easyKV) [![codecov](https://codecov.io/gh/HeavyHorst/easyKV/branch/master/graph/badge.svg)](https://codecov.io/gh/HeavyHorst/easyKV)
+
 
 # easyKV
 easyKV is based on the backends of [confd](https://github.com/kelseyhightower/confd).
@@ -14,7 +15,7 @@ A **storage backend** in `easyKV` should implement (fully or partially) this int
 ```go
 type ReadWatcher interface {
 	GetValues(keys []string) (map[string]string, error)
-	WatchPrefix(prefix string, ctx context.Context, opts ...WatchOption) (uint64, error)
+	WatchPrefix(ctx context.Context, prefix string, opts ...WatchOption) (uint64, error)
 	Close()
 }
 ```

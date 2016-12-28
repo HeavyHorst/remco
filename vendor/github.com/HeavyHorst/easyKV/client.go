@@ -38,6 +38,6 @@ func WithWaitIndex(waitIndex uint64) WatchOption {
 // A ReadWatcher - can get values and watch a prefix for changes
 type ReadWatcher interface {
 	GetValues(keys []string) (map[string]string, error)
-	WatchPrefix(prefix string, ctx context.Context, opts ...WatchOption) (uint64, error)
+	WatchPrefix(ctx context.Context, prefix string, opts ...WatchOption) (uint64, error)
 	Close()
 }

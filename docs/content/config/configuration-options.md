@@ -114,7 +114,7 @@ weight: 10
 <summary> **file** </summary>
 
  - **filepath(string):**
-   - The filepath to a yaml or json file containing the key-value pairs.
+   - The filepath to a yaml or json file containing the key-value pairs. This can be a local file or a remote http/https location.
 </details>
 
 <details>

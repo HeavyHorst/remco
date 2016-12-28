@@ -79,8 +79,7 @@ type WatchConfig struct {
 	Opts   easyKV.WatchOptions
 }
 
-// WatchPrefix is not supported for now
-func (p *plug) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
+func (p *plug) WatchPrefix(ctx context.Context, prefix string, opts ...easyKV.WatchOption) (uint64, error) {
 	var result uint64
 
 	wc := WatchConfig{Prefix: prefix}

@@ -48,7 +48,7 @@ func (s Backend) watch(ctx context.Context, processChan chan Backend, errChan ch
 		case <-ctx.Done():
 			return
 		default:
-			index, err := s.WatchPrefix(s.Prefix, ctx, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
+			index, err := s.WatchPrefix(ctx, s.Prefix, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
 			if err != nil {
 				if err != easyKV.ErrWatchCanceled {
 					errChan <- berr.BackendError{Message: err.Error(), Backend: s.Name}

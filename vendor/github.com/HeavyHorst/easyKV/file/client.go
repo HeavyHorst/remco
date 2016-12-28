@@ -11,7 +11,10 @@ package file
 import (
 	"context"
 	"io/ioutil"
+	"net/http"
 	"strings"
+
+	"time"
 
 	"github.com/HeavyHorst/easyKV"
 	"github.com/fsnotify/fsnotify"
@@ -20,12 +23,21 @@ import (
 
 // Client is a wrapper around the file client
 type Client struct {
-	filepath string
+	filepath   string
+	isURL      bool
+	httpClient http.Client
 }
 
 // New returns a new FileClient
 func New(filepath string) (*Client, error) {
-	return &Client{filepath}, nil
+	c := &Client{filepath: filepath}
+	if strings.HasPrefix(filepath, "http://") || strings.HasPrefix(filepath, "https://") {
+		c.isURL = true
+		c.httpClient = http.Client{
+			Timeout: 5 * time.Second,
+		}
+	}
+	return c, nil
 }
 
 // GetValues returns all key-value pairs from the yaml or json file.
@@ -34,10 +46,25 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	vars := make(map[string]string)
 	kvs := make(map[string]string)
 
-	data, err := ioutil.ReadFile(c.filepath)
-	if err != nil {
-		return vars, err
+	var data []byte
+	var err error
+	if c.isURL {
+		resp, err := c.httpClient.Get(c.filepath)
+		if err != nil {
+			return vars, err
+		}
+		defer resp.Body.Close()
+		data, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return vars, err
+		}
+	} else {
+		data, err = ioutil.ReadFile(c.filepath)
+		if err != nil {
+			return vars, err
+		}
 	}
+
 	err = yaml.Unmarshal(data, &yamlMap)
 	if err != nil {
 		return vars, err
@@ -87,7 +114,12 @@ func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]stri
 
 // WatchPrefix watches the file for changes with fsnotify.
 // Prefix, keys and waitIndex are only here to implement the StoreClient interface.
-func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easyKV.WatchOption) (uint64, error) {
+	if c.isURL {
+		// watch is not supported for urls
+		return 0, easyKV.ErrWatchNotSupported
+	}
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return 0, err

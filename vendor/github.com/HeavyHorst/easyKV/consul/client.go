@@ -103,7 +103,7 @@ type watchResponse struct {
 }
 
 // WatchPrefix watches a specific prefix for changes.
-func (c *Client) WatchPrefix(prefix string, ctx context.Context, opts ...easyKV.WatchOption) (uint64, error) {
+func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easyKV.WatchOption) (uint64, error) {
 	var options easyKV.WatchOptions
 	for _, o := range opts {
 		o(&options)
