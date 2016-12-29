@@ -106,11 +106,15 @@ func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *
 	switch values.(type) {
 	case []string:
 		v := values.([]string)
-		sort.Sort(byLength(v))
+		sort.Slice(v, func(i, j int) bool {
+			return len(v[i]) < len(v[j])
+		})
 		return pongo2.AsValue(v), nil
 	case memkv.KVPairs:
 		v := values.(memkv.KVPairs)
-		sort.Sort(byLengthKV(v))
+		sort.Slice(v, func(i, j int) bool {
+			return len(v[i].Key) < len(v[j].Key)
+		})
 		return pongo2.AsValue(v), nil
 	}
 
