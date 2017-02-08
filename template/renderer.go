@@ -33,6 +33,7 @@ import (
 type Renderer struct {
 	Src       string `json:"src"`
 	Dst       string `json:"dst"`
+	MkDirs    bool   `toml:"make_directories"`
 	Mode      string `json:"mode"`
 	UID       int    `json:"uid"`
 	GID       int    `json:"gid"`
@@ -63,6 +64,11 @@ func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 	}
 
 	// create TempFile in Dest directory to avoid cross-filesystem issues
+	if s.MkDirs {
+		if err := os.MkdirAll(filepath.Dir(s.Dst), 0755); err != nil {
+			return err
+		}
+	}
 	temp, err := ioutil.TempFile(filepath.Dir(s.Dst), "."+filepath.Base(s.Dst))
 	if err != nil {
 		return err
@@ -80,6 +86,7 @@ func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
+
 	// Set the owner, group, and mode on the stage file now to make it easier to
 	// compare against the destination configuration file later.
 	os.Chmod(temp.Name(), fileMode)
