@@ -42,6 +42,8 @@ weight: 10
     - The path of the template that will be used to render the application's configuration file.
  - **dst(string):**
     - The location to place the rendered configuration file.
+ - **make_directories(bool, optional):**
+    - make parent directories for the dst path as needed. Default is false.
  - **check_cmd(string, optional):**
     - The command to check config. Use {{.src}} to reference the rendered source template.
  - **reload_cmd(string, optional):**
