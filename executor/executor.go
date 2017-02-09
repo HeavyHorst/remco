@@ -202,7 +202,7 @@ func (e *Executor) getExitChan() (<-chan int, bool) {
 }
 
 // Wait waits for the children to stop.
-// Returns true if the command stops.
+// Returns true if the command stops unexpectedly and false if the context is canceled.
 // Wait ignores reloads.
 func (e *Executor) Wait(ctx context.Context) bool {
 	exitChan, valid := e.getExitChan()

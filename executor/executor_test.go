@@ -103,7 +103,7 @@ func spawnTrapChild() (Executor, error) {
 }
 
 func spawnTimeOutChild() (Executor, error) {
-	command := "bash -c 'sleep 2'"
+	command := "bash -c 'sleep 5'"
 	return spawnChild(command)
 }
 
