@@ -136,7 +136,7 @@ weight: 10
  - **node(string):**
    - The backend node.
  - **auth_type(string):**
-   - The vault authentication type. (token, approle, app-id, userpass, github)
+   - The vault authentication type. (token, approle, app-id, userpass, github, cert)
  - **auth_token(string):**
    - The vault authentication token. Only used with auth_type=token or github.
  - **app_role(string):**

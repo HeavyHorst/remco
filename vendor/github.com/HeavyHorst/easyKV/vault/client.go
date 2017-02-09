@@ -88,6 +88,8 @@ func authenticate(c *vaultapi.Client, authType string, params map[string]string)
 		secret, err = c.Logical().Write(fmt.Sprintf("/auth/userpass/login/%s", username), map[string]interface{}{
 			"password": password,
 		})
+	case "cert":
+		secret, err = c.Logical().Write("/auth/cert/login", nil)
 	}
 
 	if err != nil {
