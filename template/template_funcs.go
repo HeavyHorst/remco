@@ -80,6 +80,10 @@ func lookupSRV(service, proto, name string) []*net.SRV {
 	if err != nil {
 		return []*net.SRV{}
 	}
-	sort.Sort(sortSRV(addrs))
+	sort.Slice(addrs, func(i, j int) bool {
+		str1 := fmt.Sprintf("%s%d%d%d", addrs[i].Target, addrs[i].Port, addrs[i].Priority, addrs[i].Weight)
+		str2 := fmt.Sprintf("%s%d%d%d", addrs[j].Target, addrs[j].Port, addrs[j].Priority, addrs[j].Weight)
+		return str1 < str2
+	})
 	return addrs
 }
