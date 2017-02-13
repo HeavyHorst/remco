@@ -31,7 +31,7 @@ func (s *FilterSuite) TestFilterBase64(t *C) {
 	in := pongo2.AsValue("foo")
 	res, err := filterBase64(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 
 	t.Check(res.String(), Equals, "Zm9v")
@@ -41,7 +41,7 @@ func (s *FilterSuite) TestFilterBase(t *C) {
 	in := pongo2.AsValue("/etc/foo/bar")
 	res, err := filterBase(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 
 	t.Check(res.String(), Equals, "bar")
@@ -51,7 +51,7 @@ func (s *FilterSuite) TestFilterDir(t *C) {
 	in := pongo2.AsValue("/etc/foo/bar")
 	res, err := filterDir(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 
 	t.Check(res.String(), Equals, "/etc/foo")
@@ -70,7 +70,7 @@ func (s *FilterSuite) TestFilterToPrettyJSON(t *C) {
 	})
 	res, err := filterToPrettyJSON(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 
 	t.Check(res.String(), Equals, expected)
@@ -85,7 +85,7 @@ func (s *FilterSuite) TestFilterToJSON(t *C) {
 	})
 	res, err := filterToJSON(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 
 	t.Check(res.String(), Equals, expected)
@@ -103,7 +103,7 @@ test3: 2.5
 	})
 	res, err := filterToYAML(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 
 	t.Check(res.String(), Equals, expected)
@@ -118,7 +118,7 @@ func (s *FilterSuite) TestFilterUnmarshalYAMLObject(t *C) {
 	}
 	res, err := filterUnmarshalYAML(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 	m1 := res.Interface().(map[string]interface{})
 	t.Check(m1, DeepEquals, expected)
@@ -129,7 +129,7 @@ func (s *FilterSuite) TestFilterUnmarshalYAMLArray(t *C) {
 	expected := []interface{}{"a", "b", "c"}
 	res, err := filterUnmarshalYAML(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 	m1 := res.Interface().([]interface{})
 	t.Check(m1, DeepEquals, expected)
@@ -140,7 +140,7 @@ func (s *FilterSuite) TestFilterSortByLengthString(t *C) {
 	expected := []string{"123", "1234", "foobar"}
 	res, err := filterSortByLength(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 	m1 := res.Interface().([]string)
 	t.Check(m1, DeepEquals, expected)
@@ -154,7 +154,7 @@ func (s *FilterSuite) TestFilterSortByLengthKVPair(t *C) {
 	expected := memkv.KVPairs{a, b, c}
 	res, err := filterSortByLength(in, nil)
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 	}
 	m1 := res.Interface().(memkv.KVPairs)
 	t.Check(m1, DeepEquals, expected)
@@ -165,7 +165,7 @@ func (s *FilterSuite) TestFilterDecryptString(t *C) {
 	expected := "secret1\n"
 	res, err := filterDecrypt(in, pongo2.AsValue("../integration/config/test.gpg"))
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 		t.FailNow()
 	}
 	t.Check(res.String(), Equals, expected)
@@ -181,7 +181,7 @@ func (s *FilterSuite) TestFilterDecryptKVPairs(t *C) {
 	expected := memkv.KVPairs{memkv.KVPair{Key: "/some/key", Value: "secret1\n"}}
 	res, err := filterDecrypt(in, pongo2.AsValue("../integration/config/test.gpg"))
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 		t.FailNow()
 	}
 	m2 := res.Interface().(memkv.KVPairs)
@@ -196,7 +196,7 @@ func (s *FilterSuite) TestFilterDecryptKVPair(t *C) {
 	expected := memkv.KVPair{Key: "/some/key", Value: "secret1\n"}
 	res, err := filterDecrypt(in, pongo2.AsValue("../integration/config/test.gpg"))
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 		t.FailNow()
 	}
 	m2 := res.Interface().(memkv.KVPair)
@@ -209,7 +209,7 @@ func (s *FilterSuite) TestFilterDecryptStringArray(t *C) {
 
 	res, err := filterDecrypt(in, pongo2.AsValue("../integration/config/test.gpg"))
 	if err != nil {
-		t.Error(err.ErrorMsg)
+		t.Error(err.OrigError)
 		t.FailNow()
 	}
 	m2 := res.Interface().([]string)

@@ -63,7 +63,10 @@ func filterDir(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Er
 func filterToPrettyJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	b, err := json.MarshalIndent(in.Interface(), "", "    ")
 	if err != nil {
-		return nil, &pongo2.Error{ErrorMsg: err.Error()}
+		return nil, &pongo2.Error{
+			Sender:    "filter:filterToPrettyJSON",
+			OrigError: err,
+		}
 	}
 	return pongo2.AsValue(string(b)), nil
 }
@@ -71,7 +74,10 @@ func filterToPrettyJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *
 func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	b, err := json.Marshal(in.Interface())
 	if err != nil {
-		return nil, &pongo2.Error{ErrorMsg: err.Error()}
+		return nil, &pongo2.Error{
+			Sender:    "filterToJSON",
+			OrigError: err,
+		}
 	}
 	return pongo2.AsValue(string(b)), nil
 }
@@ -79,7 +85,10 @@ func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	b, err := yaml_mapstr.Marshal(in.Interface())
 	if err != nil {
-		return nil, &pongo2.Error{ErrorMsg: err.Error()}
+		return nil, &pongo2.Error{
+			Sender:    "filter:filterToYAML",
+			OrigError: err,
+		}
 	}
 	return pongo2.AsValue(string(b)), nil
 }
@@ -91,7 +100,10 @@ func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, 
 
 	var ret interface{}
 	if err := yaml_mapstr.Unmarshal([]byte(in.String()), &ret); err != nil {
-		return nil, &pongo2.Error{ErrorMsg: err.Error()}
+		return nil, &pongo2.Error{
+			Sender:    "filterUnmarshalYAML",
+			OrigError: err,
+		}
 	}
 
 	return pongo2.AsValue(ret), nil
@@ -124,13 +136,19 @@ func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo
 
 	secretKeyring, err := os.Open(param.String())
 	if err != nil {
-		return nil, &pongo2.Error{ErrorMsg: err.Error()}
+		return nil, &pongo2.Error{
+			Sender:    "filter:filterDecrypt",
+			OrigError: err,
+		}
 	}
 
 	defer secretKeyring.Close()
 	entityList, err := openpgp.ReadArmoredKeyRing(secretKeyring)
 	if err != nil {
-		return nil, &pongo2.Error{ErrorMsg: err.Error()}
+		return nil, &pongo2.Error{
+			Sender:    "filter:filterDecrypt",
+			OrigError: err,
+		}
 	}
 
 	input := in.Interface()
@@ -139,7 +157,10 @@ func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo
 		i := input.(string)
 		data, err := decrypt(i, entityList)
 		if err != nil {
-			return nil, &pongo2.Error{ErrorMsg: err.Error()}
+			return nil, &pongo2.Error{
+				Sender:    "filter:filterDecrypt",
+				OrigError: err,
+			}
 		}
 		return pongo2.AsValue(data), nil
 	case memkv.KVPairs:

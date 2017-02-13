@@ -99,10 +99,10 @@
 			"revisionTime": "2016-11-23T19:00:01Z"
 		},
 		{
-			"checksumSHA1": "Pautei4PXpJjwcbNqiGVIiqepS8=",
+			"checksumSHA1": "C6X9Nb7PmqtPK+kStF9v68Ebcn8=",
 			"path": "github.com/HeavyHorst/pongo2",
-			"revision": "e0c7d9cd7ed99866725bf853388b9d80136aabf7",
-			"revisionTime": "2016-11-04T15:42:24Z"
+			"revision": "c94675d3bd3256a025a5e7c238877e2cdcd49f7d",
+			"revisionTime": "2017-02-13T14:25:26Z"
 		},
 		{
 			"checksumSHA1": "z9ckOyaoHErgXLQDx514AOMxdeo=",
@@ -383,6 +383,12 @@
 			"path": "github.com/hashicorp/vault/helper/jsonutil",
 			"revision": "4e4693e5deb3d16b6563fb559da500d124e70c71",
 			"revisionTime": "2016-11-28T23:34:58Z"
+		},
+		{
+			"checksumSHA1": "KIX/3RadQkfl4ZxCmOQ01vAGLEI=",
+			"path": "github.com/juju/errors",
+			"revision": "6f54ff6318409d31ff16261533ce2c8381a4fd5d",
+			"revisionTime": "2016-08-09T03:08:48Z"
 		},
 		{
 			"checksumSHA1": "ajImwVZHzsI+aNwsgzCSFSbmJqs=",
