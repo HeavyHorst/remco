@@ -25,7 +25,7 @@ var exampleTemplates = []*template.Renderer{
 	},
 }
 
-var exampleBackend = backends.Config{
+var exampleBackend = BackendConfigs{
 	Mock: &backends.MockConfig{
 		Backend: template.Backend{
 			Watch:    false,

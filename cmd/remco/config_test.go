@@ -9,7 +9,6 @@
 package main
 
 import (
-	"context"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -50,7 +49,7 @@ var expectedTemplates = []*template.Renderer{
 	},
 }
 
-var expectedBackend = backends.Config{
+var expectedBackend = BackendConfigs{
 	Mock: &backends.MockConfig{
 		Backend: template.Backend{
 			Watch:    false,
@@ -123,16 +122,4 @@ func (s *FilterSuite) TestNewConf(t *C) {
 		t.Error(err)
 	}
 	t.Check(cfg, DeepEquals, expected)
-}
-
-func (s *FilterSuite) TestResourceInit(t *C) {
-	cfg, err := NewConfiguration(s.cfgPath)
-	if err != nil {
-		t.Error(err)
-	}
-
-	r, err := cfg.Resource[0].Init(context.Background(), nil)
-	t.Assert(err, IsNil)
-	t.Check(r, NotNil)
-	defer r.Close()
 }
