@@ -27,7 +27,7 @@ before_install:
   - zookeeper-3.4.9/bin/zkServer.sh start
 
 go:
-  - 1.8rc2
+  - 1.8rc3
   - tip
 
 env:
@@ -46,7 +46,3 @@ script:
   - bash integration/redis/test.sh
   - bash integration/env/test.sh
   - bash integration/zookeeper/test.sh
-
-after_success: 
-  - bash scripts/deploy-ghpages.sh
-  - bash <(curl -s https://codecov.io/bash)
