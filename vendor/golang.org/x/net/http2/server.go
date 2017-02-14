@@ -278,6 +278,16 @@ func (s *Server) ServeConn(c net.Conn, opts *ServeConnOpts) {
 		pushEnabled:       true,
 	}
 
+	// The net/http package sets the write deadline from the
+	// http.Server.WriteTimeout during the TLS handshake, but then
+	// passes the connection off to us with the deadline already
+	// set. Disarm it here so that it is not applied to additional
+	// streams opened on this connection.
+	// TODO: implement WriteTimeout fully. See Issue 18437.
+	if sc.hs.WriteTimeout != 0 {
+		sc.conn.SetWriteDeadline(time.Time{})
+	}
+
 	if s.NewWriteScheduler != nil {
 		sc.writeSched = s.NewWriteScheduler()
 	} else {
@@ -423,6 +433,11 @@ func (sc *serverConn) maxHeaderListSize() uint32 {
 	return uint32(n + typicalHeaders*perFieldOverhead)
 }
 
+func (sc *serverConn) curOpenStreams() uint32 {
+	sc.serveG.check()
+	return sc.curClientStreams + sc.curPushedStreams
+}
+
 // stream represents a stream. This is the minimal metadata needed by
 // the serve goroutine. Most of the actual stream state is owned by
 // the http.Handler's goroutine in the responseWriter. Because the
@@ -448,8 +463,7 @@ type stream struct {
 	numTrailerValues int64
 	weight           uint8
 	state            streamState
-	sentReset        bool   // only true once detached from streams map
-	gotReset         bool   // only true once detacted from streams map
+	resetQueued      bool   // RST_STREAM queued for write; set by sc.resetStream
 	gotTrailerHeader bool   // HEADER frame for trailers was seen
 	wroteHeaders     bool   // whether we wrote headers (not status 100)
 	reqBuf           []byte // if non-nil, body pipe buffer to return later at EOF
@@ -696,7 +710,7 @@ func (sc *serverConn) serve() {
 		return
 	}
 	// Now that we've got the preface, get us out of the
-	// "StateNew" state.  We can't go directly to idle, though.
+	// "StateNew" state. We can't go directly to idle, though.
 	// Active means we read some data and anticipate a request. We'll
 	// do another Active when we get a HEADERS frame.
 	sc.setConnState(http.StateActive)
@@ -742,7 +756,7 @@ func (sc *serverConn) serve() {
 			return
 		case <-gracefulShutdownCh:
 			gracefulShutdownCh = nil
-			sc.goAwayIn(ErrCodeNo, 0)
+			sc.startGracefulShutdown()
 		case <-sc.shutdownTimerCh:
 			sc.vlogf("GOAWAY close timer fired; closing conn from %v", sc.conn.RemoteAddr())
 			return
@@ -753,7 +767,7 @@ func (sc *serverConn) serve() {
 			fn(loopNum)
 		}
 
-		if sc.inGoAway && sc.curClientStreams == 0 && !sc.needToSendGoAway && !sc.writingFrame {
+		if sc.inGoAway && sc.curOpenStreams() == 0 && !sc.needToSendGoAway && !sc.writingFrame {
 			return
 		}
 	}
@@ -869,7 +883,33 @@ func (sc *serverConn) writeFrameFromHandler(wr FrameWriteRequest) error {
 func (sc *serverConn) writeFrame(wr FrameWriteRequest) {
 	sc.serveG.check()
 
+	// If true, wr will not be written and wr.done will not be signaled.
 	var ignoreWrite bool
+
+	// We are not allowed to write frames on closed streams. RFC 7540 Section
+	// 5.1.1 says: "An endpoint MUST NOT send frames other than PRIORITY on
+	// a closed stream." Our server never sends PRIORITY, so that exception
+	// does not apply.
+	//
+	// The serverConn might close an open stream while the stream's handler
+	// is still running. For example, the server might close a stream when it
+	// receives bad data from the client. If this happens, the handler might
+	// attempt to write a frame after the stream has been closed (since the
+	// handler hasn't yet been notified of the close). In this case, we simply
+	// ignore the frame. The handler will notice that the stream is closed when
+	// it waits for the frame to be written.
+	//
+	// As an exception to this rule, we allow sending RST_STREAM after close.
+	// This allows us to immediately reject new streams without tracking any
+	// state for those streams (except for the queued RST_STREAM frame). This
+	// may result in duplicate RST_STREAMs in some cases, but the client should
+	// ignore those.
+	if wr.StreamID() != 0 {
+		_, isReset := wr.write.(StreamError)
+		if state, _ := sc.state(wr.StreamID()); state == stateClosed && !isReset {
+			ignoreWrite = true
+		}
+	}
 
 	// Don't send a 100-continue response if we've already sent headers.
 	// See golang.org/issue/14030.
@@ -878,6 +918,11 @@ func (sc *serverConn) writeFrame(wr FrameWriteRequest) {
 		wr.stream.wroteHeaders = true
 	case write100ContinueHeadersFrame:
 		if wr.stream.wroteHeaders {
+			// We do not need to notify wr.done because this frame is
+			// never written with wr.done != nil.
+			if wr.done != nil {
+				panic("wr.done != nil for write100ContinueHeadersFrame")
+			}
 			ignoreWrite = true
 		}
 	}
@@ -901,14 +946,15 @@ func (sc *serverConn) startFrameWrite(wr FrameWriteRequest) {
 	if st != nil {
 		switch st.state {
 		case stateHalfClosedLocal:
-			panic("internal error: attempt to send frame on half-closed-local stream")
-		case stateClosed:
-			if st.sentReset || st.gotReset {
-				// Skip this frame.
-				sc.scheduleFrameWrite()
-				return
+			switch wr.write.(type) {
+			case StreamError, handlerPanicRST, writeWindowUpdate:
+				// RFC 7540 Section 5.1 allows sending RST_STREAM, PRIORITY, and WINDOW_UPDATE
+				// in this state. (We never send PRIORITY from the server, so that is not checked.)
+			default:
+				panic(fmt.Sprintf("internal error: attempt to send frame on a half-closed-local stream: %v", wr))
 			}
-			panic(fmt.Sprintf("internal error: attempt to send a write %v on a closed stream", wr))
+		case stateClosed:
+			panic(fmt.Sprintf("internal error: attempt to send frame on a closed stream: %v", wr))
 		}
 	}
 	if wpp, ok := wr.write.(*writePushPromise); ok {
@@ -916,9 +962,7 @@ func (sc *serverConn) startFrameWrite(wr FrameWriteRequest) {
 		wpp.promisedID, err = wpp.allocatePromisedID()
 		if err != nil {
 			sc.writingFrameAsync = false
-			if wr.done != nil {
-				wr.done <- err
-			}
+			wr.replyToWriter(err)
 			return
 		}
 	}
@@ -951,25 +995,9 @@ func (sc *serverConn) wroteFrame(res frameWriteResult) {
 	sc.writingFrameAsync = false
 
 	wr := res.wr
-	st := wr.stream
 
-	closeStream := endsStream(wr.write)
-
-	if _, ok := wr.write.(handlerPanicRST); ok {
-		sc.closeStream(st, errHandlerPanicked)
-	}
-
-	// Reply (if requested) to the blocked ServeHTTP goroutine.
-	if ch := wr.done; ch != nil {
-		select {
-		case ch <- res.err:
-		default:
-			panic(fmt.Sprintf("unbuffered done channel passed in for type %T", wr.write))
-		}
-	}
-	wr.write = nil // prevent use (assume it's tainted after wr.done send)
-
-	if closeStream {
+	if writeEndsStream(wr.write) {
+		st := wr.stream
 		if st == nil {
 			panic("internal error: expecting non-nil stream")
 		}
@@ -982,14 +1010,28 @@ func (sc *serverConn) wroteFrame(res frameWriteResult) {
 			// reading data (see possible TODO at top of
 			// this file), we go into closed state here
 			// anyway, after telling the peer we're
-			// hanging up on them.
-			st.state = stateHalfClosedLocal // won't last long, but necessary for closeStream via resetStream
-			errCancel := streamError(st.id, ErrCodeCancel)
-			sc.resetStream(errCancel)
+			// hanging up on them. We'll transition to
+			// stateClosed after the RST_STREAM frame is
+			// written.
+			st.state = stateHalfClosedLocal
+			sc.resetStream(streamError(st.id, ErrCodeCancel))
 		case stateHalfClosedRemote:
 			sc.closeStream(st, errHandlerComplete)
 		}
+	} else {
+		switch v := wr.write.(type) {
+		case StreamError:
+			// st may be unknown if the RST_STREAM was generated to reject bad input.
+			if st, ok := sc.streams[v.StreamID]; ok {
+				sc.closeStream(st, v)
+			}
+		case handlerPanicRST:
+			sc.closeStream(wr.stream, errHandlerPanicked)
+		}
 	}
+
+	// Reply (if requested) to unblock the ServeHTTP goroutine.
+	wr.replyToWriter(res.err)
 
 	sc.scheduleFrameWrite()
 }
@@ -1044,6 +1086,13 @@ func (sc *serverConn) scheduleFrameWrite() {
 	sc.inFrameScheduleLoop = false
 }
 
+// startGracefulShutdown sends a GOAWAY with ErrCodeNo to tell the
+// client we're gracefully shutting down. The connection isn't closed
+// until all current streams are done.
+func (sc *serverConn) startGracefulShutdown() {
+	sc.goAwayIn(ErrCodeNo, 0)
+}
+
 func (sc *serverConn) goAway(code ErrCode) {
 	sc.serveG.check()
 	var forceCloseIn time.Duration
@@ -1080,8 +1129,7 @@ func (sc *serverConn) resetStream(se StreamError) {
 	sc.serveG.check()
 	sc.writeFrame(FrameWriteRequest{write: se})
 	if st, ok := sc.streams[se.StreamID]; ok {
-		st.sentReset = true
-		sc.closeStream(st, se)
+		st.resetQueued = true
 	}
 }
 
@@ -1245,7 +1293,6 @@ func (sc *serverConn) processResetStream(f *RSTStreamFrame) error {
 		return ConnectionError(ErrCodeProtocol)
 	}
 	if st != nil {
-		st.gotReset = true
 		st.cancelCtx()
 		sc.closeStream(st, streamError(f.StreamID, f.ErrCode))
 	}
@@ -1263,12 +1310,15 @@ func (sc *serverConn) closeStream(st *stream, err error) {
 	} else {
 		sc.curClientStreams--
 	}
-	if sc.curClientStreams+sc.curPushedStreams == 0 {
-		sc.setConnState(http.StateIdle)
-	}
 	delete(sc.streams, st.id)
-	if len(sc.streams) == 0 && sc.srv.IdleTimeout != 0 {
-		sc.idleTimer.Reset(sc.srv.IdleTimeout)
+	if len(sc.streams) == 0 {
+		sc.setConnState(http.StateIdle)
+		if sc.srv.IdleTimeout != 0 {
+			sc.idleTimer.Reset(sc.srv.IdleTimeout)
+		}
+		if h1ServerKeepAlivesDisabled(sc.hs) {
+			sc.startGracefulShutdown()
+		}
 	}
 	if p := st.body; p != nil {
 		// Return any buffered unread bytes worth of conn-level flow control.
@@ -1381,7 +1431,7 @@ func (sc *serverConn) processData(f *DataFrame) error {
 		// type PROTOCOL_ERROR."
 		return ConnectionError(ErrCodeProtocol)
 	}
-	if st == nil || state != stateOpen || st.gotTrailerHeader {
+	if st == nil || state != stateOpen || st.gotTrailerHeader || st.resetQueued {
 		// This includes sending a RST_STREAM if the stream is
 		// in stateHalfClosedLocal (which currently means that
 		// the http.Handler returned, so it's done reading &
@@ -1401,6 +1451,10 @@ func (sc *serverConn) processData(f *DataFrame) error {
 		sc.inflow.take(int32(f.Length))
 		sc.sendWindowUpdate(nil, int(f.Length)) // conn-level
 
+		if st != nil && st.resetQueued {
+			// Already have a stream error in flight. Don't send another.
+			return nil
+		}
 		return streamError(id, ErrCodeStreamClosed)
 	}
 	if st.body == nil {
@@ -1450,7 +1504,7 @@ func (sc *serverConn) processGoAway(f *GoAwayFrame) error {
 	} else {
 		sc.vlogf("http2: received GOAWAY %+v, starting graceful shutdown", f)
 	}
-	sc.goAwayIn(ErrCodeNo, 0)
+	sc.startGracefulShutdown()
 	// http://tools.ietf.org/html/rfc7540#section-6.8
 	// We should not create any new streams, which means we should disable push.
 	sc.pushEnabled = false
@@ -1509,6 +1563,11 @@ func (sc *serverConn) processHeaders(f *MetaHeadersFrame) error {
 	// open, let it process its own HEADERS frame (trailers at this
 	// point, if it's valid).
 	if st := sc.streams[f.StreamID]; st != nil {
+		if st.resetQueued {
+			// We're sending RST_STREAM to close the stream, so don't bother
+			// processing this frame.
+			return nil
+		}
 		return st.processTrailerHeaders(f)
 	}
 
@@ -1671,7 +1730,7 @@ func (sc *serverConn) newStream(id, pusherID uint32, state streamState) *stream 
 	} else {
 		sc.curClientStreams++
 	}
-	if sc.curClientStreams+sc.curPushedStreams == 1 {
+	if sc.curOpenStreams() == 1 {
 		sc.setConnState(http.StateActive)
 	}
 
@@ -2044,8 +2103,8 @@ func (b *requestBody) Read(p []byte) (n int, err error) {
 	return
 }
 
-// responseWriter is the http.ResponseWriter implementation.  It's
-// intentionally small (1 pointer wide) to minimize garbage.  The
+// responseWriter is the http.ResponseWriter implementation. It's
+// intentionally small (1 pointer wide) to minimize garbage. The
 // responseWriterState pointer inside is zeroed at the end of a
 // request (in handlerDone) and calls on the responseWriter thereafter
 // simply crash (caller's mistake), but the much larger responseWriterState
@@ -2219,7 +2278,7 @@ const TrailerPrefix = "Trailer:"
 // says you SHOULD (but not must) predeclare any trailers in the
 // header, the official ResponseWriter rules said trailers in Go must
 // be predeclared, and then we reuse the same ResponseWriter.Header()
-// map to mean both Headers and Trailers.  When it's time to write the
+// map to mean both Headers and Trailers. When it's time to write the
 // Trailers, we pick out the fields of Headers that were declared as
 // trailers. That worked for a while, until we found the first major
 // user of Trailers in the wild: gRPC (using them only over http2),
@@ -2433,7 +2492,7 @@ func (w *responseWriter) push(target string, opts pushOptions) error {
 	}
 	for k := range opts.Header {
 		if strings.HasPrefix(k, ":") {
-			return fmt.Errorf("promised request headers cannot include psuedo header %q", k)
+			return fmt.Errorf("promised request headers cannot include pseudo header %q", k)
 		}
 		// These headers are meaningful only if the request has a body,
 		// but PUSH_PROMISE requests cannot have a body.
@@ -2529,7 +2588,7 @@ func (sc *serverConn) startPush(msg startPushRequest) {
 		// A server that is unable to establish a new stream identifier can send a GOAWAY
 		// frame so that the client is forced to open a new connection for new streams.
 		if sc.maxPushPromiseID+2 >= 1<<31 {
-			sc.goAwayIn(ErrCodeNo, 0)
+			sc.startGracefulShutdown()
 			return 0, ErrPushLimitReached
 		}
 		sc.maxPushPromiseID += 2
@@ -2546,7 +2605,7 @@ func (sc *serverConn) startPush(msg startPushRequest) {
 			scheme:    msg.url.Scheme,
 			authority: msg.url.Host,
 			path:      msg.url.RequestURI(),
-			header:    msg.header,
+			header:    cloneHeader(msg.header), // clone since handler runs concurrently with writing the PUSH_PROMISE
 		})
 		if err != nil {
 			// Should not happen, since we've already validated msg.url.
@@ -2678,3 +2737,17 @@ func h1ServerShutdownChan(hs *http.Server) <-chan struct{} {
 
 // optional test hook for h1ServerShutdownChan.
 var testh1ServerShutdownChan func(hs *http.Server) <-chan struct{}
+
+// h1ServerKeepAlivesDisabled reports whether hs has its keep-alives
+// disabled. See comments on h1ServerShutdownChan above for why
+// the code is written this way.
+func h1ServerKeepAlivesDisabled(hs *http.Server) bool {
+	var x interface{} = hs
+	type I interface {
+		doKeepAlives() bool
+	}
+	if hs, ok := x.(I); ok {
+		return !hs.doKeepAlives()
+	}
+	return false
+}

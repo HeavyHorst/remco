@@ -29,6 +29,7 @@ type Client struct {
 }
 
 // New returns a new FileClient
+// The filepath can be a local path to a file or a remote http/https location.
 func New(filepath string) (*Client, error) {
 	c := &Client{filepath: filepath}
 	if strings.HasPrefix(filepath, "http://") || strings.HasPrefix(filepath, "https://") {
@@ -114,6 +115,7 @@ func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]stri
 
 // WatchPrefix watches the file for changes with fsnotify.
 // Prefix, keys and waitIndex are only here to implement the StoreClient interface.
+// WatchPrefix is only supported for local files. Remote files over http/https arent supported.
 func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easyKV.WatchOption) (uint64, error) {
 	if c.isURL {
 		// watch is not supported for urls

@@ -13,14 +13,14 @@ import (
 // concurrent access.
 type Store struct {
 	FuncMap map[string]interface{}
-	*sync.RWMutex
+	sync.RWMutex
 	t *radix.Tree
 }
 
 func New() *Store {
 	s := &Store{
 		t:       radix.New(),
-		RWMutex: &sync.RWMutex{},
+		RWMutex: sync.RWMutex{},
 	}
 	s.FuncMap = map[string]interface{}{
 		"exists":    s.Exists,
@@ -87,7 +87,7 @@ func (s *Store) GetAll(pattern string) KVPairs {
 }
 
 func (s *Store) GetAllValues(pattern string) []string {
-	vs := make([]string, 0)
+	var vs []string
 	for _, kv := range s.GetAll(pattern) {
 		vs = append(vs, kv.Value)
 	}
@@ -123,7 +123,7 @@ func (s *Store) GetValue(key string, v ...string) string {
 }
 
 func (s *Store) list(filePath string, dir bool) []string {
-	vs := make([]string, 0)
+	var vs []string
 	m := make(map[string]bool)
 	// The prefix search should only return dirs
 	filePath = path.Clean(filePath) + "/"
