@@ -12,7 +12,6 @@ package template
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -27,6 +26,7 @@ import (
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
 	"github.com/Sirupsen/logrus"
+	"github.com/pkg/errors"
 )
 
 // Renderer contains all data needed for the template processing
@@ -50,41 +50,41 @@ type Renderer struct {
 // It returns an error if any.
 func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 	if !fileutil.IsFileExist(s.Src) {
-		return errors.New("Missing template: " + s.Src)
+		return fmt.Errorf("missing template: %s", s.Src)
 	}
 
 	s.logger.WithFields(logrus.Fields{
 		"template": s.Src,
-	}).Debug("Compiling source template")
+	}).Debug("compiling source template")
 
 	set := pongo2.NewSet("local", &pongo2.LocalFilesystemLoader{})
 	tmpl, err := set.FromFile(s.Src)
 	if err != nil {
-		return fmt.Errorf("Unable to process template %s, %s", s.Src, err)
+		return errors.Wrapf(err, "set.FromFile(%s) failed", s.Src)
 	}
 
 	// create TempFile in Dest directory to avoid cross-filesystem issues
 	if s.MkDirs {
 		if err := os.MkdirAll(filepath.Dir(s.Dst), 0755); err != nil {
-			return err
+			return errors.Wrap(err, "MkdirAll failed")
 		}
 	}
 	temp, err := ioutil.TempFile(filepath.Dir(s.Dst), "."+filepath.Base(s.Dst))
 	if err != nil {
-		return err
+		return errors.Wrap(err, "couldn't create tempfile")
 	}
 
 	if err = tmpl.ExecuteWriter(funcMap, temp); err != nil {
 		temp.Close()
 		os.Remove(temp.Name())
-		return err
+		return errors.Wrap(err, "template execution failed")
 	}
 
 	temp.Close()
 
 	fileMode, err := s.getFileMode()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "getFileMode failed")
 	}
 
 	// Set the owner, group, and mode on the stage file now to make it easier to
@@ -109,7 +109,7 @@ func (s *Renderer) syncFiles() (bool, error) {
 	s.logger.WithFields(logrus.Fields{
 		"staged": path.Base(staged),
 		"dest":   s.Dst,
-	}).Debug("Comparing staged and dest config files")
+	}).Debug("comparing staged and dest config files")
 
 	ok, err := fileutil.SameFile(staged, s.Dst, s.logger)
 	if err != nil {
@@ -119,22 +119,22 @@ func (s *Renderer) syncFiles() (bool, error) {
 	if !ok {
 		s.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
-		}).Info("Target config out of sync")
+		}).Info("target config out of sync")
 
 		if err := s.check(staged); err != nil {
-			return changed, errors.New("Config check failed: " + err.Error())
+			return changed, errors.Wrap(err, "config check failed")
 		}
 
 		s.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
-		}).Debug("Overwriting target config")
+		}).Debug("overwriting target config")
 
 		fileMode, err := s.getFileMode()
 		if err != nil {
-			return changed, err
+			return changed, errors.Wrap(err, "getFileMode failed")
 		}
 		if err := fileutil.ReplaceFile(staged, s.Dst, fileMode, s.logger); err != nil {
-			return changed, err
+			return changed, errors.Wrap(err, "replace file failed")
 		}
 
 		// make sure owner and group match the temp file, in case the file was created with WriteFile
@@ -142,17 +142,17 @@ func (s *Renderer) syncFiles() (bool, error) {
 		changed = true
 
 		if err := s.reload(); err != nil {
-			return changed, err
+			return changed, errors.Wrap(err, "reload command failed")
 		}
 
 		s.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
-		}).Info("Target config has been updated")
+		}).Info("target config has been updated")
 
 	} else {
 		s.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
-		}).Debug("Target config in sync")
+		}).Debug("target config in sync")
 
 	}
 	return changed, nil
@@ -165,13 +165,13 @@ func (s *Renderer) getFileMode() (os.FileMode, error) {
 		}
 		fi, err := os.Stat(s.Dst)
 		if err != nil {
-			return 0, err
+			return 0, errors.Wrap(err, "os.Stat failed")
 		}
 		return fi.Mode(), nil
 	}
 	mode, err := strconv.ParseUint(s.Mode, 0, 32)
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrapf(err, "parsing filemode failed: %s", s.Mode)
 	}
 	return os.FileMode(mode), nil
 
@@ -191,10 +191,10 @@ func (s *Renderer) check(stageFile string) error {
 	data["src"] = stageFile
 	tmpl, err := template.New("checkcmd").Parse(s.CheckCmd)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "parsing check command failed")
 	}
 	if err := tmpl.Execute(&cmdBuffer, data); err != nil {
-		return err
+		return errors.Wrap(err, "template execution failed")
 	}
 	s.logger.Debug("Running " + cmdBuffer.String())
 	c := exec.Command("/bin/sh", "-c", cmdBuffer.String())
@@ -207,7 +207,7 @@ func (s *Renderer) check(stageFile string) error {
 	output, err := c.CombinedOutput()
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("%q", string(output)))
-		return err
+		return errors.Wrap(err, "the check command failed")
 	}
 	s.logger.Debug(fmt.Sprintf("%q", string(output)))
 	return nil
@@ -230,7 +230,7 @@ func (s *Renderer) reload() error {
 	output, err := c.CombinedOutput()
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("%q", string(output)))
-		return err
+		return errors.Wrap(err, "the reload command failed")
 	}
 	s.logger.Debug(fmt.Sprintf("%q", string(output)))
 	return nil

@@ -24,7 +24,6 @@ package template
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand"
 	"os"
@@ -37,6 +36,7 @@ import (
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/Sirupsen/logrus"
+	"github.com/pkg/errors"
 )
 
 // Resource is the representation of a parsed template resource.
@@ -62,13 +62,13 @@ type ResourceConfig struct {
 }
 
 // ErrEmptySrc is returned if an emty src template is passed to NewResource
-var ErrEmptySrc = errors.New("empty src template")
+var ErrEmptySrc = fmt.Errorf("empty src template")
 
 // NewResourceFromResourceConfig creates a new resource from the given ResourceConfig
 func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, r ResourceConfig) (*Resource, error) {
 	backendList, err := r.Connectors.ConnectAll(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "connectAll failed")
 	}
 
 	for _, p := range r.Template {
@@ -89,7 +89,7 @@ func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, 
 // NewResource creates a Resource.
 func NewResource(backends []Backend, sources []*Renderer, name string, exec Executor) (*Resource, error) {
 	if len(backends) == 0 {
-		return nil, errors.New("A valid StoreClient is required")
+		return nil, fmt.Errorf("a valid StoreClient is required")
 	}
 
 	logger := log.WithFields(logrus.Fields{"resource": name})
@@ -117,7 +117,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 		tr.backends[i].store = store
 
 		if tr.backends[i].Interval <= 0 && tr.backends[i].Onetime == false && tr.backends[i].Watch == false {
-			logger.Warning("Interval needs to be > 0: setting interval to 60")
+			logger.Warning("interval needs to be > 0: setting interval to 60")
 			tr.backends[i].Interval = 60
 		}
 	}
@@ -132,7 +132,7 @@ func (t *Resource) Close() {
 	for _, v := range t.backends {
 		t.logger.WithFields(logrus.Fields{
 			"backend": v.Name,
-		}).Debug("Closing client connection")
+		}).Debug("closing client connection")
 		v.Close()
 	}
 }
@@ -144,11 +144,11 @@ func (t *Resource) setVars(storeClient Backend) error {
 	t.logger.WithFields(logrus.Fields{
 		"backend":    storeClient.Name,
 		"key_prefix": storeClient.Prefix,
-	}).Debug("Retrieving keys")
+	}).Debug("retrieving keys")
 
 	result, err := storeClient.GetValues(appendPrefix(storeClient.Prefix, storeClient.Keys))
 	if err != nil {
-		return err
+		return errors.Wrap(err, "getValues failed")
 	}
 
 	storeClient.store.Purge()
@@ -162,7 +162,7 @@ func (t *Resource) setVars(storeClient Backend) error {
 	for _, v := range t.backends {
 		for _, kv := range v.store.GetAllKVs() {
 			if t.store.Exists(kv.Key) {
-				t.logger.Warning("Key collision - " + kv.Key)
+				t.logger.Warning("key collision - " + kv.Key)
 			}
 			t.store.Set(kv.Key, kv.Value)
 		}
@@ -176,12 +176,12 @@ func (t *Resource) createStageFileAndSync() (bool, error) {
 	for _, s := range t.sources {
 		err := s.createStageFile(t.funcMap)
 		if err != nil {
-			return changed, err
+			return changed, errors.Wrap(err, "create stage file failed")
 		}
 		c, err := s.syncFiles()
 		changed = changed || c
 		if err != nil {
-			return changed, err
+			return changed, errors.Wrap(err, "sync files failed")
 		}
 	}
 	return changed, nil
@@ -198,13 +198,13 @@ func (t *Resource) process(storeClients []Backend) (bool, error) {
 	for _, storeClient := range storeClients {
 		if err = t.setVars(storeClient); err != nil {
 			return changed, berr.BackendError{
-				Message: err.Error(),
+				Message: errors.Wrap(err, "setVars failed").Error(),
 				Backend: storeClient.Name,
 			}
 		}
 	}
 	if changed, err = t.createStageFileAndSync(); err != nil {
-		return changed, err
+		return changed, errors.Wrap(err, "createStageFileAndSync failed")
 	}
 	return changed, nil
 }
@@ -225,11 +225,8 @@ func (t *Resource) Monitor(ctx context.Context) {
 	// try to process the template resource with all given backends
 	// we wait a random amount of time (between 0 - 30 seconds)
 	// to prevent ddossing our backends and try again (with all backends - no stale data)
-	// if some error occurs
-
 	retryChan := make(chan struct{}, 1)
 	retryChan <- struct{}{}
-
 retryloop:
 	for {
 		select {
@@ -248,7 +245,7 @@ retryloop:
 				}
 				go func() {
 					rn := rand.Int63n(30)
-					t.logger.Error(fmt.Sprintf("Not all templates could be rendered, trying again after %d seconds", rn))
+					t.logger.Error(fmt.Sprintf("not all templates could be rendered, trying again after %d seconds", rn))
 					time.Sleep(time.Duration(rn) * time.Second)
 					select {
 					case <-ctx.Done():
@@ -275,10 +272,12 @@ retryloop:
 	done := make(chan struct{})
 	wg.Add(1)
 	go func() {
-		// run the cancel func if the childProcess quit
+		// Wait for the child process to quit.
+		// If the process terminates unexpectedly (the context was NOT canceled), we set t.Failed to true
+		// and cancel the resource context. Remco will try to restart the resource if t.Failed is true.
 		defer wg.Done()
-		stopped := t.exec.Wait(ctx)
-		if stopped {
+		failed := t.exec.Wait(ctx)
+		if failed {
 			t.Failed = true
 			cancel()
 		}

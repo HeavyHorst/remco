@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/pkg/errors"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
@@ -49,7 +50,7 @@ func SetOutput(path string) error {
 		defer lock.Unlock()
 		f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
-			return fmt.Errorf("could not open logfile %q", path)
+			return errors.Wrapf(err, "could not open logfile %q", path)
 		}
 		log.SetOutput(f)
 	}

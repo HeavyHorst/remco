@@ -16,9 +16,9 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/HeavyHorst/consul-template/signals"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/Sirupsen/logrus"
+	"github.com/hashicorp/consul-template/signals"
 	reap "github.com/hashicorp/go-reap"
 )
 

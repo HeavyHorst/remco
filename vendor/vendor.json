@@ -15,12 +15,6 @@
 			"revisionTime": "2016-11-13T10:49:44Z"
 		},
 		{
-			"checksumSHA1": "/z2nhTENn2s3CC+QU50CypxD7LQ=",
-			"path": "github.com/HeavyHorst/consul-template/signals",
-			"revision": "45f26ba665fb092b8a526051bbced4c349cd2354",
-			"revisionTime": "2016-11-13T10:49:44Z"
-		},
-		{
 			"checksumSHA1": "ApmRyUIqjlM7e2UdPT6mDsoxMXw=",
 			"path": "github.com/HeavyHorst/easyKV",
 			"revision": "487d2943ac32250139322878118254622fdd4010",
@@ -71,12 +65,6 @@
 		{
 			"checksumSHA1": "AOzUlBi/jzjnu+7owkC86pMxKqw=",
 			"path": "github.com/HeavyHorst/easyKV/redis",
-			"revision": "487d2943ac32250139322878118254622fdd4010",
-			"revisionTime": "2016-12-28T14:28:12Z"
-		},
-		{
-			"checksumSHA1": "y0A1USWGA2BO67nok9UdsKC9Alg=",
-			"path": "github.com/HeavyHorst/easyKV/testutils",
 			"revision": "487d2943ac32250139322878118254622fdd4010",
 			"revisionTime": "2016-12-28T14:28:12Z"
 		},
@@ -271,6 +259,12 @@
 			"revisionTime": "2016-11-05T22:35:13Z"
 		},
 		{
+			"checksumSHA1": "oskgb0WteBKOItG8NNDduM7E/D0=",
+			"path": "github.com/hashicorp/consul-template/signals",
+			"revision": "c3334733e62b2a43b10a076c3597ad5002275695",
+			"revisionTime": "2017-02-13T21:01:31Z"
+		},
+		{
 			"checksumSHA1": "aEsDf+h7Jy6qUHcYEC2DDSgNPb4=",
 			"path": "github.com/hashicorp/consul/api",
 			"revision": "916f3c85b0c9e69fdcb0bc1f658bfcbb8943b0bc",
@@ -438,6 +432,12 @@
 			"path": "github.com/pborman/uuid",
 			"revision": "3d4f2ba23642d3cfd06bd4b54cf03d99d95c0f1b",
 			"revisionTime": "2016-10-05T15:16:09Z"
+		},
+		{
+			"checksumSHA1": "ynJSWoF6v+3zMnh9R0QmmG6iGV8=",
+			"path": "github.com/pkg/errors",
+			"revision": "248dadf4e9068a0b3e79f02ed0a610d935de5302",
+			"revisionTime": "2016-10-29T09:36:37Z"
 		},
 		{
 			"checksumSHA1": "GGb6UcrDCNMWWIjyjDgvauGw9qI=",

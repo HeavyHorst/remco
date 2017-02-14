@@ -13,7 +13,9 @@ package fileutil
 
 import (
 	hash "crypto/sha1"
-	"errors"
+
+	"github.com/pkg/errors"
+
 	"fmt"
 	"io"
 	"os"
@@ -25,7 +27,7 @@ func stat(name string) (fi fileInfo, err error) {
 		f, err := os.Open(name)
 		defer f.Close()
 		if err != nil {
-			return fi, err
+			return fi, errors.Wrap(err, "open file failed")
 		}
 		stats, _ := f.Stat()
 		fi.Mode = stats.Mode()
@@ -34,5 +36,5 @@ func stat(name string) (fi fileInfo, err error) {
 		fi.Hash = fmt.Sprintf("%x", h.Sum(nil))
 		return fi, nil
 	}
-	return fi, errors.New("File not found")
+	return fi, fmt.Errorf("file not found")
 }

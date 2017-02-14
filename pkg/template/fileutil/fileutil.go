@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/pkg/errors"
 )
 
 // FileInfo describes a configuration file and is returned by filestat.
@@ -49,14 +50,14 @@ func ReplaceFile(src, dest string, mode os.FileMode, logger *logrus.Entry) error
 			var rerr error
 			contents, rerr = ioutil.ReadFile(src)
 			if rerr != nil {
-				return rerr
+				return errors.Wrap(rerr, "couldn't read source file")
 			}
 			err := ioutil.WriteFile(dest, contents, mode)
 			if err != nil {
-				return err
+				return errors.Wrap(rerr, "couldn't write destination file")
 			}
 		} else {
-			return err
+			return errors.Wrap(err, "couldn't rename src -> dst")
 		}
 	}
 	return nil

@@ -20,6 +20,7 @@ import (
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"
 	"github.com/Sirupsen/logrus"
+	"github.com/pkg/errors"
 )
 
 // BackendConfigs holds every individually backend config.
@@ -73,7 +74,7 @@ type Resource struct {
 func readFileAndExpandEnv(path string) ([]byte, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
-		return buf, err
+		return buf, errors.Wrap(err, "read file failed")
 	}
 	// expand the environment variables
 	buf = []byte(os.ExpandEnv(string(buf)))
@@ -92,7 +93,7 @@ func NewConfiguration(path string) (Configuration, error) {
 	}
 
 	if err := toml.Unmarshal(buf, &c); err != nil {
-		return c, err
+		return c, errors.Wrapf(err, "toml unmarshal failed: %s", path)
 	}
 
 	for _, v := range c.Resource {
@@ -112,7 +113,7 @@ func NewConfiguration(path string) (Configuration, error) {
 
 				log.WithFields(logrus.Fields{
 					"path": fp,
-				}).Info("Loading resource configuration")
+				}).Info("loading resource configuration")
 
 				buf, err := readFileAndExpandEnv(fp)
 				if err != nil {
@@ -120,7 +121,7 @@ func NewConfiguration(path string) (Configuration, error) {
 				}
 				var r Resource
 				if err := toml.Unmarshal(buf, &r); err != nil {
-					return c, err
+					return c, errors.Wrapf(err, "toml unmarshal failed: %s", fp)
 				}
 				// don't add empty resources
 				if len(r.Template) > 0 {

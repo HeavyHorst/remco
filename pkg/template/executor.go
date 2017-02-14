@@ -16,9 +16,10 @@ import (
 	"time"
 
 	"github.com/HeavyHorst/consul-template/child"
-	"github.com/HeavyHorst/consul-template/signals"
 	"github.com/Sirupsen/logrus"
+	"github.com/hashicorp/consul-template/signals"
 	shellwords "github.com/mattn/go-shellwords"
+	"github.com/pkg/errors"
 )
 
 // ExecConfig represents the configuration values for the exec mode
@@ -55,7 +56,7 @@ type Executor struct {
 	exitChan   chan chan exitC
 }
 
-// New creates a new Executor
+// NewExecutor creates a new Executor
 func NewExecutor(execCommand, reloadSignal, killSignal string, killTimeout, splay int, logger *logrus.Entry) Executor {
 	var rs, ks os.Signal
 	var err error
@@ -200,7 +201,10 @@ func (e *Executor) StopChild() {
 func (e *Executor) Reload() error {
 	errchan := make(chan error)
 	e.reloadChan <- errchan
-	return <-errchan
+	if err := <-errchan; err != nil {
+		return errors.Wrap(err, "reload failed")
+	}
+	return nil
 }
 
 func (e *Executor) getExitChan() (<-chan int, bool) {

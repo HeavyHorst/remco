@@ -21,6 +21,7 @@ import (
 	"github.com/HeavyHorst/remco/pkg/template"
 	"github.com/Sirupsen/logrus"
 	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
 )
 
 type reloadSignal struct {
@@ -110,7 +111,7 @@ func (ru *Supervisor) writePid(pid int) error {
 
 	err := ioutil.WriteFile(ru.pidFile, []byte(fmt.Sprintf("%d", pid)), 0666)
 	if err != nil {
-		return fmt.Errorf("could not create pid file: %s", err)
+		return errors.Wrap(err, "couldn't write pid file")
 	}
 	return nil
 }
@@ -124,7 +125,7 @@ func (ru *Supervisor) deletePid() error {
 
 	stat, err := os.Stat(ru.pidFile)
 	if err != nil {
-		return fmt.Errorf("could not remove pid file: %s", err)
+		return errors.Wrap(err, "couldn't get file stats")
 	}
 
 	if stat.IsDir() {

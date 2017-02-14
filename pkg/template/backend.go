@@ -17,6 +17,7 @@ import (
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/Sirupsen/logrus"
+	"github.com/pkg/errors"
 )
 
 // A BackendConnector - Every backend implements this interface. If Connect is called a new connection to the underlaying kv-store will be established.
@@ -59,7 +60,7 @@ func (bc BackendConnectors) ConnectAll(ctx context.Context) ([]Backend, error) {
 				} else if err != berr.ErrNilConfig {
 					log.WithFields(logrus.Fields{
 						"backend": b.Name,
-					}).Error(err)
+					}).Error(errors.Wrap(err, "connect failed"))
 
 					//try again after 2 seconds
 					time.Sleep(2 * time.Second)
