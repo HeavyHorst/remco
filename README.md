@@ -23,8 +23,8 @@ See: https://heavyhorst.github.io/remco/
 ## Installation
 ### Building from source
 
-  - go get github.com/HeavyHorst/remco
-  - go install github.com/HeavyHorst/remco
+  - go get github.com/HeavyHorst/remco/cmd/remco
+  - go install github.com/HeavyHorst/remco/cmd/remco
 
   You should now have remco in your $GOPATH/bin directory
 
