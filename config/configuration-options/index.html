@@ -490,6 +490,11 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 <ul>
 <li>The location to place the rendered configuration file.</li>
 </ul></li>
+<li><strong>make_directories(bool, optional):</strong>
+
+<ul>
+<li>make parent directories for the dst path as needed. Default is false.</li>
+</ul></li>
 <li><strong>check_cmd(string, optional):</strong>
 
 <ul>
@@ -691,7 +696,7 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 <li><strong>auth_type(string):</strong>
 
 <ul>
-<li>The vault authentication type. (token, approle, app-id, userpass, github)</li>
+<li>The vault authentication type. (token, approle, app-id, userpass, github, cert)</li>
 </ul></li>
 <li><strong>auth_token(string):</strong>
 

@@ -130,6 +130,11 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;ul&gt;
 &lt;li&gt;The location to place the rendered configuration file.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;make_directories(bool, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;make parent directories for the dst path as needed. Default is false.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;check_cmd(string, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
@@ -331,7 +336,7 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;auth_type(string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The vault authentication type. (token, approle, app-id, userpass, github)&lt;/li&gt;
+&lt;li&gt;The vault authentication type. (token, approle, app-id, userpass, github, cert)&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;auth_token(string):&lt;/strong&gt;
 
