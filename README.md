@@ -33,7 +33,7 @@ See: https://heavyhorst.github.io/remco/
 
 Download the releases and extract the binary.
 ```
-REMCO_VER=0.8.0
+REMCO_VER=0.9.0
 wget https://github.com/HeavyHorst/remco/releases/download/v${REMCO_VER}/remco_${REMCO_VER}_linux_amd64.zip
 unzip remco_${REMCO_VER}_linux_amd64.zip
 ```
