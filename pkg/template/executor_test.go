@@ -143,7 +143,7 @@ func TestWait(t *testing.T) {
 		nc <- s
 	}()
 
-	if <-nc != true {
+	if !<-nc {
 		t.Error("the context was not canceled, should be true")
 	}
 }
@@ -163,7 +163,7 @@ func TestWaitCancel(t *testing.T) {
 		nc <- s
 	}()
 
-	if <-nc != false {
+	if <-nc {
 		t.Error("the context was canceled, should be false")
 	}
 
@@ -245,7 +245,7 @@ func TestSignalChild(t *testing.T) {
 
 	// the program should exit when it receives the os.Interrupt
 	n := <-nc
-	if n != true {
+	if !n {
 		t.Error("the context wasn't canceled, exec.Wait should have returned true")
 	}
 

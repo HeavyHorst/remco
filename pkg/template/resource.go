@@ -116,7 +116,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 		store := memkv.New()
 		tr.backends[i].store = store
 
-		if tr.backends[i].Interval <= 0 && tr.backends[i].Onetime == false && tr.backends[i].Watch == false {
+		if tr.backends[i].Interval <= 0 && !tr.backends[i].Onetime && !tr.backends[i].Watch {
 			logger.Warning("interval needs to be > 0: setting interval to 60")
 			tr.backends[i].Interval = 60
 		}
