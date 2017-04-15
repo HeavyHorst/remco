@@ -313,11 +313,10 @@ retryloop:
 		case storeClient := <-processChan:
 			changed, err := t.process([]Backend{storeClient})
 			if err != nil {
-				if _, ok := err.(berr.BackendError); ok {
-					t.logger.WithFields(logrus.Fields{
-						"backend": storeClient.Name,
-					}).Error(err)
-				} else {
+				switch err.(type) {
+				case berr.BackendError:
+					t.logger.WithField("backend", storeClient.Name).Error(err)
+				default:
 					t.logger.Error(err)
 				}
 			} else if changed {
@@ -328,9 +327,7 @@ retryloop:
 		case s := <-t.SignalChan:
 			t.exec.SignalChild(s)
 		case err := <-errChan:
-			t.logger.WithFields(logrus.Fields{
-				"backend": err.Backend,
-			}).Error(err.Message)
+			t.logger.WithField("backend", err.Backend).Error(err.Message)
 		case <-ctx.Done():
 			go func() {
 				for range processChan {
