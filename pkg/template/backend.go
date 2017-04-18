@@ -12,7 +12,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/HeavyHorst/easyKV"
+	"github.com/HeavyHorst/easykv"
 	"github.com/HeavyHorst/memkv"
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
@@ -30,7 +30,7 @@ type BackendConnectors []BackendConnector
 
 // Backend is the representation of a template backend like etcd or consul
 type Backend struct {
-	easyKV.ReadWatcher
+	easykv.ReadWatcher
 	Name     string
 	Onetime  bool
 	Watch    bool
@@ -87,9 +87,9 @@ func (s Backend) watch(ctx context.Context, processChan chan Backend, errChan ch
 		case <-ctx.Done():
 			return
 		default:
-			index, err := s.WatchPrefix(ctx, s.Prefix, easyKV.WithKeys(keysPrefix), easyKV.WithWaitIndex(lastIndex))
+			index, err := s.WatchPrefix(ctx, s.Prefix, easykv.WithKeys(keysPrefix), easykv.WithWaitIndex(lastIndex))
 			if err != nil {
-				if err != easyKV.ErrWatchCanceled {
+				if err != easykv.ErrWatchCanceled {
 					errChan <- berr.BackendError{Message: err.Error(), Backend: s.Name}
 					time.Sleep(2 * time.Second)
 				}

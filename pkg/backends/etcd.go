@@ -9,7 +9,7 @@
 package backends
 
 import (
-	"github.com/HeavyHorst/easyKV/etcd"
+	"github.com/HeavyHorst/easykv/etcd"
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"

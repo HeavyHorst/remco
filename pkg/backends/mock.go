@@ -9,7 +9,7 @@
 package backends
 
 import (
-	"github.com/HeavyHorst/easyKV/mock"
+	"github.com/HeavyHorst/easykv/mock"
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/template"
 )

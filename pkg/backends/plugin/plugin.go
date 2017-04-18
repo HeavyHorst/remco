@@ -15,7 +15,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/HeavyHorst/easyKV"
+	"github.com/HeavyHorst/easykv"
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/template"
 	"github.com/natefinch/pie"
@@ -77,10 +77,10 @@ func (p *plug) Close() {
 // WatchConfig holds all data needed by the plugins WatchPrefix method.
 type WatchConfig struct {
 	Prefix string
-	Opts   easyKV.WatchOptions
+	Opts   easykv.WatchOptions
 }
 
-func (p *plug) WatchPrefix(ctx context.Context, prefix string, opts ...easyKV.WatchOption) (uint64, error) {
+func (p *plug) WatchPrefix(ctx context.Context, prefix string, opts ...easykv.WatchOption) (uint64, error) {
 	var result uint64
 
 	wc := WatchConfig{Prefix: prefix}
