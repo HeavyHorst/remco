@@ -989,7 +989,7 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;ul&gt;
 &lt;li&gt;The vault authentication token. Only used with auth_type=token or github.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;app_role(string):&lt;/strong&gt;
+&lt;li&gt;&lt;strong&gt;role_id(string):&lt;/strong&gt;
 
 &lt;ul&gt;
 &lt;li&gt;The vault app role. Only used with auth_type=approle.&lt;/li&gt;
