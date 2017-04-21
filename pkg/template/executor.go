@@ -22,13 +22,28 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ExecConfig represents the configuration values for the exec mode
+// ExecConfig represents the configuration values for the exec mode.
 type ExecConfig struct {
-	Command      string `json:"command"`
+	// Command is the command to execute.	// Backtick parsing is supported:
+	//   ./foo `echo $SHELL`
+	Command string `json:"command"`
+
+	// ReloadSignal is the Signal that is sended to the subpocess if we want to reload it.
+	// If no signal is specified the child process will be killed (gracefully) and started again.
 	ReloadSignal string `toml:"reload_signal" json:"reload_signal"`
-	KillSignal   string `toml:"kill_signal" json:"kill_signal"`
-	KillTimeout  int    `toml:"kill_timeout" json:"kill_timeout"`
-	Splay        int    `json:"splay"`
+
+	// KillSignal defines the signal sent to the child process when remco is gracefully shutting down.
+	//
+	// The application needs to exit before the kill_timeout, it will be terminated otherwise (like kill -9).
+	// The default value is “SIGTERM”.
+	KillSignal string `toml:"kill_signal" json:"kill_signal"`
+
+	// KillTimeout - the maximum amount of time in seconds to wait for the child process to gracefully terminate.
+	KillTimeout int `toml:"kill_timeout" json:"kill_timeout"`
+
+	// A random splay to wait before killing the command.
+	// May be useful in large clusters to prevent all child processes to reload at the same time when configuration changes occur.
+	Splay int `json:"splay"`
 }
 
 type childSignal struct {
@@ -41,7 +56,10 @@ type exitC struct {
 	valid    bool
 }
 
-// Executor provides some methods to control a subprocess
+// An Executor controls a subprocess.
+// It can control the whole process lifecycle and can
+// reload and stop the process gracefully or send other signals to
+// the child process using channels.
 type Executor struct {
 	execCommand  string
 	reloadSignal os.Signal
@@ -56,10 +74,15 @@ type Executor struct {
 	exitChan   chan chan exitC
 }
 
-// NewExecutor creates a new Executor
+// NewExecutor creates a new Executor.
 func NewExecutor(execCommand, reloadSignal, killSignal string, killTimeout, splay int, logger *logrus.Entry) Executor {
 	var rs, ks os.Signal
 	var err error
+
+	if logger == nil {
+		logger = logrus.NewEntry(logrus.New())
+	}
+
 	if reloadSignal != "" {
 		rs, err = signals.Parse(reloadSignal)
 		if err != nil {
@@ -96,7 +119,10 @@ func NewExecutor(execCommand, reloadSignal, killSignal string, killTimeout, spla
 	}
 }
 
-// SpawnChild parses e.execCommand and starts the child process accordingly
+// SpawnChild parses e.execCommand and starts the child process accordingly.
+// Backtick parsing is supported:
+//   ./foo `echo $SHELL`
+//
 // only call this once !
 func (e *Executor) SpawnChild() error {
 	var c *child.Child
@@ -171,7 +197,7 @@ func (e *Executor) SpawnChild() error {
 	return nil
 }
 
-// SignalChild forwards the os.Signal to the child process
+// SignalChild forwards the os.Signal to the child process.
 func (e *Executor) SignalChild(s os.Signal) error {
 	err := make(chan error)
 
@@ -185,10 +211,10 @@ func (e *Executor) SignalChild(s os.Signal) error {
 
 }
 
-// StopChild stops the child process
-// it blocks until the child quits.
-// the child will be killed if it takes longer than
-// killTimeout to stop it.
+// StopChild stops the child process.
+//
+// It blocks until the child quits or the killTimeout is reached.
+// The child will be killed if it takes longer than killTimeout to stop it.
 func (e *Executor) StopChild() {
 	errchan := make(chan error)
 	e.stopChan <- errchan
@@ -214,8 +240,9 @@ func (e *Executor) getExitChan() (<-chan int, bool) {
 	return exit.exitChan, exit.valid
 }
 
-// Wait waits for the children to stop.
+// Wait waits for the child to stop.
 // Returns true if the command stops unexpectedly and false if the context is canceled.
+//
 // Wait ignores reloads.
 func (e *Executor) Wait(ctx context.Context) bool {
 	exitChan, valid := e.getExitChan()

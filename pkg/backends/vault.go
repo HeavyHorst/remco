@@ -18,15 +18,35 @@ import (
 
 // VaultConfig represents the config for the vault backend.
 type VaultConfig struct {
-	Node         string
-	AuthType     string `toml:"auth_type"`
-	AppID        string `toml:"app_id"`
-	UserID       string `toml:"user_id"`
-	RoleID       string `toml:"role_id"`
-	SecretID     string `toml:"secret_id"`
-	Username     string
-	Password     string
-	AuthToken    string `toml:"auth_token"`
+	// The address of the vault server.
+	Node string
+
+	// The vault authentication type.
+	//   (token, approle, app-id, userpass, github, cert)
+	AuthType string `toml:"auth_type"`
+
+	// The vault app ID.
+	// Only used with auth_type=app-id.
+	AppID string `toml:"app_id"`
+	// The vault user ID.
+	// Only used with auth_type=app-id.
+	UserID string `toml:"user_id"`
+
+	// The vault RoleID.
+	// Only used with auth_type=approle.
+	RoleID string `toml:"role_id"`
+	// The vault SecretID.
+	// Only used with auth_type=approle.
+	SecretID string `toml:"secret_id"`
+
+	// The username for the userpass authentication.
+	Username string
+	// The password for the userpass authentication.
+	Password string
+
+	// The vault authentication token. Only used with auth_type=token or github.
+	AuthToken string `toml:"auth_token"`
+
 	ClientCert   string `toml:"client_cert"`
 	ClientKey    string `toml:"client_key"`
 	ClientCaKeys string `toml:"client_ca_keys"`

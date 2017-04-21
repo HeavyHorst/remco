@@ -37,9 +37,10 @@ func IsFileExist(fpath string) bool {
 }
 
 // ReplaceFile replaces dest with src.
+//
 // ReplaceFile just renames (move) the file if possible.
 // If that fails it will read the src file and write the content to the destination file.
-// It returns an error iof any.
+// It returns an error if any.
 func ReplaceFile(src, dest string, mode os.FileMode, logger *logrus.Entry) error {
 	err := os.Rename(src, dest)
 	if err != nil {

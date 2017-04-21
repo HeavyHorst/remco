@@ -141,7 +141,7 @@ weight: 10
    - The vault authentication type. (token, approle, app-id, userpass, github, cert)
  - **auth_token(string):**
    - The vault authentication token. Only used with auth_type=token or github.
- - **app_role(string):**
+ - **role_id(string):**
    - The vault app role. Only used with auth_type=approle.
  - **secret_id(string):**
    - The vault secret id. Only used with auth_type=approle.

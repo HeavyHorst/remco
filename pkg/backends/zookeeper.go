@@ -18,7 +18,10 @@ import (
 
 // ZookeeperConfig represents the config for the consul backend.
 type ZookeeperConfig struct {
-	Nodes     []string
+	// A list of zookeeper nodes.
+	Nodes []string
+
+	// A DNS server record to discover the zookeeper nodes.
 	SRVRecord SRVRecord `toml:"srv_record"`
 	template.Backend
 }

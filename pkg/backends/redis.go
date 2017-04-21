@@ -18,10 +18,18 @@ import (
 
 // RedisConfig represents the config for the redis backend.
 type RedisConfig struct {
-	Nodes     []string
+	// A list of backend nodes.
+	Nodes []string
+
+	// A DNS server record to discover the redis nodes.
 	SRVRecord SRVRecord `toml:"srv_record"`
-	Password  string
-	Database  int
+
+	// The redis password.
+	Password string
+
+	// The redis database.
+	Database int
+
 	template.Backend
 }
 

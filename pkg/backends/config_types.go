@@ -18,7 +18,7 @@ import (
 // for example _etcd-client._tcp.example.com.
 type SRVRecord string
 
-// GetNodesFromSRV returns the nodes stored in the record
+// GetNodesFromSRV returns the nodes stored in the record.
 func (r SRVRecord) GetNodesFromSRV(scheme string) ([]string, error) {
 	var nodes []string
 	_, addrs, err := net.LookupSRV("", "", string(r))

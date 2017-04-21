@@ -100,7 +100,7 @@ func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 // if they differ. syncFiles will run a config check command if set before
 // overwriting the target config file. Finally, syncFile will run a reload command
 // if set to have the application or service pick up the changes.
-// It returns an error if any.
+// It returns a boolean indicating if the file has changed and an error if any.
 func (s *Renderer) syncFiles() (bool, error) {
 	var changed bool
 	staged := s.stageFile.Name()
@@ -214,7 +214,7 @@ func (s *Renderer) check(stageFile string) error {
 }
 
 // reload executes the reload command.
-// It returns nil if the reload command returns 0.
+// It returns nil if the reload command returns 0 and an error otherwise.
 func (s *Renderer) reload() error {
 	if s.ReloadCmd == "" {
 		return nil

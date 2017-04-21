@@ -47,24 +47,38 @@ type Resource struct {
 	sources  []*Renderer
 	logger   *logrus.Entry
 
-	exec       Executor
+	exec Executor
+
+	// SignalChan is a channel to send os.Signal's to all child processes.
 	SignalChan chan os.Signal
 
+	// Failed is true if we run Monitor() in exec mode and the child process exits unexpectedly.
+	// If the monitor context is canceled as usual Failed is false.
+	// Failed is used to restart the Resource on failure.
 	Failed bool
 }
 
-// ResourceConfig is a configuration struct to create a new resource
+// ResourceConfig is a configuration struct to create a new resource.
 type ResourceConfig struct {
-	Exec       ExecConfig
-	Template   []*Renderer
-	Name       string
+	Exec ExecConfig
+
+	// Template is the configuration for all template options.
+	// You can configure as much template-destination pairs as you like.
+	Template []*Renderer
+
+	// Name gives the Resource a name.
+	// This name is added to the logs to distinguish between different resources.
+	Name string
+
+	// Connectors is a list of BackendConnectors.
+	// The Resource will establish a connection to all of these.
 	Connectors BackendConnectors
 }
 
 // ErrEmptySrc is returned if an emty src template is passed to NewResource
 var ErrEmptySrc = fmt.Errorf("empty src template")
 
-// NewResourceFromResourceConfig creates a new resource from the given ResourceConfig
+// NewResourceFromResourceConfig creates a new resource from the given ResourceConfig.
 func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, r ResourceConfig) (*Resource, error) {
 	backendList, err := r.Connectors.ConnectAll(ctx)
 	if err != nil {
@@ -127,7 +141,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 	return tr, nil
 }
 
-// Close is calling the close method on all backends
+// Close closes the connection to all underlying backends.
 func (t *Resource) Close() {
 	for _, v := range t.backends {
 		t.logger.WithFields(logrus.Fields{
@@ -137,7 +151,12 @@ func (t *Resource) Close() {
 	}
 }
 
-// setVars sets the Vars for a template resource.
+// setVars reads all KV-Pairs for the backend
+// and writes these pairs to the individual (per backend) memkv store.
+// After that, the instance wide memkv store gets purged and is recreated with all individual
+// memkv KV-Pairs.
+// Key collisions are logged.
+// It returns an error if any.
 func (t *Resource) setVars(storeClient Backend) error {
 	var err error
 
@@ -210,6 +229,7 @@ func (t *Resource) process(storeClients []Backend) (bool, error) {
 }
 
 // Monitor will start to monitor all given Backends for changes.
+// It accepts a ctx.Context for cancelation.
 // It will process all given tamplates on changes.
 func (t *Resource) Monitor(ctx context.Context) {
 	t.Failed = false

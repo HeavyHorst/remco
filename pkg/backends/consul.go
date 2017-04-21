@@ -18,12 +18,25 @@ import (
 
 // ConsulConfig represents the config for the consul backend.
 type ConsulConfig struct {
-	Nodes        []string
-	Scheme       string
-	SRVRecord    SRVRecord `toml:"srv_record"`
-	ClientCert   string    `toml:"client_cert"`
-	ClientKey    string    `toml:"client_key"`
-	ClientCaKeys string    `toml:"client_ca_keys"`
+	// Nodes is a list of backend nodes.
+	// A connection will only be established to the first server in the list.
+	Nodes []string
+
+	// The backend URI scheme (http or https).
+	Scheme string
+
+	// A DNS server record to discover the consul nodes.
+	SRVRecord SRVRecord `toml:"srv_record"`
+
+	// The client cert file.
+	ClientCert string `toml:"client_cert"`
+
+	// The client key file.
+	ClientKey string `toml:"client_key"`
+
+	//The client CA key file.
+	ClientCaKeys string `toml:"client_ca_keys"`
+
 	template.Backend
 }
 

@@ -18,15 +18,37 @@ import (
 
 // EtcdConfig represents the config for the etcd backend.
 type EtcdConfig struct {
-	Nodes        []string
-	Scheme       string    //only needed for etcdv2 with SRVRecord
-	ClientCert   string    `toml:"client_cert"`
-	ClientKey    string    `toml:"client_key"`
-	ClientCaKeys string    `toml:"client_ca_keys"`
-	SRVRecord    SRVRecord `toml:"srv_record"`
-	Username     string
-	Password     string
-	Version      int
+	// Nodes is list of backend nodes.
+	Nodes []string
+
+	// The backend URI scheme (http or https).
+	// This is only used when the nodes are discovered via DNS srv records and the api level is 2.
+	//
+	// The default is http.
+	Scheme string
+
+	// The client cert file.
+	ClientCert string `toml:"client_cert"`
+
+	// The client key file.
+	ClientKey string `toml:"client_key"`
+
+	// The client CA key file.
+	ClientCaKeys string `toml:"client_ca_keys"`
+
+	// A DNS server record to discover the etcd nodes.
+	SRVRecord SRVRecord `toml:"srv_record"`
+
+	// The username for the basic_auth authentication.
+	Username string
+
+	// The password for the basic_auth authentication.
+	Password string
+
+	// The etcd api-level to use (2 or 3).
+	//
+	// The default is 2.
+	Version int
 	template.Backend
 }
 
