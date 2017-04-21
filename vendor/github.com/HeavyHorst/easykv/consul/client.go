@@ -16,10 +16,6 @@ package consul
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
-	"net/http"
 	"path"
 	"strings"
 
@@ -47,27 +43,17 @@ func New(nodes []string, opts ...Option) (*Client, error) {
 		conf.Address = nodes[0]
 	}
 
-	tlsConfig := &tls.Config{}
+	tlsConfig := api.TLSConfig{}
 	if options.TLS.ClientCert != "" && options.TLS.ClientKey != "" {
-		clientCert, err := tls.LoadX509KeyPair(options.TLS.ClientCert, options.TLS.ClientKey)
-		if err != nil {
-			return nil, err
-		}
-		tlsConfig.Certificates = []tls.Certificate{clientCert}
-		tlsConfig.BuildNameToCertificate()
+		tlsConfig.CertFile = options.TLS.ClientCert
+		tlsConfig.KeyFile = options.TLS.ClientKey
 	}
+
 	if options.TLS.ClientCaKeys != "" {
-		ca, err := ioutil.ReadFile(options.TLS.ClientCaKeys)
-		if err != nil {
-			return nil, err
-		}
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM(ca)
-		tlsConfig.RootCAs = caCertPool
+		tlsConfig.CAFile = options.TLS.ClientCaKeys
 	}
-	conf.HttpClient.Transport = &http.Transport{
-		TLSClientConfig: tlsConfig,
-	}
+
+	conf.TLSConfig = tlsConfig
 
 	client, err := api.NewClient(conf)
 	if err != nil {
