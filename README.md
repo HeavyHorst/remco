@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/HeavyHorst/remco.png?label=ready&title=Ready)](https://waffle.io/HeavyHorst/remco)
 [![Build Status](https://travis-ci.org/HeavyHorst/remco.svg?branch=master)](https://travis-ci.org/HeavyHorst/remco) [![Go Report Card](https://goreportcard.com/badge/github.com/HeavyHorst/remco)](https://goreportcard.com/report/github.com/HeavyHorst/remco) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/HeavyHorst/remco/master/LICENSE)
 
 # Remco
