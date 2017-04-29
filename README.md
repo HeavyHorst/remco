@@ -18,6 +18,9 @@ Remcos main purposes are (like confd's):
    - Additional backends can be provided as plugins.
    - [Exec](https://heavyhorst.github.io/remco/details/exec-mode/) mode similar to consul-template.
 
+## Overview
+![remco overview](https://cdn.rawgit.com/HeavyHorst/remco/master/docs/images/Remco-overview.svg)
+
 ## Documentation 
 
 See: https://heavyhorst.github.io/remco/
