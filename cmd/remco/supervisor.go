@@ -67,7 +67,7 @@ func NewSupervisor(cfg Configuration, reapLock *sync.RWMutex, done chan struct{}
 	go func() {
 		defer w.wg.Done()
 		// close the done channel
-		// this signals the main function that the Runner has completed all work
+		// this signals the main function that all work is done.
 		// for example all backends are configured with onetime=true
 		defer close(done)
 		for {
@@ -251,7 +251,7 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 	}
 }
 
-// Reload rereads the configuration, stops the old Runner and starts a new one.
+// Reload with the new configuration.
 func (ru *Supervisor) Reload(cfg Configuration) {
 	reloaded := make(chan struct{})
 	ru.reloadChan <- reloadSignal{
@@ -261,7 +261,7 @@ func (ru *Supervisor) Reload(cfg Configuration) {
 	<-reloaded
 }
 
-// Stop stops the Runner gracefully.
+// Stop stops the Supervisor gracefully.
 func (ru *Supervisor) Stop() {
 	close(ru.stopChan)
 	// wait for the main routine to exit
