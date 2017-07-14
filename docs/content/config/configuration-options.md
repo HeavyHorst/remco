@@ -15,6 +15,8 @@ weight: 10
    - The format of the log messages. Valid formats are *text* and *json*.
  - **include_dir(string):**
    - Specify an entire directory of resource configuration files to include.
+ - **filter_dir(string):**
+   - A folder with custom JavaScript template filters.
  - **pid_file(string):**
    - A filename to write the process-id to.
  - **log_file(string):**

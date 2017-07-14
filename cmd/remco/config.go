@@ -56,6 +56,7 @@ type Configuration struct {
 	LogLevel   string `toml:"log_level"`
 	LogFormat  string `toml:"log_format"`
 	IncludeDir string `toml:"include_dir"`
+	FilterDir  string `toml:"filter_dir"`
 	PidFile    string `toml:"pid_file"`
 	LogFile    string `toml:"log_file"`
 	Resource   []Resource
@@ -131,6 +132,12 @@ func NewConfiguration(path string) (Configuration, error) {
 					c.Resource = append(c.Resource, r)
 				}
 			}
+		}
+	}
+
+	if c.FilterDir != "" {
+		if err := template.RegisterCustomJsFilters(c.FilterDir); err != nil {
+			return c, err
 		}
 	}
 

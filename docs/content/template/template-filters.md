@@ -7,6 +7,8 @@ toc: true
 weight: 20
 ---
 
+## Builtin filters
+
 <details>
 <summary> **base64** -- Encodes a string as base64 </summary>
 ```
@@ -91,3 +93,32 @@ ETCDCTL_API=3 etcdctl put /test/data $data
 ```
 </details>
 
+
+## Custom filters
+
+It is possible to create custom filters in JavaScript.
+If you want to create a 'toEnv' filter, which transforms file system paths to environment variables, you must create the file 'toEnv.js' in the configurable filter directory.
+
+The filter code could look like:
+```javascript
+In.split("/").join("_").substr(1).toUpperCase();
+```
+
+There are two predifined variabled:
+
+  - In: the filter input
+  - Param: the optional filter parameter
+ 
+### Examples
+**reverse filter**
+ 
+```javascript
+function reverse(s) {
+     var o = "";
+     for (var i = s.length - 1; i >= 0; i--)
+        o += s[i];
+     return o;
+}
+
+reverse(In);
+```

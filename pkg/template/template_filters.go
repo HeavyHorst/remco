@@ -12,23 +12,28 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
+	"strings"
 
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/HeavyHorst/memkv"
 	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/pkg/log"
+	"github.com/dop251/goja"
 	"github.com/mickep76/iodatafmt/yaml_mapstr"
+	"github.com/pkg/errors"
 )
 
 func init() {
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
 	pongo2.RegisterFilter("parseYAML", filterUnmarshalYAML)
 	pongo2.RegisterFilter("parseJSON", filterUnmarshalYAML)      // just an alias
-	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAML) //deprecated
+	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAML) // deprecated
 	pongo2.RegisterFilter("toJSON", filterToJSON)
 	pongo2.RegisterFilter("toPrettyJSON", filterToPrettyJSON)
 	pongo2.RegisterFilter("toYAML", filterToYAML)
@@ -36,6 +41,51 @@ func init() {
 	pongo2.RegisterFilter("base", filterBase)
 	pongo2.RegisterFilter("base64", filterBase64)
 	pongo2.RegisterFilter("decrypt", filterDecrypt)
+}
+
+// RegisterCustomJsFilters loads all filters from the given directory.
+// It returns an error if any.
+func RegisterCustomJsFilters(folder string) error {
+	files, _ := ioutil.ReadDir(folder)
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), ".js") {
+			fp := filepath.Join(folder, file.Name())
+			buf, err := ioutil.ReadFile(fp)
+			if err != nil {
+				return errors.Errorf("couldn't load custom filter %s", fp)
+			}
+			name := file.Name()
+			name = name[0 : len(name)-3]
+
+			filterFunc := pongoJSFilter(string(buf))
+
+			if err := pongo2.RegisterFilter(name, filterFunc); err != nil {
+				if err := pongo2.ReplaceFilter(name, filterFunc); err != nil {
+					return errors.Errorf("couldn't replace existing filter %s", name)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func pongoJSFilter(js string) func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	return func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+		vm := goja.New()
+
+		vm.Set("In", in.Interface())
+		vm.Set("Param", param.Interface())
+
+		v, err := vm.RunString(js)
+		if err != nil {
+			return nil, &pongo2.Error{
+				Sender:    "filterToEnv",
+				OrigError: err,
+			}
+		}
+
+		return pongo2.AsValue(v.Export()), nil
+	}
 }
 
 func filterBase64(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -115,15 +165,13 @@ func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *
 	}
 
 	values := in.Interface()
-	switch values.(type) {
+	switch v := values.(type) {
 	case []string:
-		v := values.([]string)
 		sort.Slice(v, func(i, j int) bool {
 			return len(v[i]) < len(v[j])
 		})
 		return pongo2.AsValue(v), nil
 	case memkv.KVPairs:
-		v := values.(memkv.KVPairs)
 		sort.Slice(v, func(i, j int) bool {
 			return len(v[i].Key) < len(v[j].Key)
 		})
@@ -156,9 +204,8 @@ func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo
 	}
 
 	input := in.Interface()
-	switch input.(type) {
+	switch i := input.(type) {
 	case string:
-		i := input.(string)
 		data, err := decrypt(i, entityList)
 		if err != nil {
 			return nil, &pongo2.Error{
@@ -168,7 +215,6 @@ func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo
 		}
 		return pongo2.AsValue(data), nil
 	case memkv.KVPairs:
-		i := input.(memkv.KVPairs)
 		var new []memkv.KVPair
 		for _, v := range i {
 			dvalue, err := decrypt(v.Value, entityList)
@@ -179,14 +225,12 @@ func filterDecrypt(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo
 		}
 		return pongo2.AsValue(memkv.KVPairs(new)), nil
 	case memkv.KVPair:
-		i := input.(memkv.KVPair)
 		dvalue, err := decrypt(i.Value, entityList)
 		if err != nil {
 			log.Warning(fmt.Sprintf("Couldn't decrypt `%s` - %s", i.Value, err))
 		}
 		return pongo2.AsValue(memkv.KVPair{Key: i.Key, Value: dvalue}), nil
 	case []string:
-		i := input.([]string)
 		var new []string
 		for _, v := range i {
 			dvalue, err := decrypt(v, entityList)
