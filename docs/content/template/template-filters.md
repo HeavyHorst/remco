@@ -104,7 +104,7 @@ The filter code could look like:
 In.split("/").join("_").substr(1).toUpperCase();
 ```
 
-There are two predifined variabled:
+There are two predifined variables:
 
   - In: the filter input
   - Param: the optional filter parameter
