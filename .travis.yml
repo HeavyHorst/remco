@@ -40,7 +40,7 @@ services:
   - redis
 
 before_script:
-   - go vet ./...
+   - go vet $(go list ./... | grep -v /vendor/)
    - golint $(go list ./... | grep -v /vendor/)
    - megacheck $(go list ./... | grep -v /vendor/)
 
