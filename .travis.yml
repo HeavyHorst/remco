@@ -1,6 +1,9 @@
 language: go
 
 before_install:
+  - go get github.com/golang/lint/golint
+  - go get honnef.co/go/tools/cmd/megacheck
+
   # install consul
   - wget https://releases.hashicorp.com/consul/0.7.5/consul_0.7.5_linux_amd64.zip
   - unzip consul_0.7.5_linux_amd64.zip
@@ -35,6 +38,11 @@ env:
 
 services:
   - redis
+
+before_script:
+   - go vet ./...
+   - golint $(go list ./... | grep -v /vendor/)
+   - megacheck $(go list ./... | grep -v /vendor/)
 
 script:
   - ./test
