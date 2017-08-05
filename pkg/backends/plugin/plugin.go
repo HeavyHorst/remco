@@ -33,7 +33,7 @@ type Plugin struct {
 	template.Backend
 }
 
-// Connect creates the connection to the plugin and sends the config map to the same.
+// Connect creates the connection to the plugin and initializes it with the stored configuration.
 func (p *Plugin) Connect() (template.Backend, error) {
 	if p == nil {
 		return template.Backend{}, berr.ErrNilConfig
@@ -47,7 +47,7 @@ func (p *Plugin) Connect() (template.Backend, error) {
 	}
 
 	plugin := &plug{client}
-	if err := plugin.Init(p.Config); err != nil {
+	if err := plugin.initPlugin(p.Config); err != nil {
 		return p.Backend, err
 	}
 
@@ -55,9 +55,9 @@ func (p *Plugin) Connect() (template.Backend, error) {
 	return p.Backend, nil
 }
 
-// Init sends the config map to the plugin
+// initPlugin sends the config map to the plugin
 // the plugin can then run some initialization tasks
-func (p *plug) Init(config map[string]interface{}) error {
+func (p *plug) initPlugin(config map[string]interface{}) error {
 	var result bool
 	return p.client.Call("Plugin.Init", config, &result)
 }
