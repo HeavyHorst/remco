@@ -50,7 +50,7 @@ type Backend struct {
 	// The key-path prefix.
 	Prefix string
 
-	// The backend polling interval. Can be used as a reconcilation loop for watch or standalone.
+	// The backend polling interval. Can be used as a reconciliation loop for watch or standalone.
 	Interval int
 
 	// The backend keys that the template requires to be rendered correctly.

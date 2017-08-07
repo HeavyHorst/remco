@@ -69,7 +69,7 @@ weight: 10
  - **prefix(string, optional):**
    - Key path prefix. Default is "".
  - **interval(int, optional):**
-   - The backend polling interval. Can be used as a reconcilation loop for watch or standalone.
+   - The backend polling interval. Can be used as a reconciliation loop for watch or standalone.
  - **onetime(bool, optional):**
    - Render the config file and quit. Default is false.
 </details>
