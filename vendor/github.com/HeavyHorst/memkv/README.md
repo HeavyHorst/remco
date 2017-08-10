@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kelseyhightower/memkv"
+	"github.com/HeavyHorst/memkv"
 )
 
 func main() {

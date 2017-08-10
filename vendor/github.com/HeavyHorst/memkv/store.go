@@ -1,6 +1,7 @@
 package memkv
 
 import (
+	"errors"
 	"path"
 	"sort"
 	"strings"
@@ -8,6 +9,17 @@ import (
 
 	radix "github.com/armon/go-radix"
 )
+
+var ErrNotExist = errors.New("key does not exist")
+
+type KeyError struct {
+	Key string
+	Err error
+}
+
+func (e *KeyError) Error() string {
+	return e.Err.Error() + ": " + e.Key
+}
 
 // A Store represents an in-memory key-value store safe for
 // concurrent access.
@@ -35,7 +47,7 @@ func New() *Store {
 	return s
 }
 
-// Delete deletes the KVPair associated with key.
+// Del deletes the KVPair associated with key.
 func (s *Store) Del(key string) {
 	s.Lock()
 	s.t.Delete(key)
@@ -51,20 +63,21 @@ func (s *Store) Exists(key string) bool {
 }
 
 // Get gets the KVPair associated with key. If there is no KVPair
-// associated with key, Get returns KVPair{}.
-func (s *Store) Get(key string) KVPair {
+// associated with key, Get returns KVPair{}, ErrNotExist.
+func (s *Store) Get(key string) (KVPair, error) {
 	s.RLock()
-	defer s.RUnlock()
 	data, ok := s.t.Get(key)
+	s.RUnlock()
 	if !ok {
-		return KVPair{}
+		return KVPair{}, &KeyError{key, ErrNotExist}
 	}
-	return data.(KVPair)
+	return data.(KVPair), nil
 }
 
 // GetAll returns a KVPair for all nodes with keys matching pattern.
 // The syntax of patterns is the same as in path.Match.
-func (s *Store) GetAll(pattern string) KVPairs {
+func (s *Store) GetAll(pattern string) (KVPairs, error) {
+	var getErr error
 	ks := make(KVPairs, 0)
 	s.RLock()
 	defer s.RUnlock()
@@ -72,6 +85,7 @@ func (s *Store) GetAll(pattern string) KVPairs {
 	s.t.Walk(func(key string, value interface{}) bool {
 		m, err := path.Match(pattern, key)
 		if err != nil {
+			getErr = err
 			return true
 		}
 		if m {
@@ -80,19 +94,25 @@ func (s *Store) GetAll(pattern string) KVPairs {
 		return false
 	})
 
-	if len(ks) == 0 {
-		return nil
+	if getErr != nil {
+		return nil, getErr
 	}
-	return ks
+
+	return ks, nil
 }
 
-func (s *Store) GetAllValues(pattern string) []string {
+func (s *Store) GetAllValues(pattern string) ([]string, error) {
 	var vs []string
-	for _, kv := range s.GetAll(pattern) {
+	ks, err := s.GetAll(pattern)
+	if err != nil {
+		return vs, err
+	}
+
+	for _, kv := range ks {
 		vs = append(vs, kv.Value)
 	}
 	sort.Strings(vs)
-	return vs
+	return vs, nil
 }
 
 // GetAllKVs returns all KV-Pairs
@@ -109,17 +129,17 @@ func (s *Store) GetAllKVs() KVPairs {
 }
 
 // GetValue gets the value associated with key. If there are no values
-// associated with key, GetValue returns "".
-func (s *Store) GetValue(key string, v ...string) string {
-	defaultValue := ""
-	if len(v) > 0 {
-		defaultValue = v[0]
+// associated with key, GetValue returns "", ErrNotExist.
+func (s *Store) GetValue(key string, v ...string) (string, error) {
+	kv, err := s.Get(key)
+	if err != nil {
+		if len(v) > 0 {
+			return v[0], nil
+		}
+		return "", &KeyError{key, ErrNotExist}
 	}
-	kv := s.Get(key)
-	if kv.Key == "" {
-		return defaultValue
-	}
-	return kv.Value
+
+	return kv.Value, nil
 }
 
 func (s *Store) list(filePath string, dir bool) []string {
@@ -148,10 +168,12 @@ func (s *Store) list(filePath string, dir bool) []string {
 	return vs
 }
 
+//List returns all keys prefixed with filePath.
 func (s *Store) List(filePath string) []string {
 	return s.list(filePath, false)
 }
 
+//ListDir returns all directories prefixed with filePath.
 func (s *Store) ListDir(filePath string) []string {
 	return s.list(filePath, true)
 }
@@ -163,6 +185,7 @@ func (s *Store) Set(key string, value string) {
 	s.Unlock()
 }
 
+//Purge removes all keys from the store.
 func (s *Store) Purge() {
 	s.Lock()
 	s.t = radix.New()
