@@ -32,7 +32,10 @@ func (s *FunctionTestSuite) TestAddFuncs(t *C) {
 }
 
 func (s *FunctionTestSuite) TestLookupIP(t *C) {
-	ips := lookupIP("localhost")
+	ips, err := lookupIP("localhost")
+	if err != nil {
+		t.Error(err)
+	}
 	if len(ips) > 0 {
 		t.Check(ips[0], Equals, "127.0.0.1")
 	} else {
@@ -74,7 +77,10 @@ func (s *FunctionTestSuite) TestLookupSRV(t *C) {
 		},
 	}
 
-	srv := lookupSRV("xmpp-server", "tcp", "google.com")
+	srv, err := lookupSRV("xmpp-server", "tcp", "google.com")
+	if err != nil {
+		t.Error(err)
+	}
 	t.Check(srv, DeepEquals, expected)
 }
 
