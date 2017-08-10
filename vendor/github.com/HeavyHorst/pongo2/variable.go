@@ -277,9 +277,8 @@ func (vr *variableResolver) resolve(ctx *ExecutionContext) (*Value, error) {
 						if part.i >= 0 && current.Len() > part.i {
 							current = current.Index(part.i)
 						} else {
-							// Access to non-existed index will cause an error
-							return nil, errors.Errorf("%s is out of range (type: %s, length: %d)",
-								vr.String(), current.Kind().String(), current.Len())
+							// In Django, exceeding the length of a list is just empty.
+							return AsValue(nil), nil
 						}
 					default:
 						return nil, errors.Errorf("Can't access an index on type %s (variable %s)",
@@ -349,8 +348,8 @@ func (vr *variableResolver) resolve(ctx *ExecutionContext) (*Value, error) {
 			}
 
 			// Output arguments
-			if t.NumOut() != 1 {
-				return nil, errors.Errorf("'%s' must have exactly 1 output argument", vr.String())
+			if t.NumOut() != 1 && t.NumOut() != 2 {
+				return nil, errors.Errorf("'%s' must have exactly 1 or 2 output arguments, the second argument must be of type error", vr.String())
 			}
 
 			// Evaluate all parameters
@@ -407,7 +406,20 @@ func (vr *variableResolver) resolve(ctx *ExecutionContext) (*Value, error) {
 			}
 
 			// Call it and get first return parameter back
-			rv := current.Call(parameters)[0]
+			values := current.Call(parameters)
+			rv := values[0]
+			if t.NumOut() == 2 {
+				e := values[1].Interface()
+				if e != nil {
+					err, ok := e.(error)
+					if !ok {
+						return nil, errors.Errorf("The second return value is not an error")
+					}
+					if err != nil {
+						return nil, err
+					}
+				}
+			}
 
 			if rv.Type() != typeOfValuePtr {
 				current = reflect.ValueOf(rv.Interface())

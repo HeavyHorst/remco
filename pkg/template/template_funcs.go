@@ -60,10 +60,10 @@ func getenv(key string, v ...string) string {
 	return value
 }
 
-func lookupIP(data string) []string {
+func lookupIP(data string) ([]string, error) {
 	ips, err := net.LookupIP(data)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	// "Cast" IPs into strings and sort the array
 	ipStrings := make([]string, len(ips))
@@ -72,7 +72,7 @@ func lookupIP(data string) []string {
 		ipStrings[i] = ip.String()
 	}
 	sort.Strings(ipStrings)
-	return ipStrings
+	return ipStrings, nil
 }
 
 func lookupSRV(service, proto, name string) []*net.SRV {
