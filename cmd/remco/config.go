@@ -84,7 +84,7 @@ func readFileAndExpandEnv(path string) ([]byte, error) {
 
 // NewConfiguration reads the file at `path`, expand the environment variables
 // and unmarshals it to a new configuration struct.
-// it returns an error if any.
+// It returns an error if any.
 func NewConfiguration(path string) (Configuration, error) {
 	var c Configuration
 
