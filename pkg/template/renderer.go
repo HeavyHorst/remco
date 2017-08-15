@@ -58,6 +58,10 @@ func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 	}).Debug("compiling source template")
 
 	set := pongo2.NewSet("local", &pongo2.LocalFilesystemLoader{})
+	set.Options = &pongo2.Options{
+		TrimBlocks:   true,
+		LStripBlocks: true,
+	}
 	tmpl, err := set.FromFile(s.Src)
 	if err != nil {
 		return errors.Wrapf(err, "set.FromFile(%s) failed", s.Src)
