@@ -30,7 +30,6 @@ before_install:
   - zookeeper-3.4.9/bin/zkServer.sh start
 
 go:
-  - 1.8.x
   - tip
 
 env:
