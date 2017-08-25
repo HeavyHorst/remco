@@ -28,8 +28,11 @@ before_install:
   - echo "clientPort=2181" >> zookeeper-3.4.9/conf/zoo.cfg
   - mkdir /tmp/zookeeper
   - zookeeper-3.4.9/bin/zkServer.sh start
+  # https://github.com/travis-ci/travis-ci/issues/8229
+  - export GOROOT=$(go env GOROOT)
 
 go:
+  - 1.9
   - tip
 
 env:
