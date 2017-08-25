@@ -46,7 +46,7 @@ func (c *ZookeeperConfig) Connect() (template.Backend, error) {
 	log.WithFields(logrus.Fields{
 		"backend": c.Backend.Name,
 		"nodes":   c.Nodes,
-	}).Info("Set backend nodes")
+	}).Info("set backend nodes")
 
 	client, err := zookeeper.New(c.Nodes)
 	if err != nil {

@@ -53,7 +53,7 @@ func (c *RedisConfig) Connect() (template.Backend, error) {
 	log.WithFields(logrus.Fields{
 		"backend": c.Backend.Name,
 		"nodes":   c.Nodes,
-	}).Info("Set backend nodes")
+	}).Info("set backend nodes")
 
 	client, err := redis.New(c.Nodes, redis.WithPassword(c.Password), redis.WithDatabase(c.Database))
 	if err != nil {

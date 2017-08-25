@@ -34,7 +34,7 @@ func (c *FileConfig) Connect() (template.Backend, error) {
 	log.WithFields(logrus.Fields{
 		"backend":  c.Backend.Name,
 		"filepath": c.Filepath,
-	}).Info("Set filepath")
+	}).Info("set file path")
 
 	client, err := file.New(c.Filepath)
 	if err != nil {

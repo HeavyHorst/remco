@@ -63,7 +63,7 @@ func (c *VaultConfig) Connect() (template.Backend, error) {
 	log.WithFields(logrus.Fields{
 		"backend": c.Backend.Name,
 		"nodes":   []string{c.Node},
-	}).Info("Set backend nodes")
+	}).Info("set backend nodes")
 
 	tlsOps := vault.TLSOptions{
 		ClientCert:   c.ClientCert,

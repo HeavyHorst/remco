@@ -90,7 +90,7 @@ func (c *EtcdConfig) Connect() (template.Backend, error) {
 	log.WithFields(logrus.Fields{
 		"backend": c.Backend.Name,
 		"nodes":   c.Nodes,
-	}).Info("Set backend nodes")
+	}).Info("set backend nodes")
 
 	client, err := etcd.New(c.Nodes,
 		etcd.WithBasicAuth(etcd.BasicAuthOptions{
