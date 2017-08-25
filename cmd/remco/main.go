@@ -17,9 +17,9 @@ import (
 	"syscall"
 
 	"github.com/HeavyHorst/remco/pkg/log"
-	"github.com/Sirupsen/logrus"
 	"github.com/hashicorp/consul-template/signals"
 	reap "github.com/hashicorp/go-reap"
+	"github.com/sirupsen/logrus"
 )
 
 var (

@@ -108,7 +108,7 @@ type watchResponse struct {
 	err       error
 }
 
-func (c *Client) watch(key string, respChan chan watchResponse, ctx context.Context) {
+func (c *Client) watch(ctx context.Context, key string, respChan chan watchResponse) {
 	_, _, keyWatcher, err := c.client.GetW(key)
 	if err != nil {
 		respChan <- watchResponse{0, err}
@@ -156,7 +156,7 @@ func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easykv.
 
 	//watch all subfolders for changes
 	watchMap := make(map[string]string)
-	for k, _ := range entries {
+	for k := range entries {
 		for _, v := range options.Keys {
 			if strings.HasPrefix(k, v) {
 				for dir := filepath.Dir(k); dir != "/"; dir = filepath.Dir(dir) {
@@ -165,7 +165,7 @@ func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easykv.
 						wg.Add(1)
 						go func(dir string) {
 							defer wg.Done()
-							c.watch(dir, respChan, ctx)
+							c.watch(ctx, dir, respChan)
 						}(dir)
 					}
 				}
@@ -175,13 +175,13 @@ func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easykv.
 	}
 
 	//watch all keys in prefix for changes
-	for k, _ := range entries {
+	for k := range entries {
 		for _, v := range options.Keys {
 			if strings.HasPrefix(k, v) {
 				wg.Add(1)
 				go func(k string) {
 					defer wg.Done()
-					c.watch(k, respChan, ctx)
+					c.watch(ctx, k, respChan)
 				}(k)
 				break
 			}

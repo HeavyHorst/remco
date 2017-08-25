@@ -16,8 +16,8 @@ import (
 	"github.com/HeavyHorst/memkv"
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
-	"github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // A BackendConnector - Every backend implements this interface.

@@ -16,10 +16,10 @@ import (
 	"time"
 
 	"github.com/HeavyHorst/consul-template/child"
-	"github.com/Sirupsen/logrus"
 	"github.com/hashicorp/consul-template/signals"
 	shellwords "github.com/mattn/go-shellwords"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // ExecConfig represents the configuration values for the exec mode.

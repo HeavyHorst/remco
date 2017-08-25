@@ -35,9 +35,7 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 }
 
 // Close mock
-func (c *Client) Close() {
-	return
-}
+func (c *Client) Close() {}
 
 // WatchPrefix mock
 func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easykv.WatchOption) (uint64, error) {

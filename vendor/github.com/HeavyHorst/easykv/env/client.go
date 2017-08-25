@@ -33,9 +33,7 @@ func New() (*Client, error) {
 
 // Close is only meant to fulfill the easykv.ReadWatcher interface.
 // Does nothing.
-func (c *Client) Close() {
-	return
-}
+func (c *Client) Close() {}
 
 // GetValues is used to lookup all keys with a prefix.
 // Several prefixes can be specified in the keys array.

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -104,6 +105,26 @@ type QueryOptions struct {
 	// relayed back to the sender through N other random nodes. Must be
 	// a value from 0 to 5 (inclusive).
 	RelayFactor uint8
+
+	// ctx is an optional context pass through to the underlying HTTP
+	// request layer. Use Context() and WithContext() to manage this.
+	ctx context.Context
+}
+
+func (o *QueryOptions) Context() context.Context {
+	if o != nil && o.ctx != nil {
+		return o.ctx
+	}
+	return context.Background()
+}
+
+func (o *QueryOptions) WithContext(ctx context.Context) *QueryOptions {
+	o2 := new(QueryOptions)
+	if o != nil {
+		*o2 = *o
+	}
+	o2.ctx = ctx
+	return o2
 }
 
 // WriteOptions are used to parameterize a write
@@ -120,6 +141,26 @@ type WriteOptions struct {
 	// relayed back to the sender through N other random nodes. Must be
 	// a value from 0 to 5 (inclusive).
 	RelayFactor uint8
+
+	// ctx is an optional context pass through to the underlying HTTP
+	// request layer. Use Context() and WithContext() to manage this.
+	ctx context.Context
+}
+
+func (o *WriteOptions) Context() context.Context {
+	if o != nil && o.ctx != nil {
+		return o.ctx
+	}
+	return context.Background()
+}
+
+func (o *WriteOptions) WithContext(ctx context.Context) *WriteOptions {
+	o2 := new(WriteOptions)
+	if o != nil {
+		*o2 = *o
+	}
+	o2.ctx = ctx
+	return o2
 }
 
 // QueryMeta is used to return meta data about a query
@@ -240,8 +281,8 @@ func DefaultNonPooledConfig() *Config {
 // given function to make the transport.
 func defaultConfig(transportFn func() *http.Transport) *Config {
 	config := &Config{
-		Address: "127.0.0.1:8500",
-		Scheme:  "http",
+		Address:   "127.0.0.1:8500",
+		Scheme:    "http",
 		Transport: transportFn(),
 	}
 
@@ -369,10 +410,6 @@ func NewClient(config *Config) (*Client, error) {
 		config.Transport = defConfig.Transport
 	}
 
-	if config.HttpClient == nil {
-		config.HttpClient = defConfig.HttpClient
-	}
-
 	if config.TLSConfig.Address == "" {
 		config.TLSConfig.Address = defConfig.TLSConfig.Address
 	}
@@ -434,15 +471,18 @@ func NewClient(config *Config) (*Client, error) {
 // NewHttpClient returns an http client configured with the given Transport and TLS
 // config.
 func NewHttpClient(transport *http.Transport, tlsConf TLSConfig) (*http.Client, error) {
-	tlsClientConfig, err := SetupTLSConfig(&tlsConf)
-
-	if err != nil {
-		return nil, err
-	}
-
-	transport.TLSClientConfig = tlsClientConfig
 	client := &http.Client{
 		Transport: transport,
+	}
+
+	if transport.TLSClientConfig == nil {
+		tlsClientConfig, err := SetupTLSConfig(&tlsConf)
+
+		if err != nil {
+			return nil, err
+		}
+
+		transport.TLSClientConfig = tlsClientConfig
 	}
 
 	return client, nil
@@ -457,6 +497,7 @@ type request struct {
 	body   io.Reader
 	header http.Header
 	obj    interface{}
+	ctx    context.Context
 }
 
 // setQueryOptions is used to annotate the request with
@@ -494,6 +535,7 @@ func (r *request) setQueryOptions(q *QueryOptions) {
 	if q.RelayFactor != 0 {
 		r.params.Set("relay-factor", strconv.Itoa(int(q.RelayFactor)))
 	}
+	r.ctx = q.ctx
 }
 
 // durToMsec converts a duration to a millisecond specified string. If the
@@ -538,6 +580,7 @@ func (r *request) setWriteOptions(q *WriteOptions) {
 	if q.RelayFactor != 0 {
 		r.params.Set("relay-factor", strconv.Itoa(int(q.RelayFactor)))
 	}
+	r.ctx = q.ctx
 }
 
 // toHTTP converts the request to an HTTP request
@@ -547,11 +590,11 @@ func (r *request) toHTTP() (*http.Request, error) {
 
 	// Check if we should encode the body
 	if r.body == nil && r.obj != nil {
-		if b, err := encodeBody(r.obj); err != nil {
+		b, err := encodeBody(r.obj)
+		if err != nil {
 			return nil, err
-		} else {
-			r.body = b
 		}
+		r.body = b
 	}
 
 	// Create the HTTP request
@@ -569,8 +612,11 @@ func (r *request) toHTTP() (*http.Request, error) {
 	if r.config.HttpAuth != nil {
 		req.SetBasicAuth(r.config.HttpAuth.Username, r.config.HttpAuth.Password)
 	}
-
-	return req, nil
+	if r.ctx != nil {
+		return req.WithContext(r.ctx), nil
+	} else {
+		return req, nil
+	}
 }
 
 // newRequest is used to create a new request
@@ -649,6 +695,8 @@ func (c *Client) write(endpoint string, in, out interface{}, q *WriteOptions) (*
 		if err := decodeBody(resp, &out); err != nil {
 			return nil, err
 		}
+	} else if _, err := ioutil.ReadAll(resp.Body); err != nil {
+		return nil, err
 	}
 	return wm, nil
 }

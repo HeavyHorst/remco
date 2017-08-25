@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/HeavyHorst/easyKV.svg?branch=master)](https://travis-ci.org/HeavyHorst/easyKV) [![Go Report Card](https://goreportcard.com/badge/github.com/HeavyHorst/easyKV)](https://goreportcard.com/report/github.com/HeavyHorst/easyKV) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/HeavyHorst/easyKV/master/LICENCE)
-[![](https://godoc.org/github.com/HeavyHorst/easyKV?status.svg)](http://godoc.org/github.com/HeavyHorst/easyKV) [![codecov](https://codecov.io/gh/HeavyHorst/easyKV/branch/master/graph/badge.svg)](https://codecov.io/gh/HeavyHorst/easyKV)
+[![Build Status](https://travis-ci.org/HeavyHorst/easykv.svg?branch=master)](https://travis-ci.org/HeavyHorst/easykv) [![Go Report Card](https://goreportcard.com/badge/github.com/HeavyHorst/easykv)](https://goreportcard.com/report/github.com/HeavyHorst/easykv) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/HeavyHorst/easykv/master/LICENCE)
+[![](https://godoc.org/github.com/HeavyHorst/easykv?status.svg)](http://godoc.org/github.com/HeavyHorst/easykv)
 
 
 # easyKV

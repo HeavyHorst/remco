@@ -22,6 +22,7 @@ import (
 	pb "github.com/coreos/etcd/etcdserver/etcdserverpb"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type (
@@ -67,6 +68,9 @@ const (
 	leaseResponseChSize = 16
 	// NoLease is a lease ID for the absence of a lease.
 	NoLease LeaseID = 0
+
+	// retryConnWait is how long to wait before retrying request due to an error
+	retryConnWait = 500 * time.Millisecond
 )
 
 // ErrKeepAliveHalted is returned if client keep alive loop halts with an unexpected error.
@@ -144,17 +148,21 @@ type keepAlive struct {
 }
 
 func NewLease(c *Client) Lease {
+	return NewLeaseFromLeaseClient(RetryLeaseClient(c), c.cfg.DialTimeout+time.Second)
+}
+
+func NewLeaseFromLeaseClient(remote pb.LeaseClient, keepAliveTimeout time.Duration) Lease {
 	l := &lessor{
 		donec:                 make(chan struct{}),
 		keepAlives:            make(map[LeaseID]*keepAlive),
-		remote:                RetryLeaseClient(c),
-		firstKeepAliveTimeout: c.cfg.DialTimeout + time.Second,
+		remote:                remote,
+		firstKeepAliveTimeout: keepAliveTimeout,
 	}
 	if l.firstKeepAliveTimeout == time.Second {
 		l.firstKeepAliveTimeout = defaultTTL
 	}
-
-	l.stopCtx, l.stopCancel = context.WithCancel(context.Background())
+	reqLeaderCtx := WithRequireLeader(context.Background())
+	l.stopCtx, l.stopCancel = context.WithCancel(reqLeaderCtx)
 	return l
 }
 
@@ -255,7 +263,7 @@ func (l *lessor) KeepAliveOnce(ctx context.Context, id LeaseID) (*LeaseKeepAlive
 	for {
 		resp, err := l.keepAliveOnce(ctx, id)
 		if err == nil {
-			if resp.TTL == 0 {
+			if resp.TTL <= 0 {
 				err = rpctypes.ErrLeaseNotFound
 			}
 			return resp, err
@@ -306,6 +314,45 @@ func (l *lessor) keepAliveCtxCloser(id LeaseID, ctx context.Context, donec <-cha
 	}
 }
 
+// closeRequireLeader scans all keep alives for ctxs that have require leader
+// and closes the associated channels.
+func (l *lessor) closeRequireLeader() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	for _, ka := range l.keepAlives {
+		reqIdxs := 0
+		// find all required leader channels, close, mark as nil
+		for i, ctx := range ka.ctxs {
+			md, ok := metadata.FromContext(ctx)
+			if !ok {
+				continue
+			}
+			ks := md[rpctypes.MetadataRequireLeaderKey]
+			if len(ks) < 1 || ks[0] != rpctypes.MetadataHasLeader {
+				continue
+			}
+			close(ka.chs[i])
+			ka.chs[i] = nil
+			reqIdxs++
+		}
+		if reqIdxs == 0 {
+			continue
+		}
+		// remove all channels that required a leader from keepalive
+		newChs := make([]chan<- *LeaseKeepAliveResponse, len(ka.chs)-reqIdxs)
+		newCtxs := make([]context.Context, len(newChs))
+		newIdx := 0
+		for i := range ka.chs {
+			if ka.chs[i] == nil {
+				continue
+			}
+			newChs[newIdx], newCtxs[newIdx] = ka.chs[i], ka.ctxs[newIdx]
+			newIdx++
+		}
+		ka.chs, ka.ctxs = newChs, newCtxs
+	}
+}
+
 func (l *lessor) keepAliveOnce(ctx context.Context, id LeaseID) (*LeaseKeepAliveResponse, error) {
 	cctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -345,26 +392,45 @@ func (l *lessor) recvKeepAliveLoop() (gerr error) {
 		l.mu.Unlock()
 	}()
 
-	stream, serr := l.resetRecv()
-	for serr == nil {
-		resp, err := stream.Recv()
+	for {
+		stream, err := l.resetRecv()
 		if err != nil {
-			if isHaltErr(l.stopCtx, err) {
+			if canceledByCaller(l.stopCtx, err) {
 				return err
 			}
-			stream, serr = l.resetRecv()
-			continue
+		} else {
+			for {
+				resp, err := stream.Recv()
+
+				if err != nil {
+					if canceledByCaller(l.stopCtx, err) {
+						return err
+					}
+
+					if toErr(l.stopCtx, err) == rpctypes.ErrNoLeader {
+						l.closeRequireLeader()
+					}
+					break
+				}
+
+				l.recvKeepAlive(resp)
+			}
 		}
-		l.recvKeepAlive(resp)
+
+		select {
+		case <-time.After(retryConnWait):
+			continue
+		case <-l.stopCtx.Done():
+			return l.stopCtx.Err()
+		}
 	}
-	return serr
 }
 
 // resetRecv opens a new lease stream and starts sending LeaseKeepAliveRequests
 func (l *lessor) resetRecv() (pb.Lease_LeaseKeepAliveClient, error) {
 	sctx, cancel := context.WithCancel(l.stopCtx)
 	stream, err := l.remote.LeaseKeepAlive(sctx, grpc.FailFast(false))
-	if err = toErr(sctx, err); err != nil {
+	if err != nil {
 		cancel()
 		return nil, err
 	}
@@ -372,7 +438,6 @@ func (l *lessor) resetRecv() (pb.Lease_LeaseKeepAliveClient, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	if l.stream != nil && l.streamCancel != nil {
-		l.stream.CloseSend()
 		l.streamCancel()
 	}
 
@@ -407,7 +472,7 @@ func (l *lessor) recvKeepAlive(resp *pb.LeaseKeepAliveResponse) {
 	}
 
 	// send update to all channels
-	nextKeepAlive := time.Now().Add(1 + time.Duration(karesp.TTL/3)*time.Second)
+	nextKeepAlive := time.Now().Add((time.Duration(karesp.TTL) * time.Second) / 3.0)
 	ka.deadline = time.Now().Add(time.Duration(karesp.TTL) * time.Second)
 	for _, ch := range ka.chs {
 		select {
