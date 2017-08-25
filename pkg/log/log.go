@@ -13,8 +13,8 @@ import (
 	"os"
 	"sync"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 

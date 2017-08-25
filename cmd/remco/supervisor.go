@@ -19,9 +19,9 @@ import (
 
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"
-	"github.com/Sirupsen/logrus"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type reloadSignal struct {

@@ -87,9 +87,7 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 
 // Close is only meant to fulfill the easykv.ReadWatcher interface.
 // Does nothing.
-func (c *Client) Close() {
-	return
-}
+func (c *Client) Close() {}
 
 // nodeWalk recursively descends nodes, updating vars.
 func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]string) error {

@@ -14,7 +14,7 @@ import (
 	"testing"
 
 	"github.com/HeavyHorst/remco/pkg/log"
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	. "gopkg.in/check.v1"
 )
 

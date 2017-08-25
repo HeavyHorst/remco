@@ -25,8 +25,8 @@ import (
 	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
-	"github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // Renderer contains all data needed for the template processing

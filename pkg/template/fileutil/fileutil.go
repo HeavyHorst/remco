@@ -16,8 +16,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // FileInfo describes a configuration file and is returned by filestat.

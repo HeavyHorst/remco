@@ -28,7 +28,7 @@ Below is a simple example of usage
 
 ```go
 // Reap children with no control or feedback.
-go ReapChildren(nil, nil, nil)
+go reap.ReapChildren(nil, nil, nil)
 
 // Get feedback on reaped children and errors.
 if reap.IsSupported() {
@@ -36,7 +36,7 @@ if reap.IsSupported() {
 	errors := make(reap.ErrorCh, 1)
 	done := make(chan struct{})
 	var reapLock sync.RWMutex
-	go ReapChildren(pids, errors, done, &reapLock)
+	go reap.ReapChildren(pids, errors, done, &reapLock)
 	// ...
 	close(done)
 } else {

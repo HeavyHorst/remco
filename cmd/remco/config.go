@@ -19,8 +19,8 @@ import (
 	"github.com/HeavyHorst/remco/pkg/backends/plugin"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"
-	"github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // BackendConfigs holds every individually backend config.
