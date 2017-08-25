@@ -16,10 +16,6 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-const (
-	secret = `wcBMA2d6jjCDCcXCAQgARmuHp37r8h9NHylLytnCfazCKTwJtG6eIcXH/BC8ACvYfx/yKqcj9vf5v7TCI+xCko3cBCZ3+Y/3b0497niK1qioqLBrWGiPhee/iwZ/fEXDjlC1w4Mzqa+GrDHsUwhKIbwtKJCeNXbA7SkJFm0tFGdA1RLKhsuWFmvtwtRbuMc9c73Lq89uzF9fWARcNF0GaGZtkk3Sui6GrtrJc7gZqLqKDhgrR1uwlpBKyZh5us6rSh9cBmfDB1BYvO9q3Ywz4pKA9yEtPFsnrqSxeFPBPrGhap7RJdzHB28Ysx6ogmhuDNNSNuwjQNyZn1JA0zDWuzg+Lo3rjsDpYiE2EK2EHNLgAeT3mYEW4p3QYSXY4PLd6cHx4ZSF4Crgz+HNq+BT4qo4svzgsOPds1LhZ6z9quAu4RKe4L7j86ZluQaud/vgneH86eDQ4hTm86DgkeO65b++2bBQOeDK5FB2EXstONJS6qnN/dyqNZzivXJHLeE2RgA=`
-)
-
 // Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
 
@@ -158,60 +154,4 @@ func (s *FilterSuite) TestFilterSortByLengthKVPair(t *C) {
 	}
 	m1 := res.Interface().(memkv.KVPairs)
 	t.Check(m1, DeepEquals, expected)
-}
-
-func (s *FilterSuite) TestFilterDecryptString(t *C) {
-	in := pongo2.AsValue(secret)
-	expected := "secret1\n"
-	res, err := filterDecrypt(in, pongo2.AsValue("../../integration/config/test.gpg"))
-	if err != nil {
-		t.Error(err.OrigError)
-		t.FailNow()
-	}
-	t.Check(res.String(), Equals, expected)
-}
-
-func (s *FilterSuite) TestFilterDecryptKVPairs(t *C) {
-	in := pongo2.AsValue(memkv.KVPairs{
-		memkv.KVPair{
-			Key:   "/some/key",
-			Value: secret,
-		},
-	})
-	expected := memkv.KVPairs{memkv.KVPair{Key: "/some/key", Value: "secret1\n"}}
-	res, err := filterDecrypt(in, pongo2.AsValue("../../integration/config/test.gpg"))
-	if err != nil {
-		t.Error(err.OrigError)
-		t.FailNow()
-	}
-	m2 := res.Interface().(memkv.KVPairs)
-	t.Check(m2, DeepEquals, expected)
-}
-
-func (s *FilterSuite) TestFilterDecryptKVPair(t *C) {
-	in := pongo2.AsValue(memkv.KVPair{
-		Key:   "/some/key",
-		Value: secret,
-	})
-	expected := memkv.KVPair{Key: "/some/key", Value: "secret1\n"}
-	res, err := filterDecrypt(in, pongo2.AsValue("../../integration/config/test.gpg"))
-	if err != nil {
-		t.Error(err.OrigError)
-		t.FailNow()
-	}
-	m2 := res.Interface().(memkv.KVPair)
-	t.Check(m2, DeepEquals, expected)
-}
-
-func (s *FilterSuite) TestFilterDecryptStringArray(t *C) {
-	in := pongo2.AsValue([]string{secret})
-	expected := []string{"secret1\n"}
-
-	res, err := filterDecrypt(in, pongo2.AsValue("../../integration/config/test.gpg"))
-	if err != nil {
-		t.Error(err.OrigError)
-		t.FailNow()
-	}
-	m2 := res.Interface().([]string)
-	t.Check(m2, DeepEquals, expected)
 }
