@@ -250,7 +250,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["cast5","openpgp","openpgp/armor","openpgp/elgamal","openpgp/errors","openpgp/packet","openpgp/s2k","ssh/terminal"]
+  packages = ["ssh/terminal"]
   revision = "eb71ad9bd329b5ac0fd0148dd99bd62e8be8e035"
 
 [[projects]]
@@ -298,6 +298,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b944c6f31dff94c2403a710a28c0d9a82c5b2b65a617f308a175ebc233ae30af"
+  inputs-digest = "351a4ebe0445fe710ed0247954d555f6af41aaeb85507f4b47a7ef4f7cbbf6b0"
   solver-name = "gps-cdcl"
   solver-version = 1

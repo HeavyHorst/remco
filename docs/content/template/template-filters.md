@@ -75,25 +75,6 @@ Works with []string and []KVPair.
 ```
 </details>
 
-<details>
-<summary> **decrypt** -- Decrypts the stored data. Data must follow the following format, `base64(gpg(gzip(data)))`. </summary>
-
-This is compatible with [crypt](https://github.com/xordataexchange/crypt/tree/master/bin/crypt).
-
-Works with string, []string, KVPair, KVPairs
-
-```
-{{ getv("/test/data") | decrypt:"/path/to/your/armored/private/key" }}
-```
-
-#### Storing data using gpg
-```
-data = `echo 'secret text' | gzip -c | gpg2 --compress-level 0 --encrypt --default-recipient <your-recipient> | base64`
-ETCDCTL_API=3 etcdctl put /test/data $data
-```
-</details>
-
-
 ## Custom filters
 
 It is possible to create custom filters in JavaScript.
