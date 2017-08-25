@@ -26,10 +26,10 @@
   version = "v1.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/HeavyHorst/pongo2"
   packages = ["."]
-  revision = "c28873085e42507119e1418d0681dde9dbea4a1a"
+  revision = "082b30d780373f0069b89181489204f2310a7b3a"
+  version = "v3.1"
 
 [[projects]]
   branch = "master"
@@ -298,6 +298,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "696682206332aa7463c4901c37463a1cf6eb60df4d55fd4d4265f544640117dc"
+  inputs-digest = "b944c6f31dff94c2403a710a28c0d9a82c5b2b65a617f308a175ebc233ae30af"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flosch/pongo2"
+	"github.com/HeavyHorst/pongo2"
 )
 
 var adminList = []string{"user2"}
