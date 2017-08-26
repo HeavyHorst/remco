@@ -23,7 +23,6 @@ import (
 	"text/template"
 
 	"github.com/HeavyHorst/pongo2"
-	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -117,7 +116,7 @@ func (s *Renderer) syncFiles() (bool, error) {
 
 	ok, err := fileutil.SameFile(staged, s.Dst, s.logger)
 	if err != nil {
-		log.Error(err.Error())
+		s.logger.Error(err.Error())
 	}
 
 	if !ok {
