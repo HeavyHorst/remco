@@ -72,7 +72,7 @@ type ResourceConfig struct {
 
 	// Connectors is a list of BackendConnectors.
 	// The Resource will establish a connection to all of these.
-	Connectors BackendConnectors
+	Connectors []BackendConnector
 }
 
 // ErrEmptySrc is returned if an emty src template is passed to NewResource
@@ -80,9 +80,9 @@ var ErrEmptySrc = fmt.Errorf("empty src template")
 
 // NewResourceFromResourceConfig creates a new resource from the given ResourceConfig.
 func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, r ResourceConfig) (*Resource, error) {
-	backendList, err := r.Connectors.ConnectAll(ctx)
+	backendList, err := connectAllBackends(ctx, r.Connectors)
 	if err != nil {
-		return nil, errors.Wrap(err, "connectAll failed")
+		return nil, errors.Wrap(err, "connectAllBackends failed")
 	}
 
 	for _, p := range r.Template {

@@ -29,10 +29,6 @@ type BackendConnector interface {
 	Connect() (Backend, error)
 }
 
-// BackendConnectors is a list of BackendConnectors.
-// This is just a helper Type to simplify operations on many BackendConnectors.
-type BackendConnectors []BackendConnector
-
 // Backend is the representation of a template backend like etcd or consul
 type Backend struct {
 	easykv.ReadWatcher
@@ -59,9 +55,9 @@ type Backend struct {
 	store *memkv.Store
 }
 
-// ConnectAll connects to all configured backends.
+// connectAllBackends connects to all configured backends.
 // This method blocks until a connection to every backend has been established or the context is canceled.
-func (bc BackendConnectors) ConnectAll(ctx context.Context) ([]Backend, error) {
+func connectAllBackends(ctx context.Context, bc []BackendConnector) ([]Backend, error) {
 	var backendList []Backend
 	for _, config := range bc {
 	retryloop:

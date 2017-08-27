@@ -38,8 +38,8 @@ type BackendConfigs struct {
 }
 
 // GetBackends returns a slice with all BackendConfigs for easy iteration.
-func (c *BackendConfigs) GetBackends() template.BackendConnectors {
-	return template.BackendConnectors{
+func (c *BackendConfigs) GetBackends() []template.BackendConnector {
+	return []template.BackendConnector{
 		c.Etcd,
 		c.File,
 		c.Env,
