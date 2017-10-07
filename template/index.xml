@@ -188,6 +188,8 @@ something
       <guid>https://heavyhorst.github.io/remco/template/template-filters/</guid>
       <description>
 
+&lt;h2 id=&#34;builtin-filters&#34;&gt;Builtin filters&lt;/h2&gt;
+
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;base64&lt;/strong&gt; &amp;ndash; Encodes a string as base64 &lt;/summary&gt;&lt;/p&gt;
 
@@ -262,23 +264,36 @@ something
 
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;decrypt&lt;/strong&gt; &amp;ndash; Decrypts the stored data. Data must follow the following format, &lt;code&gt;base64(gpg(gzip(data)))&lt;/code&gt;. &lt;/summary&gt;&lt;/p&gt;
+&lt;h2 id=&#34;custom-filters&#34;&gt;Custom filters&lt;/h2&gt;
 
-&lt;p&gt;This is compatible with &lt;a href=&#34;https://github.com/xordataexchange/crypt/tree/master/bin/crypt&#34;&gt;crypt&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It is possible to create custom filters in JavaScript.
+If you want to create a &amp;lsquo;toEnv&amp;rsquo; filter, which transforms file system paths to environment variables, you must create the file &amp;lsquo;toEnv.js&amp;rsquo; in the configurable filter directory.&lt;/p&gt;
 
-&lt;p&gt;Works with string, []string, KVPair, KVPairs&lt;/p&gt;
+&lt;p&gt;The filter code could look like:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;{{ getv(&amp;quot;/test/data&amp;quot;) | decrypt:&amp;quot;/path/to/your/armored/private/key&amp;quot; }}
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;In.split(&amp;quot;/&amp;quot;).join(&amp;quot;_&amp;quot;).substr(1).toUpperCase();
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h4 id=&#34;storing-data-using-gpg&#34;&gt;Storing data using gpg&lt;/h4&gt;
+&lt;p&gt;There are two predifined variables:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;data = `echo &#39;secret text&#39; | gzip -c | gpg2 --compress-level 0 --encrypt --default-recipient &amp;lt;your-recipient&amp;gt; | base64`
-ETCDCTL_API=3 etcdctl put /test/data $data
+&lt;ul&gt;
+&lt;li&gt;In: the filter input&lt;/li&gt;
+&lt;li&gt;Param: the optional filter parameter&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;examples&#34;&gt;Examples&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;reverse filter&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function reverse(s) {
+     var o = &amp;quot;&amp;quot;;
+     for (var i = s.length - 1; i &amp;gt;= 0; i--)
+        o += s[i];
+     return o;
+}
+
+reverse(In);
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 </description>
     </item>
     

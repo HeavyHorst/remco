@@ -107,7 +107,7 @@ No additional init system is needed.&lt;/p&gt;
       <description>&lt;p&gt;Remco can fetch configuration data from a bunch of different kv-stores.
 Some backends can be configured to watch for changes in the store to immediately react to these changes.
 The other way is to provide a backend polling interval.
-These two modes are not mutual exclusive, you can watch for changes and run the interval processor as a reconcilation loop.&lt;/p&gt;
+These two modes are not mutual exclusive, you can watch for changes and run the interval processor as a reconciliation loop.&lt;/p&gt;
 
 &lt;p&gt;Every Backend needs to implement the &lt;a href=&#34;https://github.com/HeavyHorst/easyKV&#34;&gt;easyKV&lt;/a&gt; interface.
 This is also the repository where the current implementations live.&lt;/p&gt;

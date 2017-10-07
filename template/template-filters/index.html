@@ -384,12 +384,10 @@
 <ul>
 <li>
 <ul>
-<li>
+<li><a href="#builtin-filters">Builtin filters</a></li>
+<li><a href="#custom-filters">Custom filters</a>
 <ul>
-<li>
-<ul>
-<li><a href="#storing-data-using-gpg">Storing data using gpg</a></li>
-</ul></li>
+<li><a href="#examples">Examples</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -407,6 +405,8 @@
                 
 
 
+
+<h2 id="builtin-filters">Builtin filters</h2>
 
 <p><details>
 <summary> <strong>base64</strong> &ndash; Encodes a string as base64 </summary></p>
@@ -482,23 +482,36 @@
 
 <p></details></p>
 
-<p><details>
-<summary> <strong>decrypt</strong> &ndash; Decrypts the stored data. Data must follow the following format, <code>base64(gpg(gzip(data)))</code>. </summary></p>
+<h2 id="custom-filters">Custom filters</h2>
 
-<p>This is compatible with <a href="https://github.com/xordataexchange/crypt/tree/master/bin/crypt">crypt</a>.</p>
+<p>It is possible to create custom filters in JavaScript.
+If you want to create a &lsquo;toEnv&rsquo; filter, which transforms file system paths to environment variables, you must create the file &lsquo;toEnv.js&rsquo; in the configurable filter directory.</p>
 
-<p>Works with string, []string, KVPair, KVPairs</p>
+<p>The filter code could look like:</p>
 
-<pre><code>{{ getv(&quot;/test/data&quot;) | decrypt:&quot;/path/to/your/armored/private/key&quot; }}
+<pre><code class="language-javascript">In.split(&quot;/&quot;).join(&quot;_&quot;).substr(1).toUpperCase();
 </code></pre>
 
-<h4 id="storing-data-using-gpg">Storing data using gpg</h4>
+<p>There are two predifined variables:</p>
 
-<pre><code>data = `echo 'secret text' | gzip -c | gpg2 --compress-level 0 --encrypt --default-recipient &lt;your-recipient&gt; | base64`
-ETCDCTL_API=3 etcdctl put /test/data $data
+<ul>
+<li>In: the filter input</li>
+<li>Param: the optional filter parameter</li>
+</ul>
+
+<h3 id="examples">Examples</h3>
+
+<p><strong>reverse filter</strong></p>
+
+<pre><code class="language-javascript">function reverse(s) {
+     var o = &quot;&quot;;
+     for (var i = s.length - 1; i &gt;= 0; i--)
+        o += s[i];
+     return o;
+}
+
+reverse(In);
 </code></pre>
-
-<p></details></p>
 
 
       

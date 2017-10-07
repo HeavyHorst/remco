@@ -64,6 +64,11 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;ul&gt;
 &lt;li&gt;Specify an entire directory of resource configuration files to include.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;filter_dir(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A folder with custom JavaScript template filters.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;pid_file(string):&lt;/strong&gt;
 
 &lt;ul&gt;
@@ -186,7 +191,7 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;interval(int, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The backend polling interval. Can be used as a reconcilation loop for watch or standalone.&lt;/li&gt;
+&lt;li&gt;The backend polling interval. Can be used as a reconciliation loop for watch or standalone.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;onetime(bool, optional):&lt;/strong&gt;
 
