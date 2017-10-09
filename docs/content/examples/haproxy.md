@@ -9,11 +9,11 @@ weight: 5
 
 ## The haproxy template
 
-We expect registrator to write the services in this format (to etcd for example): 
+We expect [registrator](http://gliderlabs.github.io/registrator/latest/) to write the service data in this format to etcd: 
 
     /services/<service-name>/<service-id> = <ip>:<port>
 
-The scheme (tcp, http) and the host_port is configurable over the following keys:
+The scheme (tcp, http) and the host_port of the service is configurable over the following keys:
 
     /config/<service-name>/scheme
     /config/<service-name>/host_port
@@ -70,7 +70,7 @@ use_backend redis_servers if is_redis
 <hr>
 
 Optional template block to expose a service on an host port:
-We iterate over all services under /config, test if a scheme and the host_port is configured and create the host port configuration.
+We iterate over all services under /config, test if the scheme and host_port is configured and create the host port configuration.
 
 
 ```
@@ -199,7 +199,7 @@ etcdctl set /config/exampleService/host_port 1234
 ```
 
 
-In his example we connect to a local etcd cluster.
+In this example we connect to a local etcd cluster.
 
 ```bash
 sudo docker run --rm -ti --net=host -e ETCD_NODE=http://localhost:2379 remcohaproxy
