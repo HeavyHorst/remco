@@ -15,6 +15,7 @@ Remcos main purposes are (like confd's):
    - [Pongo2](https://github.com/flosch/pongo2) template engine instead of go's text/template
    - Zombie reaping support (if remco runs as pid 1)
    - Additional backends can be provided as plugins.
+   - Create your own custom template filters easily with JavaScript.
    - [Exec](https://heavyhorst.github.io/remco/details/exec-mode/) mode similar to consul-template.
 
 ## Overview
