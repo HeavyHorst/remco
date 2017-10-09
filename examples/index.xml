@@ -36,12 +36,12 @@
 
 &lt;h2 id=&#34;the-haproxy-template&#34;&gt;The haproxy template&lt;/h2&gt;
 
-&lt;p&gt;We expect registrator to write the services in this format (to etcd for example):&lt;/p&gt;
+&lt;p&gt;We expect &lt;a href=&#34;http://gliderlabs.github.io/registrator/latest/&#34;&gt;registrator&lt;/a&gt; to write the service data in this format to etcd:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;/services/&amp;lt;service-name&amp;gt;/&amp;lt;service-id&amp;gt; = &amp;lt;ip&amp;gt;:&amp;lt;port&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The scheme (tcp, http) and the host_port is configurable over the following keys:&lt;/p&gt;
+&lt;p&gt;The scheme (tcp, http) and the host_port of the service is configurable over the following keys:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;/config/&amp;lt;service-name&amp;gt;/scheme
 /config/&amp;lt;service-name&amp;gt;/host_port
@@ -96,7 +96,7 @@ use_backend redis_servers if is_redis
 &lt;hr&gt;
 
 &lt;p&gt;Optional template block to expose a service on an host port:
-We iterate over all services under /config, test if a scheme and the host_port is configured and create the host port configuration.&lt;/p&gt;
+We iterate over all services under /config, test if the scheme and host_port is configured and create the host port configuration.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;{% for dir in lsdir(&amp;quot;/config&amp;quot;) %}
   {% if exists (printf (&amp;quot;/config/%s/scheme&amp;quot;, dir )) %}
@@ -214,7 +214,7 @@ etcdctl set /config/exampleService/scheme http
 etcdctl set /config/exampleService/host_port 1234
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;In his example we connect to a local etcd cluster.&lt;/p&gt;
+&lt;p&gt;In this example we connect to a local etcd cluster.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;sudo docker run --rm -ti --net=host -e ETCD_NODE=http://localhost:2379 remcohaproxy
 &lt;/code&gt;&lt;/pre&gt;

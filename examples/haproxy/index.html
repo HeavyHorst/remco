@@ -415,12 +415,12 @@
 
 <h2 id="the-haproxy-template">The haproxy template</h2>
 
-<p>We expect registrator to write the services in this format (to etcd for example):</p>
+<p>We expect <a href="http://gliderlabs.github.io/registrator/latest/">registrator</a> to write the service data in this format to etcd:</p>
 
 <pre><code>/services/&lt;service-name&gt;/&lt;service-id&gt; = &lt;ip&gt;:&lt;port&gt;
 </code></pre>
 
-<p>The scheme (tcp, http) and the host_port is configurable over the following keys:</p>
+<p>The scheme (tcp, http) and the host_port of the service is configurable over the following keys:</p>
 
 <pre><code>/config/&lt;service-name&gt;/scheme
 /config/&lt;service-name&gt;/host_port
@@ -475,7 +475,7 @@ use_backend redis_servers if is_redis
 <hr>
 
 <p>Optional template block to expose a service on an host port:
-We iterate over all services under /config, test if a scheme and the host_port is configured and create the host port configuration.</p>
+We iterate over all services under /config, test if the scheme and host_port is configured and create the host port configuration.</p>
 
 <pre><code>{% for dir in lsdir(&quot;/config&quot;) %}
   {% if exists (printf (&quot;/config/%s/scheme&quot;, dir )) %}
@@ -593,7 +593,7 @@ etcdctl set /config/exampleService/scheme http
 etcdctl set /config/exampleService/host_port 1234
 </code></pre>
 
-<p>In his example we connect to a local etcd cluster.</p>
+<p>In this example we connect to a local etcd cluster.</p>
 
 <pre><code class="language-bash">sudo docker run --rm -ti --net=host -e ETCD_NODE=http://localhost:2379 remcohaproxy
 </code></pre>
