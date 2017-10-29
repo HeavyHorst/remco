@@ -45,7 +45,7 @@ var exampleConfiguration = Configuration{
 		{
 			Name:     "test.toml",
 			Template: exampleTemplates,
-			Backend:  exampleBackend,
+			Backends: exampleBackend,
 		},
 	},
 }

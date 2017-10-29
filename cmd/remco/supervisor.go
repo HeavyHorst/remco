@@ -178,8 +178,8 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 		go func(r Resource) {
 			defer wait.Done()
 
-			backendConfigs := r.Backend.GetBackends()
-			for _, v := range r.Backend.Plugin {
+			backendConfigs := r.Backends.GetBackends()
+			for _, v := range r.Backends.Plugin {
 				backendConfigs = append(backendConfigs, &v)
 			}
 

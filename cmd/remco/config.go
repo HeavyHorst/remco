@@ -62,11 +62,16 @@ type Configuration struct {
 	Resource   []Resource
 }
 
+type DefaultBackends struct {
+	Backends BackendConfigs `toml:"default_backends"`
+	Resource []Resource
+}
+
 // Resource is the representation of an resource configuration
 type Resource struct {
 	Exec     template.ExecConfig
 	Template []*template.Renderer
-	Backend  BackendConfigs
+	Backends BackendConfigs `toml:"backend"`
 
 	// defaults to the filename of the resource
 	Name string
@@ -87,10 +92,20 @@ func readFileAndExpandEnv(path string) ([]byte, error) {
 // It returns an error if any.
 func NewConfiguration(path string) (Configuration, error) {
 	var c Configuration
+	var dbc DefaultBackends
 
 	buf, err := readFileAndExpandEnv(path)
 	if err != nil {
 		return c, err
+	}
+
+	if err := toml.Unmarshal(buf, &dbc); err != nil {
+		return c, errors.Wrapf(err, "toml unmarshal failed: %s", path)
+	}
+
+	c.Resource = dbc.Resource
+	for i := 0; i < len(c.Resource); i++ {
+		c.Resource[i].Backends = dbc.Backends
 	}
 
 	if err := toml.Unmarshal(buf, &c); err != nil {
@@ -120,7 +135,9 @@ func NewConfiguration(path string) (Configuration, error) {
 				if err != nil {
 					return c, err
 				}
-				var r Resource
+				r := Resource{
+					Backends: dbc.Backends,
+				}
 				if err := toml.Unmarshal(buf, &r); err != nil {
 					return c, errors.Wrapf(err, "toml unmarshal failed: %s", fp)
 				}

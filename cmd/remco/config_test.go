@@ -24,6 +24,27 @@ const (
       log_level = "debug"
       log_format = "text"
       include_dir = "/tmp/resource.d/"
+      
+      [default_backends]
+      [default_backends.mock]
+          onetime  = false
+          prefix   = "Hallo"
+      
+      
+      [[resource]]
+		  name = "haproxy"
+		  [[resource.template]]
+	        src = "/tmp/test12345.tmpl"
+	        dst = "/tmp/test12345.cfg"
+	        checkCmd = ""
+	        reloadCmd = ""
+	        mode = "0644"
+	      [resource.backend]
+	      [resource.backend.mock]
+		      keys = ["/"]
+			  watch = false
+			  interval = 1
+
 `
 	resourceFile string = `
         [[template]]
@@ -37,7 +58,6 @@ const (
 	      keys = ["/"]
 		  watch = false
 		  interval = 1
-		  onetime = false
 `
 )
 
@@ -56,6 +76,7 @@ var expectedBackend = BackendConfigs{
 			Keys:     []string{"/"},
 			Interval: 1,
 			Onetime:  false,
+			Prefix:   "Hallo",
 		},
 	},
 }
@@ -66,9 +87,14 @@ var expected = Configuration{
 	IncludeDir: "/tmp/resource.d/",
 	Resource: []Resource{
 		{
+			Name:     "haproxy",
+			Template: expectedTemplates,
+			Backends: expectedBackend,
+		},
+		{
 			Name:     "test.toml",
 			Template: expectedTemplates,
-			Backend:  expectedBackend,
+			Backends: expectedBackend,
 		},
 	},
 }
