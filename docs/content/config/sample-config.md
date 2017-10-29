@@ -18,6 +18,12 @@ include_dir = "/etc/remco/resource.d/"
 pid_file    = "/var/run/remco/remco.pid"
 log_file    = "/var/log/remco.log"
 
+# default backend configurations.
+# these settings can be overwritten in the individual resource backend settings.
+[default_backends]
+[default_backends.file]
+    onetime  = true
+    prefix   = "/bla"
 
 ################################################################
 # Resource configuration
