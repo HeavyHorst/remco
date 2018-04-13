@@ -45,7 +45,6 @@ type Renderer struct {
 	stageFile *os.File
 	logger    *logrus.Entry
 	ReapLock  *sync.RWMutex
-	once      sync.Once
 }
 
 // createStageFile stages the src configuration file by processing the src
