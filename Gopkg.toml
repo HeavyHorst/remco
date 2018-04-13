@@ -20,6 +20,9 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
+[prune]
+  go-tests = true
+  unused-packages = true
 
 [[constraint]]
   name = "github.com/BurntSushi/toml"
@@ -39,7 +42,7 @@
 
 [[constraint]]
   name = "github.com/HeavyHorst/pongo2"
-  version = "3.1"
+  version = "3.2.0"
 
 [[constraint]]
   branch = "master"
@@ -80,10 +83,6 @@
 [[constraint]]
   name = "github.com/x-cray/logrus-prefixed-formatter"
   version = "0.5.2"
-
-[[constraint]]
-  branch = "master"
-  name = "golang.org/x/crypto"
 
 [[constraint]]
   branch = "v1"

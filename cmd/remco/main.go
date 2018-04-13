@@ -16,6 +16,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/hashicorp/consul-template/signals"
 	reap "github.com/hashicorp/go-reap"
@@ -29,6 +30,7 @@ var (
 
 func init() {
 	const defaultConfig = "/etc/remco/config"
+	pongo2.SetAutoescape(false)
 	flag.StringVar(&configPath, "config", defaultConfig, "path to the configuration file")
 	flag.BoolVar(&printVersionAndExit, "version", false, "print version and exit")
 }
