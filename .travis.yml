@@ -21,7 +21,7 @@ before_install:
   - sudo mv vault /bin/
   - vault server -dev &
   # Install zookeeper
-  - wget http://www.eu.apache.org/dist/zookeeper/zookeeper-3.4.9/zookeeper-3.4.9.tar.gz
+  - wget https://archive.apache.org/dist/zookeeper/zookeeper-3.4.9/zookeeper-3.4.9.tar.gz
   - tar xzf zookeeper-3.4.9.tar.gz
   - echo "tickTime=2000" > zookeeper-3.4.9/conf/zoo.cfg
   - echo "dataDir=/tmp/zookeeper" >> zookeeper-3.4.9/conf/zoo.cfg
