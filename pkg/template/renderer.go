@@ -28,6 +28,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func init() {
+	pongo2.SetAutoescape(false)
+}
+
 // Renderer contains all data needed for the template processing
 type Renderer struct {
 	Src       string `json:"src"`
@@ -41,6 +45,7 @@ type Renderer struct {
 	stageFile *os.File
 	logger    *logrus.Entry
 	ReapLock  *sync.RWMutex
+	once      sync.Once
 }
 
 // createStageFile stages the src configuration file by processing the src

@@ -32,7 +32,7 @@ before_install:
   - export GOROOT=$(go env GOROOT)
 
 go:
-  - 1.9
+  - 1.10.x
   - tip
 
 env:
