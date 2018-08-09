@@ -73,27 +73,27 @@ func SetLevel(level string) error {
 
 // Debug logs a message with severity DEBUG.
 func Debug(v ...interface{}) {
-	logger.Debug(v)
+	logger.Debug(v...)
 }
 
 // Error logs a message with severity ERROR.
 func Error(v ...interface{}) {
-	logger.Error(v)
+	logger.Error(v...)
 }
 
 // Fatal logs a message with severity ERROR followed by a call to os.Exit().
 func Fatal(v ...interface{}) {
-	logger.Fatal(v)
+	logger.Fatal(v...)
 }
 
 // Info logs a message with severity INFO.
 func Info(v ...interface{}) {
-	logger.Info(v)
+	logger.Info(v...)
 }
 
 // Warning logs a message with severity WARNING.
 func Warning(v ...interface{}) {
-	logger.Warning(v)
+	logger.Warning(v...)
 }
 
 // WithFields is a Wrapper for logrus.WithFields
