@@ -68,7 +68,7 @@ func (s *ResourceSuite) SetUpSuite(t *C) {
 	}
 
 	exec := NewExecutor("", "", "", 0, 0, nil)
-	res, err := NewResource([]Backend{s.backend}, []*Renderer{s.renderer}, "test", exec)
+	res, err := NewResource([]Backend{s.backend}, []*Renderer{s.renderer}, "test", exec, "")
 	t.Assert(err, IsNil)
 	s.resource = res
 }
