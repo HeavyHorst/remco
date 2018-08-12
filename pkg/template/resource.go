@@ -47,8 +47,8 @@ type Resource struct {
 	sources  []*Renderer
 	logger   *logrus.Entry
 
-	exec Executor
-
+	exec     Executor
+	startCmd string
 	// SignalChan is a channel to send os.Signal's to all child processes.
 	SignalChan chan os.Signal
 
@@ -60,7 +60,8 @@ type Resource struct {
 
 // ResourceConfig is a configuration struct to create a new resource.
 type ResourceConfig struct {
-	Exec ExecConfig
+	Exec     ExecConfig
+	StartCmd string
 
 	// Template is the configuration for all template options.
 	// You can configure as much template-destination pairs as you like.
@@ -91,7 +92,7 @@ func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, 
 
 	logger := log.WithFields(logrus.Fields{"resource": r.Name})
 	exec := NewExecutor(r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout, r.Exec.Splay, logger)
-	res, err := NewResource(backendList, r.Template, r.Name, exec)
+	res, err := NewResource(backendList, r.Template, r.Name, exec, r.StartCmd)
 	if err != nil {
 		for _, v := range backendList {
 			v.Close()
@@ -101,7 +102,7 @@ func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, 
 }
 
 // NewResource creates a Resource.
-func NewResource(backends []Backend, sources []*Renderer, name string, exec Executor) (*Resource, error) {
+func NewResource(backends []Backend, sources []*Renderer, name string, exec Executor, startCmd string) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, fmt.Errorf("a valid StoreClient is required")
 	}
@@ -123,6 +124,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 		logger:     logger,
 		SignalChan: make(chan os.Signal, 1),
 		exec:       exec,
+		startCmd:   startCmd,
 	}
 
 	// initialize the inidividual backend memkv Stores
@@ -277,6 +279,17 @@ retryloop:
 				continue retryloop
 			}
 			break retryloop
+		}
+	}
+
+	if t.startCmd != "" {
+		output, err := execCommand(t.startCmd, t.logger, nil)
+		if err != nil {
+			t.logger.Error(fmt.Sprintf("failed to execute the start cmd - %q", string(output)))
+			t.Failed = true
+			cancel()
+		} else {
+			t.logger.Debug(fmt.Sprintf("%q", string(output)))
 		}
 	}
 
