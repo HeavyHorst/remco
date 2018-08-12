@@ -40,11 +40,13 @@ type Renderer struct {
 	Mode      string `json:"mode"`
 	UID       int    `json:"uid"`
 	GID       int    `json:"gid"`
+	StartCmd  string `toml:"start_cmd" json:"start_cmd"`
 	ReloadCmd string `toml:"reload_cmd" json:"reload_cmd"`
 	CheckCmd  string `toml:"check_cmd" json:"check_cmd"`
 	stageFile *os.File
 	logger    *logrus.Entry
 	ReapLock  *sync.RWMutex
+	started   bool
 }
 
 // createStageFile stages the src configuration file by processing the src
@@ -148,15 +150,28 @@ func (s *Renderer) syncFiles() (bool, error) {
 		os.Chown(s.Dst, s.UID, s.GID)
 		changed = true
 
-		if err := s.reload(); err != nil {
-			return changed, errors.Wrap(err, "reload command failed")
+		cmd := s.ReloadCmd
+		if !s.started && s.StartCmd != "" {
+			cmd = s.StartCmd
 		}
 
+		if err := s.execCommand(cmd); err != nil {
+			return changed, errors.Wrap(err, "start/reload command failed")
+		}
+
+		s.started = true
 		s.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
 		}).Info("target config has been updated")
 
 	} else {
+		if !s.started && s.StartCmd != "" {
+			if err := s.execCommand(s.StartCmd); err != nil {
+				return changed, errors.Wrap(err, "start command failed")
+			}
+			s.started = true
+		}
+
 		s.logger.WithFields(logrus.Fields{
 			"config": s.Dst,
 		}).Debug("target config in sync")
@@ -222,12 +237,13 @@ func (s *Renderer) check(stageFile string) error {
 
 // reload executes the reload command.
 // It returns nil if the reload command returns 0 and an error otherwise.
-func (s *Renderer) reload() error {
-	if s.ReloadCmd == "" {
+func (s *Renderer) execCommand(cmd string) error {
+	if cmd == "" {
 		return nil
 	}
-	s.logger.Debug("Running " + s.ReloadCmd)
-	c := exec.Command("/bin/sh", "-c", s.ReloadCmd)
+
+	s.logger.Debug("Running " + cmd)
+	c := exec.Command("/bin/sh", "-c", cmd)
 
 	if s.ReapLock != nil {
 		s.ReapLock.RLock()
@@ -237,8 +253,9 @@ func (s *Renderer) reload() error {
 	output, err := c.CombinedOutput()
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("%q", string(output)))
-		return errors.Wrap(err, "the reload command failed")
+		return errors.Wrapf(err, "the command failed: %q", cmd)
 	}
+
 	s.logger.Debug(fmt.Sprintf("%q", string(output)))
 	return nil
 }
