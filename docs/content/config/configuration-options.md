@@ -14,7 +14,7 @@ weight: 10
  - **log_format(string):** 
    - The format of the log messages. Valid formats are *text* and *json*.
  - **include_dir(string):**
-   - Specify an entire directory of resource configuration files to include.
+   - Specify an entire directory of resource configuration files to include. Data from files will be imported directly into `resource` array.
  - **filter_dir(string):**
    - A folder with custom JavaScript template filters.
  - **pid_file(string):**
