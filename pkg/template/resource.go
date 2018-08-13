@@ -47,8 +47,9 @@ type Resource struct {
 	sources  []*Renderer
 	logger   *logrus.Entry
 
-	exec     Executor
-	startCmd string
+	exec      Executor
+	startCmd  string
+	reloadCmd string
 	// SignalChan is a channel to send os.Signal's to all child processes.
 	SignalChan chan os.Signal
 
@@ -60,8 +61,9 @@ type Resource struct {
 
 // ResourceConfig is a configuration struct to create a new resource.
 type ResourceConfig struct {
-	Exec     ExecConfig
-	StartCmd string
+	Exec      ExecConfig
+	StartCmd  string
+	ReloadCmd string
 
 	// Template is the configuration for all template options.
 	// You can configure as much template-destination pairs as you like.
@@ -92,7 +94,7 @@ func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, 
 
 	logger := log.WithFields(logrus.Fields{"resource": r.Name})
 	exec := NewExecutor(r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout, r.Exec.Splay, logger)
-	res, err := NewResource(backendList, r.Template, r.Name, exec, r.StartCmd)
+	res, err := NewResource(backendList, r.Template, r.Name, exec, r.StartCmd, r.ReloadCmd)
 	if err != nil {
 		for _, v := range backendList {
 			v.Close()
@@ -102,7 +104,7 @@ func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, 
 }
 
 // NewResource creates a Resource.
-func NewResource(backends []Backend, sources []*Renderer, name string, exec Executor, startCmd string) (*Resource, error) {
+func NewResource(backends []Backend, sources []*Renderer, name string, exec Executor, startCmd, reloadCmd string) (*Resource, error) {
 	if len(backends) == 0 {
 		return nil, fmt.Errorf("a valid StoreClient is required")
 	}
@@ -125,6 +127,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 		SignalChan: make(chan os.Signal, 1),
 		exec:       exec,
 		startCmd:   startCmd,
+		reloadCmd:  reloadCmd,
 	}
 
 	// initialize the inidividual backend memkv Stores
@@ -192,14 +195,14 @@ func (t *Resource) setVars(storeClient Backend) error {
 	return nil
 }
 
-func (t *Resource) createStageFileAndSync() (bool, error) {
+func (t *Resource) createStageFileAndSync(runCommands bool) (bool, error) {
 	var changed bool
 	for _, s := range t.sources {
 		err := s.createStageFile(t.funcMap)
 		if err != nil {
 			return changed, errors.Wrap(err, "create stage file failed")
 		}
-		c, err := s.syncFiles()
+		c, err := s.syncFiles(runCommands)
 		changed = changed || c
 		if err != nil {
 			return changed, errors.Wrap(err, "sync files failed")
@@ -213,7 +216,7 @@ func (t *Resource) createStageFileAndSync() (bool, error) {
 // from the store, then we stage a candidate configuration file, and finally sync
 // things up.
 // It returns an error if any.
-func (t *Resource) process(storeClients []Backend) (bool, error) {
+func (t *Resource) process(storeClients []Backend, runCommands bool) (bool, error) {
 	var changed bool
 	var err error
 	for _, storeClient := range storeClients {
@@ -224,7 +227,7 @@ func (t *Resource) process(storeClients []Backend) (bool, error) {
 			}
 		}
 	}
-	if changed, err = t.createStageFileAndSync(); err != nil {
+	if changed, err = t.createStageFileAndSync(runCommands); err != nil {
 		return changed, errors.Wrap(err, "createStageFileAndSync failed")
 	}
 	return changed, nil
@@ -255,7 +258,7 @@ retryloop:
 		case <-ctx.Done():
 			return
 		case <-retryChan:
-			if _, err := t.process(t.backends); err != nil {
+			if _, err := t.process(t.backends, t.startCmd == ""); err != nil {
 				switch err.(type) {
 				case berr.BackendError:
 					err := err.(berr.BackendError)
@@ -344,7 +347,7 @@ retryloop:
 	for {
 		select {
 		case storeClient := <-processChan:
-			changed, err := t.process([]Backend{storeClient})
+			changed, err := t.process([]Backend{storeClient}, true)
 			if err != nil {
 				switch err.(type) {
 				case berr.BackendError:
@@ -355,6 +358,13 @@ retryloop:
 			} else if changed {
 				if err := t.exec.Reload(); err != nil {
 					t.logger.Error(err)
+				}
+
+				if t.reloadCmd != "" {
+					output, err := execCommand(t.reloadCmd, t.logger, nil)
+					if err != nil {
+						t.logger.Error(fmt.Sprintf("failed to execute the resource reload cmd - %q", string(output)))
+					}
 				}
 			}
 		case s := <-t.SignalChan:

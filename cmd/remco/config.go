@@ -69,10 +69,11 @@ type DefaultBackends struct {
 
 // Resource is the representation of an resource configuration
 type Resource struct {
-	Exec     template.ExecConfig
-	StartCmd string `toml:"start_cmd" json:"reload_cmd"`
-	Template []*template.Renderer
-	Backends BackendConfigs `toml:"backend"`
+	Exec      template.ExecConfig
+	StartCmd  string `toml:"start_cmd" json:"start_cmd"`
+	ReloadCmd string `toml:"reload_cmd" json:"reload_cmd"`
+	Template  []*template.Renderer
+	Backends  BackendConfigs `toml:"backend"`
 
 	// defaults to the filename of the resource
 	Name string

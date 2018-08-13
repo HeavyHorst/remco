@@ -68,7 +68,7 @@ func (s *ResourceSuite) SetUpSuite(t *C) {
 	}
 
 	exec := NewExecutor("", "", "", 0, 0, nil)
-	res, err := NewResource([]Backend{s.backend}, []*Renderer{s.renderer}, "test", exec, "")
+	res, err := NewResource([]Backend{s.backend}, []*Renderer{s.renderer}, "test", exec, "", "")
 	t.Assert(err, IsNil)
 	s.resource = res
 }
@@ -103,12 +103,12 @@ func (s *ResourceSuite) TestSetVars(t *C) {
 }
 
 func (s *ResourceSuite) TestCreateStageFileAndSync(t *C) {
-	_, err := s.resource.createStageFileAndSync()
+	_, err := s.resource.createStageFileAndSync(true)
 	t.Check(err, IsNil)
 }
 
 func (s *ResourceSuite) TestProcess(t *C) {
-	_, err := s.resource.process(s.resource.backends)
+	_, err := s.resource.process(s.resource.backends, true)
 	t.Check(err, IsNil)
 
 	data, err := ioutil.ReadFile("/tmp/remco-basic-test.conf")

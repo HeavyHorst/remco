@@ -188,6 +188,7 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 				Template:   r.Template,
 				Name:       r.Name,
 				StartCmd:   r.StartCmd,
+				ReloadCmd:  r.ReloadCmd,
 				Connectors: backendConfigs,
 			}
 			res, err := template.NewResourceFromResourceConfig(ctx, ru.reapLock, rsc)

@@ -108,7 +108,7 @@ func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 // overwriting the target config file. Finally, syncFile will run a reload command
 // if set to have the application or service pick up the changes.
 // It returns a boolean indicating if the file has changed and an error if any.
-func (s *Renderer) syncFiles() (bool, error) {
+func (s *Renderer) syncFiles(runCommands bool) (bool, error) {
 	var changed bool
 	staged := s.stageFile.Name()
 	defer os.Remove(staged)
@@ -128,8 +128,10 @@ func (s *Renderer) syncFiles() (bool, error) {
 			"config": s.Dst,
 		}).Info("target config out of sync")
 
-		if err := s.check(staged); err != nil {
-			return changed, errors.Wrap(err, "config check failed")
+		if runCommands {
+			if err := s.check(staged); err != nil {
+				return changed, errors.Wrap(err, "config check failed")
+			}
 		}
 
 		s.logger.WithFields(logrus.Fields{
@@ -148,8 +150,10 @@ func (s *Renderer) syncFiles() (bool, error) {
 		os.Chown(s.Dst, s.UID, s.GID)
 		changed = true
 
-		if err := s.reload(); err != nil {
-			return changed, errors.Wrap(err, "reload command failed")
+		if runCommands {
+			if err := s.reload(); err != nil {
+				return changed, errors.Wrap(err, "reload command failed")
+			}
 		}
 
 		s.logger.WithFields(logrus.Fields{
@@ -236,7 +240,7 @@ func (s *Renderer) reload() error {
 }
 
 func execCommand(cmd string, logger *logrus.Entry, rl *sync.RWMutex) ([]byte, error) {
-	logger.Debug("Running " + cmd)
+	logger.Debugf("Running %q", cmd)
 	c := exec.Command("/bin/sh", "-c", cmd)
 
 	if rl != nil {
