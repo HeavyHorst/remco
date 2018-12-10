@@ -42,7 +42,7 @@
 
 [[constraint]]
   name = "github.com/HeavyHorst/pongo2"
-  version = "3.2.0"
+  version = "3.3.0"
 
 [[constraint]]
   branch = "master"
