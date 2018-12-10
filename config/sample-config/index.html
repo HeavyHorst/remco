@@ -403,12 +403,20 @@ include_dir = &quot;/etc/remco/resource.d/&quot;
 pid_file    = &quot;/var/run/remco/remco.pid&quot;
 log_file    = &quot;/var/log/remco.log&quot;
 
+# default backend configurations.
+# these settings can be overwritten in the individual resource backend settings.
+[default_backends]
+[default_backends.file]
+    onetime  = true
+    prefix   = &quot;/bla&quot;
 
 ################################################################
 # Resource configuration
 ################################################################
 [[resource]]
   name = &quot;haproxy&quot;
+  start_cmd   = &quot;echo 1&quot;
+  reload_cmd  = &quot;echo 1&quot;
   [[resource.template]]
     src         = &quot;/etc/remco/templates/haproxy.cfg&quot;
     dst         = &quot;/etc/haproxy/haproxy.cfg&quot;
@@ -418,7 +426,7 @@ log_file    = &quot;/var/log/remco.log&quot;
 
   [resource.backend]
     # you can use as many backends as you like
-	# in this example vault and file
+	  # in this example vault and file
     [resource.backend.vault]
       node           = &quot;http://127.0.0.1:8200&quot;
       ## Token based auth backend
@@ -445,8 +453,8 @@ log_file    = &quot;/var/log/remco.log&quot;
 
     [resource.backend.file]
       filepath = &quot;/etc/remco/test.yml&quot;
-	  watch    = true
-	  keys     = [&quot;/prefix&quot;]
+	    watch    = true
+	    keys     = [&quot;/prefix&quot;]
 
 </code></pre>
 

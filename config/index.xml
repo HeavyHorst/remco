@@ -62,7 +62,7 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 &lt;li&gt;&lt;strong&gt;include_dir(string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Specify an entire directory of resource configuration files to include.&lt;/li&gt;
+&lt;li&gt;Specify an entire directory of resource configuration files to include. Data from files will be imported directly into &lt;code&gt;resource&lt;/code&gt; array.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;filter_dir(string):&lt;/strong&gt;
 
@@ -88,6 +88,16 @@ to configure values, you can simply use $VARIABLE_NAME or ${VARIABLE_NAME} and t
 
 &lt;ul&gt;
 &lt;li&gt;You can give the resource a name which is added to the logs as field &lt;em&gt;resource&lt;/em&gt;. Default is the name of the resource file.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;start_cmd(string, optional)&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;An optional command which is executed once all templates have been processed successfully.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;reload_cmd(string, optional)&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;An optional command which is executed as soon as a template belonging to the resource has been successfully recreated.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -168,6 +178,8 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;backend-configuration-options&#34;&gt;Backend configuration options&lt;/h2&gt;
+
+&lt;p&gt;See the example configuration to see how global default values can be set for individual backends.&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;valid in every backend&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
@@ -435,12 +447,20 @@ include_dir = &amp;quot;/etc/remco/resource.d/&amp;quot;
 pid_file    = &amp;quot;/var/run/remco/remco.pid&amp;quot;
 log_file    = &amp;quot;/var/log/remco.log&amp;quot;
 
+# default backend configurations.
+# these settings can be overwritten in the individual resource backend settings.
+[default_backends]
+[default_backends.file]
+    onetime  = true
+    prefix   = &amp;quot;/bla&amp;quot;
 
 ################################################################
 # Resource configuration
 ################################################################
 [[resource]]
   name = &amp;quot;haproxy&amp;quot;
+  start_cmd   = &amp;quot;echo 1&amp;quot;
+  reload_cmd  = &amp;quot;echo 1&amp;quot;
   [[resource.template]]
     src         = &amp;quot;/etc/remco/templates/haproxy.cfg&amp;quot;
     dst         = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
@@ -450,7 +470,7 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
 
   [resource.backend]
     # you can use as many backends as you like
-	# in this example vault and file
+	  # in this example vault and file
     [resource.backend.vault]
       node           = &amp;quot;http://127.0.0.1:8200&amp;quot;
       ## Token based auth backend
@@ -477,8 +497,8 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
 
     [resource.backend.file]
       filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
-	  watch    = true
-	  keys     = [&amp;quot;/prefix&amp;quot;]
+	    watch    = true
+	    keys     = [&amp;quot;/prefix&amp;quot;]
 
 &lt;/code&gt;&lt;/pre&gt;
 </description>

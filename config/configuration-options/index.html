@@ -422,7 +422,7 @@
 <li><strong>include_dir(string):</strong>
 
 <ul>
-<li>Specify an entire directory of resource configuration files to include.</li>
+<li>Specify an entire directory of resource configuration files to include. Data from files will be imported directly into <code>resource</code> array.</li>
 </ul></li>
 <li><strong>filter_dir(string):</strong>
 
@@ -448,6 +448,16 @@
 
 <ul>
 <li>You can give the resource a name which is added to the logs as field <em>resource</em>. Default is the name of the resource file.</li>
+</ul></li>
+<li><strong>start_cmd(string, optional)</strong>
+
+<ul>
+<li>An optional command which is executed once all templates have been processed successfully.</li>
+</ul></li>
+<li><strong>reload_cmd(string, optional)</strong>
+
+<ul>
+<li>An optional command which is executed as soon as a template belonging to the resource has been successfully recreated.</li>
 </ul></li>
 </ul>
 
@@ -528,6 +538,8 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 </ul>
 
 <h2 id="backend-configuration-options">Backend configuration options</h2>
+
+<p>See the example configuration to see how global default values can be set for individual backends.</p>
 
 <p><details>
 <summary> <strong>valid in every backend</strong> </summary></p>
