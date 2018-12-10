@@ -25,6 +25,10 @@ weight: 10
 ## Resource configuration options
  - **name(string, optional):**
     - You can give the resource a name which is added to the logs as field *resource*. Default is the name of the resource file.
+ - **start_cmd(string, optional)**
+    - An optional command which is executed once all templates have been processed successfully.
+ - **reload_cmd(string, optional)**
+    - An optional command which is executed as soon as a template belonging to the resource has been successfully recreated.
 
 ## Exec configuration options
  - **command(string):**
@@ -58,6 +62,8 @@ weight: 10
     - The GID that should own the file. Defaults to the effective gid.
 
 ## Backend configuration options
+
+See the example configuration to see how global default values can be set for individual backends.
 
 <details>
 <summary> **valid in every backend** </summary>

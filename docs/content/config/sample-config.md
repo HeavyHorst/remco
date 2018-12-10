@@ -30,6 +30,8 @@ log_file    = "/var/log/remco.log"
 ################################################################
 [[resource]]
   name = "haproxy"
+  start_cmd   = "echo 1"
+  reload_cmd  = "echo 1"
   [[resource.template]]
     src         = "/etc/remco/templates/haproxy.cfg"
     dst         = "/etc/haproxy/haproxy.cfg"
@@ -39,7 +41,7 @@ log_file    = "/var/log/remco.log"
 
   [resource.backend]
     # you can use as many backends as you like
-	# in this example vault and file
+	  # in this example vault and file
     [resource.backend.vault]
       node           = "http://127.0.0.1:8200"
       ## Token based auth backend
@@ -66,8 +68,8 @@ log_file    = "/var/log/remco.log"
 
     [resource.backend.file]
       filepath = "/etc/remco/test.yml"
-	  watch    = true
-	  keys     = ["/prefix"]
+	    watch    = true
+	    keys     = ["/prefix"]
 
 ```      
 
