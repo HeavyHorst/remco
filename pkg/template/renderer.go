@@ -151,7 +151,7 @@ func (s *Renderer) syncFiles(runCommands bool) (bool, error) {
 		changed = true
 
 		if runCommands {
-			if err := s.reload(); err != nil {
+			if err := s.reload(s.Dst); err != nil {
 				return changed, errors.Wrap(err, "reload command failed")
 			}
 		}
@@ -226,17 +226,33 @@ func (s *Renderer) check(stageFile string) error {
 
 // reload executes the reload command.
 // It returns nil if the reload command returns 0 and an error otherwise.
-func (s *Renderer) reload() error {
+func (s *Renderer) reload(renderedFile string) error {
 	if s.ReloadCmd == "" {
 		return nil
 	}
-	output, err := execCommand(s.ReloadCmd, s.logger, s.ReapLock)
+	cmd, err := renderTemplate(s.ReloadCmd, map[string]string{"dst": renderedFile})
+	if err != nil {
+		return errors.Wrap(err, "rendering reload command failed")
+	}
+	output, err := execCommand(cmd, s.logger, s.ReapLock)
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("%q", string(output)))
 		return errors.Wrap(err, "the reload command failed")
 	}
 	s.logger.Debug(fmt.Sprintf("%q", string(output)))
 	return nil
+}
+
+func renderTemplate(unparsed string, data interface{}) (string, error) {
+	var rendered bytes.Buffer
+	tmpl, err := template.New("").Parse(unparsed)
+	if err != nil {
+		return "", errors.Wrap(err, "parsing template failed")
+	}
+	if err := tmpl.Execute(&rendered, data); err != nil {
+		return "", errors.Wrap(err, "template execution failed")
+	}
+	return rendered.String(), nil
 }
 
 func execCommand(cmd string, logger *logrus.Entry, rl *sync.RWMutex) ([]byte, error) {
