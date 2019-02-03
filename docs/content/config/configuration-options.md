@@ -51,9 +51,9 @@ weight: 10
  - **make_directories(bool, optional):**
     - make parent directories for the dst path as needed. Default is false.
  - **check_cmd(string, optional):**
-    - The command to check config. Use {{.src}} to reference the rendered source template.
+    - An optional command to check the rendered source template before writing it to the destination. If this command returns non-zero, the destination will not be overwritten by the rendered source template. We can use `{{.src}}` here to reference the rendered source template.
  - **reload_cmd(string, optional):**
-    - The command to reload config.
+    - An optional command to run after the destination is updated. We can use `{{.dst}}` here to reference the destination.
  - **mode(string, optional):**
     - The permission mode of the file. Default is "0644".
  - **UID(int, optional):**

@@ -143,7 +143,7 @@ name = "haproxy"
 [[resource.template]]
   src = "/etc/remco/templates/haproxy.tmpl"
   dst = "/etc/haproxy/haproxy.cfg"
-  reload_cmd 	  = "haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`"
+  reload_cmd 	  = "haproxy -f {{.dst}} -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`"
 
   [resource.backend]
     [resource.backend.etcd]
