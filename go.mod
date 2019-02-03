@@ -112,7 +112,7 @@ require (
 	github.com/streadway/amqp v0.0.0-20181205114330-a314942b2fd9 // indirect
 	github.com/tevino/go-zookeeper v0.0.0-20170512024026-c218ec636bef // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5 // indirect
-	github.com/ugorji/go/codec v0.0.0-20190128213124-ee1426cffec0 // indirect
+	github.com/ugorji/go v1.1.1 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
 	go.etcd.io/bbolt v1.3.2 // indirect

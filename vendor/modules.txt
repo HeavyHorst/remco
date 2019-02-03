@@ -147,7 +147,7 @@ github.com/ryanuber/go-glob
 github.com/sirupsen/logrus
 # github.com/tevino/go-zookeeper v0.0.0-20170512024026-c218ec636bef
 github.com/tevino/go-zookeeper/zk
-# github.com/ugorji/go/codec v0.0.0-20190128213124-ee1426cffec0
+# github.com/ugorji/go v1.1.1
 github.com/ugorji/go/codec
 # github.com/x-cray/logrus-prefixed-formatter v0.5.2
 github.com/x-cray/logrus-prefixed-formatter
