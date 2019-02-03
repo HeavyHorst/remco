@@ -147,7 +147,7 @@ func (o *objectGoReflect) getOwnProp(name string) Value {
 		if v := o._getField(name); v.IsValid() {
 			return &valueProperty{
 				value:      o.val.runtime.ToValue(v.Interface()),
-				writable:   true,
+				writable:   v.CanSet(),
 				enumerable: true,
 			}
 		}
@@ -176,6 +176,10 @@ func (o *objectGoReflect) putStr(name string, val Value, throw bool) {
 func (o *objectGoReflect) _put(name string, val Value, throw bool) bool {
 	if o.value.Kind() == reflect.Struct {
 		if v := o._getField(name); v.IsValid() {
+			if !v.CanSet() {
+				o.val.runtime.typeErrorResult(throw, "Cannot assign to a non-addressable or read-only property %s of a host object", name)
+				return false
+			}
 			vv, err := o.val.runtime.toReflectValue(val, v.Type())
 			if err != nil {
 				o.val.runtime.typeErrorResult(throw, "Go struct conversion error: %v", err)
@@ -195,23 +199,23 @@ func (o *objectGoReflect) _putProp(name string, value Value, writable, enumerabl
 	return o.baseObject._putProp(name, value, writable, enumerable, configurable)
 }
 
-func (r *Runtime) checkHostObjectPropertyDescr(name string, descr objectImpl, throw bool) bool {
-	if descr.hasPropertyStr("get") || descr.hasPropertyStr("set") {
+func (r *Runtime) checkHostObjectPropertyDescr(name string, descr propertyDescr, throw bool) bool {
+	if descr.Getter != nil || descr.Setter != nil {
 		r.typeErrorResult(throw, "Host objects do not support accessor properties")
 		return false
 	}
-	if wr := descr.getStr("writable"); wr != nil && !wr.ToBoolean() {
+	if descr.Writable == FLAG_FALSE {
 		r.typeErrorResult(throw, "Host object field %s cannot be made read-only", name)
 		return false
 	}
-	if cfg := descr.getStr("configurable"); cfg != nil && cfg.ToBoolean() {
+	if descr.Configurable == FLAG_TRUE {
 		r.typeErrorResult(throw, "Host object field %s cannot be made configurable", name)
 		return false
 	}
 	return true
 }
 
-func (o *objectGoReflect) defineOwnProperty(n Value, descr objectImpl, throw bool) bool {
+func (o *objectGoReflect) defineOwnProperty(n Value, descr propertyDescr, throw bool) bool {
 	name := n.String()
 	if ast.IsExported(name) {
 		if o.value.Kind() == reflect.Struct {
@@ -219,7 +223,7 @@ func (o *objectGoReflect) defineOwnProperty(n Value, descr objectImpl, throw boo
 				if !o.val.runtime.checkHostObjectPropertyDescr(name, descr, throw) {
 					return false
 				}
-				val := descr.getStr("value")
+				val := descr.Value
 				if val == nil {
 					val = _undefined
 				}
@@ -377,10 +381,10 @@ func (i *goreflectPropIter) nextMethod() (propIterItem, iterNextFunc) {
 	return propIterItem{}, nil
 }
 
-func (o *objectGoReflect) _enumerate(recusrive bool) iterNextFunc {
+func (o *objectGoReflect) _enumerate(recursive bool) iterNextFunc {
 	r := &goreflectPropIter{
 		o:         o,
-		recursive: recusrive,
+		recursive: recursive,
 	}
 	if o.value.Kind() == reflect.Struct {
 		return r.nextField

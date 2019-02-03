@@ -266,10 +266,10 @@ func (i *sparseArrayPropIter) next() (propIterItem, iterNextFunc) {
 	return i.a.baseObject._enumerate(i.recursive)()
 }
 
-func (a *sparseArrayObject) _enumerate(recusrive bool) iterNextFunc {
+func (a *sparseArrayObject) _enumerate(recursive bool) iterNextFunc {
 	return (&sparseArrayPropIter{
 		a:         a,
-		recursive: recusrive,
+		recursive: recursive,
 	}).next
 }
 
@@ -336,7 +336,7 @@ func (a *sparseArrayObject) expand() bool {
 	return true
 }
 
-func (a *sparseArrayObject) defineOwnProperty(n Value, descr objectImpl, throw bool) bool {
+func (a *sparseArrayObject) defineOwnProperty(n Value, descr propertyDescr, throw bool) bool {
 	if idx := toIdx(n); idx >= 0 {
 		var existing Value
 		i := a.findIdx(idx)

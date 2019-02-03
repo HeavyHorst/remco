@@ -40,7 +40,7 @@ func NewEtcdClient(machines []string, cert, key, caCert string, basicAuth bool, 
 
 	tls := false
 	if caCert != "" {
-		tlsInfo.CAFile = caCert
+		tlsInfo.TrustedCAFile = caCert
 		tls = true
 	}
 	if cert != "" && key != "" {

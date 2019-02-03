@@ -155,13 +155,13 @@ func (c *Client) WatchPrefix(ctx context.Context, prefix string, opts ...easykv.
 	defer cancel()
 
 	//watch all subfolders for changes
-	watchMap := make(map[string]string)
+	watchMap := make(map[string]struct{})
 	for k := range entries {
 		for _, v := range options.Keys {
 			if strings.HasPrefix(k, v) {
 				for dir := filepath.Dir(k); dir != "/"; dir = filepath.Dir(dir) {
 					if _, ok := watchMap[dir]; !ok {
-						watchMap[dir] = ""
+						watchMap[dir] = struct{}{}
 						wg.Add(1)
 						go func(dir string) {
 							defer wg.Done()
