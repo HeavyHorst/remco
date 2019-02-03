@@ -259,9 +259,8 @@ retryloop:
 			return
 		case <-retryChan:
 			if _, err := t.process(t.backends, t.startCmd == ""); err != nil {
-				switch err.(type) {
+				switch err := err.(type) {
 				case berr.BackendError:
-					err := err.(berr.BackendError)
 					t.logger.WithFields(logrus.Fields{
 						"backend": err.Backend,
 					}).Error(err)
