@@ -197,25 +197,11 @@ func (s *Renderer) check(stageFile string) error {
 	if s.CheckCmd == "" {
 		return nil
 	}
-	var cmdBuffer bytes.Buffer
-	data := make(map[string]string)
-	data["src"] = stageFile
-	tmpl, err := template.New("checkcmd").Parse(s.CheckCmd)
+	cmd, err := renderTemplate(s.CheckCmd, map[string]string{"src": stageFile})
 	if err != nil {
-		return errors.Wrap(err, "parsing check command failed")
+		return errors.Wrap(err, "rendering check command failed")
 	}
-	if err := tmpl.Execute(&cmdBuffer, data); err != nil {
-		return errors.Wrap(err, "template execution failed")
-	}
-	s.logger.Debug("Running " + cmdBuffer.String())
-	c := exec.Command("/bin/sh", "-c", cmdBuffer.String())
-
-	if s.ReapLock != nil {
-		s.ReapLock.RLock()
-		defer s.ReapLock.RUnlock()
-	}
-
-	output, err := c.CombinedOutput()
+	output, err := execCommand(cmd, s.logger, s.ReapLock)
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("%q", string(output)))
 		return errors.Wrap(err, "the check command failed")
