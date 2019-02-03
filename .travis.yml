@@ -10,10 +10,10 @@ before_install:
   - sudo mv consul /bin/
   - consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul -bind 127.0.0.1 &
   # install etcd
-  - curl -L https://github.com/coreos/etcd/releases/download/v3.1.0/etcd-v3.1.0-linux-amd64.tar.gz -o etcd-v3.1.0-linux-amd64.tar.gz
-  - tar xzf etcd-v3.1.0-linux-amd64.tar.gz
-  - sudo mv etcd-v3.1.0-linux-amd64/etcd /bin/
-  - sudo mv etcd-v3.1.0-linux-amd64/etcdctl /bin/
+  - curl -L https://github.com/etcd-io/etcd/releases/download/v3.3.11/etcd-v3.3.11-linux-amd64.tar.gz -o etcd-v3.3.11-linux-amd64.tar.gz
+  - tar xzf etcd-v3.3.11-linux-amd64.tar.gz
+  - sudo mv etcd-v3.3.11-linux-amd64/etcd /bin/
+  - sudo mv etcd-v3.3.11-linux-amd64/etcdctl /bin/
   - etcd &
   # Install vault
   - wget https://releases.hashicorp.com/vault/0.6.5/vault_0.6.5_linux_amd64.zip
