@@ -54,6 +54,3 @@ Now you can run the remco command!
 
 See [Contributing](https://github.com/HeavyHorst/remco/blob/master/CONTRIBUTING) for details on submitting patches.
 
-## Project Status
-
-Remco is under active development. We do not recommend its use in production, but we encourage you to try out Remco and provide feedback via issues and pull requests.
