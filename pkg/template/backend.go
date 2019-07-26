@@ -97,14 +97,22 @@ func (s Backend) watch(ctx context.Context, processChan chan Backend, errChan ch
 	var lastIndex uint64
 	keysPrefix := appendPrefix(s.Prefix, s.Keys)
 
+	var backendError bool
+
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		default:
+			if backendError {
+				processChan <- s
+				backendError = false
+			}
+
 			index, err := s.WatchPrefix(ctx, s.Prefix, easykv.WithKeys(keysPrefix), easykv.WithWaitIndex(lastIndex))
 			if err != nil {
 				if err != easykv.ErrWatchCanceled {
+					backendError = true
 					errChan <- berr.BackendError{Message: err.Error(), Backend: s.Name}
 					time.Sleep(2 * time.Second)
 				}
