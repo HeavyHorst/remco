@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=0.11.0
+version=0.11.1
 date=`date -u '+%Y-%m-%d %H:%M:%S'`
 commit=`git rev-parse HEAD`
 os_list=( "linux" "darwin" "windows" )
