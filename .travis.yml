@@ -1,23 +1,22 @@
 language: go
 
 before_install:
-  - go get golang.org/x/lint/golint
   - go get honnef.co/go/tools/cmd/staticcheck
 
   # install consul
-  - wget https://releases.hashicorp.com/consul/0.7.5/consul_0.7.5_linux_amd64.zip
-  - unzip consul_0.7.5_linux_amd64.zip
+  - wget https://releases.hashicorp.com/consul/1.5.3/consul_1.5.3_linux_amd64.zip
+  - unzip consul_1.5.3_linux_amd64.zip
   - sudo mv consul /bin/
   - consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul -bind 127.0.0.1 &
   # install etcd
-  - curl -L https://github.com/etcd-io/etcd/releases/download/v3.3.11/etcd-v3.3.11-linux-amd64.tar.gz -o etcd-v3.3.11-linux-amd64.tar.gz
-  - tar xzf etcd-v3.3.11-linux-amd64.tar.gz
-  - sudo mv etcd-v3.3.11-linux-amd64/etcd /bin/
-  - sudo mv etcd-v3.3.11-linux-amd64/etcdctl /bin/
+  - curl -L https://github.com/etcd-io/etcd/releases/download/v3.3.13/etcd-v3.3.13-linux-amd64.tar.gz -o etcd-v3.3.13-linux-amd64.tar.gz
+  - tar xzf etcd-v3.3.13-linux-amd64.tar.gz
+  - sudo mv etcd-v3.3.13-linux-amd64/etcd /bin/
+  - sudo mv etcd-v3.3.13-linux-amd64/etcdctl /bin/
   - etcd &
   # Install vault
-  - wget https://releases.hashicorp.com/vault/0.6.5/vault_0.6.5_linux_amd64.zip
-  - unzip vault_0.6.5_linux_amd64.zip
+  - wget https://releases.hashicorp.com/vault/1.2.1/vault_1.2.1_linux_amd64.zip
+  - unzip vault_1.2.1_linux_amd64.zip
   - sudo mv vault /bin/
   - vault server -dev &
   # Install zookeeper
@@ -32,7 +31,7 @@ before_install:
   - export GOROOT=$(go env GOROOT)
 
 go:
-  - 1.11.x
+  - 1.12.x
   - tip
 
 env:
@@ -43,7 +42,6 @@ services:
 
 before_script:
    - go vet $(go list ./... | grep -v /vendor/)
-   - golint $(go list ./... | grep -v /vendor/)
    - staticcheck $(go list ./... | grep -v /vendor/)
 
 script:
