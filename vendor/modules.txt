@@ -3,17 +3,17 @@ github.com/BurntSushi/toml
 # github.com/HeavyHorst/consul-template v0.17.0
 github.com/HeavyHorst/consul-template/child
 # github.com/HeavyHorst/easykv v1.2.2
+github.com/HeavyHorst/easykv
 github.com/HeavyHorst/easykv/consul
 github.com/HeavyHorst/easykv/env
 github.com/HeavyHorst/easykv/etcd
+github.com/HeavyHorst/easykv/etcd/etcdv2
+github.com/HeavyHorst/easykv/etcd/etcdv3
 github.com/HeavyHorst/easykv/file
 github.com/HeavyHorst/easykv/mock
 github.com/HeavyHorst/easykv/redis
 github.com/HeavyHorst/easykv/vault
 github.com/HeavyHorst/easykv/zookeeper
-github.com/HeavyHorst/easykv
-github.com/HeavyHorst/easykv/etcd/etcdv2
-github.com/HeavyHorst/easykv/etcd/etcdv3
 # github.com/HeavyHorst/memkv v1.0.1
 github.com/HeavyHorst/memkv
 # github.com/HeavyHorst/pongo2 v3.3.0+incompatible
@@ -23,18 +23,18 @@ github.com/armon/go-metrics
 # github.com/armon/go-radix v1.0.0
 github.com/armon/go-radix
 # github.com/coreos/etcd v3.3.11+incompatible
+github.com/coreos/etcd/auth/authpb
 github.com/coreos/etcd/client
 github.com/coreos/etcd/clientv3
-github.com/coreos/etcd/pkg/transport
-github.com/coreos/etcd/pkg/pathutil
-github.com/coreos/etcd/pkg/srv
-github.com/coreos/etcd/pkg/types
-github.com/coreos/etcd/version
-github.com/coreos/etcd/auth/authpb
 github.com/coreos/etcd/etcdserver/api/v3rpc/rpctypes
 github.com/coreos/etcd/etcdserver/etcdserverpb
 github.com/coreos/etcd/mvcc/mvccpb
+github.com/coreos/etcd/pkg/pathutil
+github.com/coreos/etcd/pkg/srv
 github.com/coreos/etcd/pkg/tlsutil
+github.com/coreos/etcd/pkg/transport
+github.com/coreos/etcd/pkg/types
+github.com/coreos/etcd/version
 # github.com/coreos/go-semver v0.2.0
 github.com/coreos/go-semver/semver
 # github.com/dlclark/regexp2 v1.1.6
@@ -49,8 +49,8 @@ github.com/dop251/goja/token
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/garyburd/redigo v1.6.0
-github.com/garyburd/redigo/redis
 github.com/garyburd/redigo/internal
+github.com/garyburd/redigo/redis
 # github.com/go-sourcemap/sourcemap v2.1.2+incompatible
 github.com/go-sourcemap/sourcemap
 github.com/go-sourcemap/sourcemap/internal/base64vlq
@@ -94,21 +94,21 @@ github.com/hashicorp/golang-lru/simplelru
 github.com/hashicorp/hcl
 github.com/hashicorp/hcl/hcl/ast
 github.com/hashicorp/hcl/hcl/parser
-github.com/hashicorp/hcl/hcl/token
-github.com/hashicorp/hcl/json/parser
 github.com/hashicorp/hcl/hcl/scanner
 github.com/hashicorp/hcl/hcl/strconv
+github.com/hashicorp/hcl/hcl/token
+github.com/hashicorp/hcl/json/parser
 github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
 # github.com/hashicorp/serf v0.8.2
 github.com/hashicorp/serf/coordinate
 # github.com/hashicorp/vault v1.0.2
 github.com/hashicorp/vault/api
+github.com/hashicorp/vault/helper/compressutil
 github.com/hashicorp/vault/helper/consts
 github.com/hashicorp/vault/helper/hclutil
 github.com/hashicorp/vault/helper/jsonutil
 github.com/hashicorp/vault/helper/parseutil
-github.com/hashicorp/vault/helper/compressutil
 github.com/hashicorp/vault/helper/strutil
 # github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5
 github.com/juju/errors
@@ -154,45 +154,45 @@ github.com/x-cray/logrus-prefixed-formatter
 # golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/net v0.0.0-20190125091013-d26f9f9a57f3
-golang.org/x/net/http2
+golang.org/x/net/context
 golang.org/x/net/http/httpguts
+golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
-golang.org/x/net/context
-golang.org/x/net/trace
 golang.org/x/net/internal/timeseries
+golang.org/x/net/trace
 # golang.org/x/sys v0.0.0-20190129075346-302c3dd5f1cc
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 # golang.org/x/text v0.3.0
 golang.org/x/text/cases
 golang.org/x/text/collate
-golang.org/x/text/language
-golang.org/x/text/unicode/norm
 golang.org/x/text/internal
-golang.org/x/text/transform
 golang.org/x/text/internal/colltab
 golang.org/x/text/internal/tag
+golang.org/x/text/language
 golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
 # golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
 golang.org/x/time/rate
 # google.golang.org/genproto v0.0.0-20181202183823-bd91e49a0898
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.18.0
 google.golang.org/grpc
-google.golang.org/grpc/codes
-google.golang.org/grpc/credentials
-google.golang.org/grpc/grpclog
-google.golang.org/grpc/health/grpc_health_v1
-google.golang.org/grpc/keepalive
-google.golang.org/grpc/metadata
-google.golang.org/grpc/status
 google.golang.org/grpc/balancer
+google.golang.org/grpc/balancer/base
 google.golang.org/grpc/balancer/roundrobin
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/codes
 google.golang.org/grpc/connectivity
+google.golang.org/grpc/credentials
+google.golang.org/grpc/credentials/internal
 google.golang.org/grpc/encoding
 google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/grpclog
+google.golang.org/grpc/health/grpc_health_v1
 google.golang.org/grpc/internal
 google.golang.org/grpc/internal/backoff
 google.golang.org/grpc/internal/binarylog
@@ -200,18 +200,18 @@ google.golang.org/grpc/internal/channelz
 google.golang.org/grpc/internal/envconfig
 google.golang.org/grpc/internal/grpcrand
 google.golang.org/grpc/internal/grpcsync
+google.golang.org/grpc/internal/syscall
 google.golang.org/grpc/internal/transport
+google.golang.org/grpc/keepalive
+google.golang.org/grpc/metadata
 google.golang.org/grpc/naming
 google.golang.org/grpc/peer
 google.golang.org/grpc/resolver
 google.golang.org/grpc/resolver/dns
 google.golang.org/grpc/resolver/passthrough
 google.golang.org/grpc/stats
+google.golang.org/grpc/status
 google.golang.org/grpc/tap
-google.golang.org/grpc/credentials/internal
-google.golang.org/grpc/balancer/base
-google.golang.org/grpc/binarylog/grpc_binarylog_v1
-google.golang.org/grpc/internal/syscall
 # gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127
 gopkg.in/check.v1
 # gopkg.in/yaml.v2 v2.2.2
