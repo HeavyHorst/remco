@@ -30,6 +30,9 @@ before_install:
   # https://github.com/travis-ci/travis-ci/issues/8229
   - export GOROOT=$(go env GOROOT)
 
+install:
+  - sudo make install
+
 go:
   - 1.12.x
   - tip
