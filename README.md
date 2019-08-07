@@ -33,6 +33,26 @@ See: https://heavyhorst.github.io/remco/
 
   You should now have remco in your $GOPATH/bin directory
 
+### Building from the repository
+
+```shell
+$ git clone https://github.com/HeavyHorst/remco
+$ cd remco
+$ make
+$ ls bin/
+remco
+```
+
+### Building a given release
+
+```shell
+$ export VERSION=v0.11.1
+$ git checkout ${VERSION}
+$ make release -j
+$ ls bin/
+remco_0.11.1_darwin_amd64.zip  remco_0.11.1_linux_amd64.zip  remco_0.11.1_windows_amd64.zip  remco_darwin  remco_linux  remco_windows
+```
+
 ### Using a pre-built release
 
 Download the releases and extract the binary.
