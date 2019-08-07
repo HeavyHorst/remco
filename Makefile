@@ -88,8 +88,8 @@ install: build
 	fi
 
 tag:
-	git tag -a ${VERSION} -m "version ${VERSION}"
-	git push origin ${VERSION}
+	git tag -a v${VERSION} -m "version ${VERSION}"
+	git push origin v${VERSION}
 
 release: $(OUT_RELEASE_ZIP)
 
