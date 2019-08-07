@@ -3,9 +3,8 @@ set -e
 ROOT_TOKEN=$(vault read -field id auth/token/lookup-self)
 sed -i -- "s/§§token§§/${ROOT_TOKEN}/g" integration/vault/vault.toml
 
-
-vault mount -path database generic
-vault mount -path upstream generic
+vault secrets enable -path database kv
+vault secrets enable -path upstream kv
 
 vault write database/host value=127.0.0.1
 vault write database/port value=3306
