@@ -112,6 +112,20 @@ something
 </details>
 
 <details>
+<summary> **unixTS** -- Wrapper for [time.Now().Unix()](https://golang.org/pkg/time/#Unix). </summary>
+```
+{{ unixTS }}
+```
+</details>
+
+<details>
+<summary> **dateRFC3339** -- Wrapper for [time.Now().Format(time.RFC3339)](https://golang.org/pkg/time/). </summary>
+```
+{{ dateRFC3339 }}
+```
+</details>
+
+<details>
 <summary> **lookupIP** -- Wrapper for the [net.LookupIP](https://golang.org/pkg/net/#LookupIP) function. The wrapper returns the IP addresses in alphabetical order. </summary>
 ```
 {% for ip in lookupIP("kube-master") %}

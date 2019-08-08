@@ -18,7 +18,9 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"time"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
@@ -26,13 +28,15 @@ import (
 
 func newFuncMap() map[string]interface{} {
 	m := map[string]interface{}{
-		"getenv":     getenv,
-		"contains":   strings.Contains,
-		"replace":    strings.Replace,
-		"lookupIP":   lookupIP,
-		"lookupSRV":  lookupSRV,
-		"fileExists": fileutil.IsFileExist,
-		"printf":     fmt.Sprintf,
+		"getenv":      getenv,
+		"contains":    strings.Contains,
+		"replace":     strings.Replace,
+		"lookupIP":    lookupIP,
+		"lookupSRV":   lookupSRV,
+		"fileExists":  fileutil.IsFileExist,
+		"printf":      fmt.Sprintf,
+		"unixTS":      unixTimestampNow,
+		"dateRFC3339": dateRFC3339Now,
 	}
 
 	return m
@@ -86,4 +90,12 @@ func lookupSRV(service, proto, name string) ([]*net.SRV, error) {
 		return str1 < str2
 	})
 	return addrs, nil
+}
+
+func unixTimestampNow() string {
+	return strconv.FormatInt(time.Now().Unix(), 10)
+}
+
+func dateRFC3339Now() string {
+	return time.Now().Format(time.RFC3339)
 }
