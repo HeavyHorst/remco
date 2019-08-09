@@ -44,7 +44,7 @@ build: ${BIN_NAME}
 
 ${BIN_NAME}: $(GO_SRC)
 	@echo "building ${BIN_NAME} ${VERSION}"
-	$(GO) build -ldflags "-X main.version=${VERSION} \
+	$(GO) build -a -tags netgo -ldflags "-X main.version=${VERSION} \
 		-X main.buildDate=${BUILD_DATE} \
 		-X main.commit=${GIT_COMMIT}${GIT_DIRTY}" \
 		-o ${BIN_NAME} ${GO_OPTS} ./cmd/remco/
@@ -94,7 +94,7 @@ tag:
 release: $(OUT_RELEASE_ZIP)
 
 $(OUT_RELEASE_ZIP): $(GO_SRC)
-	GOOS=$(subst bin/remco_${VERSION}_,,$(subst _amd64.zip,,$@)) \
+	CGO_ENABLED=0 GOOS=$(subst bin/remco_${VERSION}_,,$(subst _amd64.zip,,$@)) \
 	     $(MAKE) build \
 	     BIN_NAME=$(subst ${VERSION}_,,$(subst _amd64.zip,,$@))
 	cd bin && zip -r $(shell basename $@) $(shell basename $(subst ${VERSION}_,,$(subst _amd64.zip,,$@)))
