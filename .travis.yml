@@ -36,7 +36,7 @@ install:
 
 go:
   - 1.12.x
-  - tip
+  - 1.13.x
 
 env:
   - VAULT_ADDR='http://127.0.0.1:8200' GO111MODULE=on
