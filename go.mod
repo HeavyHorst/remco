@@ -3,12 +3,12 @@ module github.com/HeavyHorst/remco
 go 1.12
 
 require (
-	contrib.go.opencensus.io/exporter/ocagent v0.4.3 // indirect
+	contrib.go.opencensus.io/exporter/ocagent v0.6.0 // indirect
 	github.com/Azure/azure-sdk-for-go v25.0.0+incompatible // indirect
 	github.com/Azure/go-autorest v11.4.0+incompatible // indirect
 	github.com/BurntSushi/toml v0.3.1
 	github.com/HeavyHorst/consul-template v0.17.0
-	github.com/HeavyHorst/easykv v1.2.2
+	github.com/HeavyHorst/easykv v1.2.4
 	github.com/HeavyHorst/memkv v1.0.1
 	github.com/HeavyHorst/pongo2 v3.3.0+incompatible
 	github.com/SAP/go-hdb v0.13.2 // indirect
@@ -46,12 +46,10 @@ require (
 	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/golang/groupcache v0.0.0-20190129154638-5b532d6fd5ef // indirect
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf // indirect
-	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75 // indirect
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.7.0 // indirect
 	github.com/hashicorp/consul v1.4.2 // indirect
 	github.com/hashicorp/consul-template v0.19.5
 	github.com/hashicorp/go-gatedio v0.0.0-20151013192243-8b8de1022221 // indirect
@@ -116,10 +114,6 @@ require (
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
 	go.etcd.io/bbolt v1.3.2 // indirect
-	golang.org/x/net v0.0.0-20190125091013-d26f9f9a57f3 // indirect
-	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c // indirect
-	google.golang.org/api v0.1.0 // indirect
-	google.golang.org/grpc v1.18.0 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127
 	gopkg.in/gorethink/gorethink.v4 v4.1.0 // indirect

@@ -22,7 +22,7 @@ type VaultConfig struct {
 	Node string
 
 	// The vault authentication type.
-	//   (token, approle, app-id, userpass, github, cert)
+	//   (token, approle, app-id, userpass, github, cert, kubernetes)
 	AuthType string `toml:"auth_type"`
 
 	// The vault app ID.
@@ -33,7 +33,7 @@ type VaultConfig struct {
 	UserID string `toml:"user_id"`
 
 	// The vault RoleID.
-	// Only used with auth_type=approle.
+	// Only used with auth_type=approle and kubernetes.
 	RoleID string `toml:"role_id"`
 	// The vault SecretID.
 	// Only used with auth_type=approle.
@@ -44,7 +44,7 @@ type VaultConfig struct {
 	// The password for the userpass authentication.
 	Password string
 
-	// The vault authentication token. Only used with auth_type=token or github.
+	// The vault authentication token. Only used with auth_type=token and github.
 	AuthToken string `toml:"auth_token"`
 
 	ClientCert   string `toml:"client_cert"`

@@ -88,6 +88,15 @@ func authenticate(c *vaultapi.Client, authType string, params map[string]string)
 		secret, err = c.Logical().Write(fmt.Sprintf("/auth/userpass/login/%s", username), map[string]interface{}{
 			"password": password,
 		})
+	case "kubernetes":
+		jwt, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
+		if err != nil {
+			return err
+		}
+		secret, err = c.Logical().Write("/auth/kubernetes/login", map[string]interface{}{
+			"jwt":  string(jwt[:]),
+			"role": getParameter("role-id", params),
+		})
 	case "cert":
 		secret, err = c.Logical().Write("/auth/cert/login", nil)
 	}

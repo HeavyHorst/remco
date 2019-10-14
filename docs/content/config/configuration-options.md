@@ -146,11 +146,11 @@ See the example configuration to see how global default values can be set for in
  - **node(string):**
    - The backend node.
  - **auth_type(string):**
-   - The vault authentication type. (token, approle, app-id, userpass, github, cert)
+   - The vault authentication type. (token, approle, app-id, userpass, github, cert, kubernetes)
  - **auth_token(string):**
    - The vault authentication token. Only used with auth_type=token or github.
  - **role_id(string):**
-   - The vault app role. Only used with auth_type=approle.
+   - The vault app role. Only used with auth_type=approle and kubernetes.
  - **secret_id(string):**
    - The vault secret id. Only used with auth_type=approle.
  - **app_id(string):**
