@@ -67,6 +67,7 @@ log_file    = "/var/log/remco.log"
       keys     = ["/"]
 
     [resource.backend.file]
+      httpheader = { X-Test-Token = "XXX", X-Test-Token2 = "YYY" } 
       filepath = "/etc/remco/test.yml"
 	    watch    = true
 	    keys     = ["/prefix"]

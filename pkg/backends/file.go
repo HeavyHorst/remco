@@ -21,6 +21,9 @@ type FileConfig struct {
 	// The filepath to a yaml or json file containing the key-value pairs.
 	// This can be a local file or a remote http/https location.
 	Filepath string
+
+	// Optional HTTP headers to append to the request if the file path is a remote http/https location.
+	HTTPHeader map[string]string
 	template.Backend
 }
 
@@ -36,7 +39,7 @@ func (c *FileConfig) Connect() (template.Backend, error) {
 		"filepath": c.Filepath,
 	}).Info("set file path")
 
-	client, err := file.New(c.Filepath)
+	client, err := file.New(c.Filepath, file.WithHeaders(c.HTTPHeader))
 	if err != nil {
 		return c.Backend, err
 	}
