@@ -27,7 +27,7 @@ import (
 	"context"
 
 	"github.com/HeavyHorst/easykv"
-	"github.com/coreos/etcd/client"
+	"go.etcd.io/etcd/client"
 )
 
 // Client is a wrapper around the etcd client

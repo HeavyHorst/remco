@@ -10,6 +10,7 @@ package file
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -28,14 +29,41 @@ type Client struct {
 	httpClient http.Client
 }
 
+// transport is a wrapper around any provided underlying transport that will
+// also add any provided headers to any request made with this transport.
+type transport struct {
+	Headers             map[string]string
+	UnderlyingTransport http.RoundTripper
+}
+
+// RoundTrip satisfies the RoundTripper interface for our custom transport above.
+// If an underlying transport is not provided, we default to http.DefaultTransport.
+func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	for k, v := range t.Headers {
+		req.Header.Add(k, v)
+	}
+	if t.UnderlyingTransport == nil {
+		t.UnderlyingTransport = http.DefaultTransport
+	}
+	return t.UnderlyingTransport.RoundTrip(req)
+}
+
 // New returns a new FileClient
 // The filepath can be a local path to a file or a remote http/https location.
-func New(filepath string) (*Client, error) {
+func New(filepath string, opts ...Option) (*Client, error) {
+	var options Options
+	for _, o := range opts {
+		o(&options)
+	}
+
 	c := &Client{filepath: filepath}
 	if strings.HasPrefix(filepath, "http://") || strings.HasPrefix(filepath, "https://") {
 		c.isURL = true
 		c.httpClient = http.Client{
 			Timeout: 5 * time.Second,
+			Transport: &transport{
+				Headers: options.Headers,
+			},
 		}
 	}
 	return c, nil
@@ -90,25 +118,20 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 func (c *Client) Close() {}
 
 // nodeWalk recursively descends nodes, updating vars.
-func nodeWalk(node map[interface{}]interface{}, key string, vars map[string]string) error {
-	for k, v := range node {
-		key := key + "/" + k.(string)
-
-		switch v := v.(type) {
-		case map[interface{}]interface{}:
+func nodeWalk(node interface{}, key string, vars map[string]string) error {
+	switch node := node.(type) {
+	case map[interface{}]interface{}:
+		for k, v := range node {
+			key := fmt.Sprintf("%s/%v", key, k)
 			nodeWalk(v, key, vars)
-		case []interface{}:
-			for _, j := range v {
-				switch j := j.(type) {
-				case map[interface{}]interface{}:
-					nodeWalk(j, key, vars)
-				case string:
-					vars[key+"/"+j] = ""
-				}
-			}
-		case string:
-			vars[key] = v
 		}
+	case []interface{}:
+		for i, j := range node {
+			key := fmt.Sprintf("%s/%d", key, i)
+			nodeWalk(j, key, vars)
+		}
+	default:
+		vars[key] = fmt.Sprintf("%v", node)
 	}
 	return nil
 }

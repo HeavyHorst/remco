@@ -1,8 +1,8 @@
 language: go
 
 before_install:
-  - go get github.com/golang/lint/golint
-  - go get honnef.co/go/tools/cmd/megacheck
+  - go get golang.org/x/lint/golint
+  - go get honnef.co/go/tools/cmd/staticcheck
 
   # install consul
   - mkdir consultemp
@@ -11,10 +11,10 @@ before_install:
   - sudo mv consultemp/consul /bin/
   - consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul -bind 127.0.0.1 &
   # install etcd
-  - curl -L https://github.com/coreos/etcd/releases/download/v3.1.3/etcd-v3.1.3-linux-amd64.tar.gz -o etcd-v3.1.3-linux-amd64.tar.gz
-  - tar xzf etcd-v3.1.3-linux-amd64.tar.gz
-  - sudo mv etcd-v3.1.3-linux-amd64/etcd /bin/
-  - sudo mv etcd-v3.1.3-linux-amd64/etcdctl /bin/
+  - curl -L https://github.com/etcd-io/etcd/releases/download/v3.3.17/etcd-v3.3.17-linux-amd64.tar.gz -o etcd-v3.3.17-linux-amd64.tar.gz
+  - tar xzf etcd-v3.3.17-linux-amd64.tar.gz
+  - sudo mv etcd-v3.3.17-linux-amd64/etcd /bin/
+  - sudo mv etcd-v3.3.17-linux-amd64/etcdctl /bin/
   - etcd &
   # Install vault
   - mkdir vaulttemp
@@ -34,8 +34,8 @@ before_install:
   - zookeeper-3.4.9/bin/zkServer.sh start
 
 go:
-  - 1.10.x
-  - tip
+  - 1.12.x
+  - 1.13.x
 
 env:
   - VAULT_ADDR='http://127.0.0.1:8200'
@@ -46,7 +46,7 @@ services:
 before_script:
    - go vet ./...
    - golint ./...
-   - megacheck ./...
+   - staticcheck ./...
 
 script:
   - ./test

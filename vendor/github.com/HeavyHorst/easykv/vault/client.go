@@ -89,9 +89,9 @@ func authenticate(c *vaultapi.Client, authType string, params map[string]string)
 			"password": password,
 		})
 	case "kubernetes":
-		jwt, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
-		if err != nil {
-			return err
+		jwt, readErr := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
+		if readErr != nil {
+			return readErr
 		}
 		secret, err = c.Logical().Write("/auth/kubernetes/login", map[string]interface{}{
 			"jwt":  string(jwt[:]),
@@ -258,10 +258,10 @@ func walkTree(c *vaultapi.Client, key string, branches map[string]bool) error {
 
 	keyList := resp.Data["keys"].([]interface{})
 	for _, innerKey := range keyList {
-		switch innerKey.(type) {
+		switch innerKey := innerKey.(type) {
 		case string:
-			innerKey = path.Join(key, "/", innerKey.(string))
-			walkTree(c, innerKey.(string), branches)
+			innerKey = path.Join(key, "/", innerKey)
+			walkTree(c, innerKey, branches)
 		}
 	}
 	return nil
@@ -282,12 +282,11 @@ func isKV(data map[string]interface{}) (string, bool) {
 
 // recursively walks on all the values of a specific key and set them in the variables map
 func flatten(key string, value interface{}, vars map[string]string) {
-	switch value.(type) {
+	switch value := value.(type) {
 	case string:
-		vars[key] = value.(string)
+		vars[key] = value
 	case map[string]interface{}:
-		inner := value.(map[string]interface{})
-		for innerKey, innerValue := range inner {
+		for innerKey, innerValue := range value {
 			innerKey = path.Join(key, "/", innerKey)
 			flatten(innerKey, innerValue, vars)
 		}
