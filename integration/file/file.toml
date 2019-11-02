@@ -18,5 +18,5 @@ log_format = "text"
     [resource.backend.file]
       onetime = true
       filepath = "./integration/file/config.yml"
-      httpheader = { X-Test-Token = "XXX", X-Test-Token2 = "YYY" }
+      httpheaders = { X-Test-Token = "XXX", X-Test-Token2 = "YYY" }
       keys = ["/"]

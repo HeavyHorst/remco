@@ -23,7 +23,7 @@ type FileConfig struct {
 	Filepath string
 
 	// Optional HTTP headers to append to the request if the file path is a remote http/https location.
-	HTTPHeader map[string]string
+	HTTPHeaders map[string]string
 	template.Backend
 }
 
@@ -39,7 +39,7 @@ func (c *FileConfig) Connect() (template.Backend, error) {
 		"filepath": c.Filepath,
 	}).Info("set file path")
 
-	client, err := file.New(c.Filepath, file.WithHeaders(c.HTTPHeader))
+	client, err := file.New(c.Filepath, file.WithHeaders(c.HTTPHeaders))
 	if err != nil {
 		return c.Backend, err
 	}
