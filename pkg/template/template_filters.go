@@ -35,6 +35,7 @@ func init() {
 	pongo2.RegisterFilter("dir", filterDir)
 	pongo2.RegisterFilter("base", filterBase)
 	pongo2.RegisterFilter("base64", filterBase64)
+	pongo2.RegisterFilter("index", filterIndex)
 }
 
 // RegisterCustomJsFilters loads all filters from the given directory.
@@ -151,6 +152,19 @@ func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, 
 	}
 
 	return pongo2.AsValue(ret), nil
+}
+
+func filterIndex(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.CanSlice() {
+		return in, nil
+	}
+
+	index := param.Integer()
+	if index < 0 {
+		index = in.Len() + index
+	}
+
+	return pongo2.AsValue(in.Index(index)), nil
 }
 
 func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

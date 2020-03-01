@@ -155,3 +155,24 @@ func (s *FilterSuite) TestFilterSortByLengthKVPair(t *C) {
 	m1 := res.Interface().(memkv.KVPairs)
 	t.Check(m1, DeepEquals, expected)
 }
+
+func (s *FilterSuite) TestFilterIndex(t *C) {
+	in := pongo2.AsValue([]string{"Hallo", "Test", "123", "Moin"})
+	expected := "123"
+
+	res, err := filterIndex(in, pongo2.AsValue(2))
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+
+	// test negative index
+	res2, err := filterIndex(in, pongo2.AsValue(-2))
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+
+	m1 := res.String()
+	m2 := res2.String()
+	t.Check(m1, DeepEquals, expected)
+	t.Check(m2, DeepEquals, expected)
+}

@@ -40,6 +40,13 @@ weight: 20
 </details>
 
 <details>
+<summary> **index** -- Returns an array element by index  </summary>
+```
+{{ "/home/user/test" | split:"/" | index:"1" }}
+```
+</details>
+
+<details>
 <summary> **parseYAML** -- Returns an interface{} of the yaml/json value.</summary>
 </details>
 
