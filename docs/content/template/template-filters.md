@@ -11,6 +11,7 @@ weight: 20
 
 <details>
 <summary> **base64** -- Encodes a string as base64 </summary>
+
 ```
 {{ "somestring" | base64}}
 ```
@@ -18,6 +19,7 @@ weight: 20
 
 <details>
 <summary> **base** -- Alias for the [path.Base](https://golang.org/pkg/path/#Base) function. </summary>
+
 ```
 {{ "/home/user/test" | base }}
 ```
@@ -25,6 +27,7 @@ weight: 20
 
 <details>
 <summary> **dir** -- Alias for the [path.Dir](https://golang.org/pkg/path/#Dir) function. </summary>
+
 ```
 {{ "/home/user/test" | dir }}
 ```
@@ -32,6 +35,7 @@ weight: 20
 
 <details>
 <summary> **split** -- Alias for the [strings.Split](https://golang.org/pkg/strings/#Split) function. </summary>
+
 ```
 {% for i in ("/home/user/test" | split:"/") %}
 {{i}}
@@ -41,6 +45,7 @@ weight: 20
 
 <details>
 <summary> **mapValue** -- Returns an map element by key  </summary>
+
 ```
 {{ getv("/some_yaml_config") | parseYAML | mapValue:"key" }}
 ```
@@ -48,6 +53,7 @@ weight: 20
 
 <details>
 <summary> **index** -- Returns an array element by index  </summary>
+
 ```
 {{ "/home/user/test" | split:"/" | index:"1" }}
 ```
@@ -59,6 +65,7 @@ weight: 20
 
 <details>
 <summary> **toJSON** -- Converts data, for example the result of gets or lsdir, into an JSON object. </summary>
+
 ```
 {{ gets("/myapp/database/*") | toJson}}
 ```
@@ -66,6 +73,7 @@ weight: 20
 
 <details>
 <summary> **toPrettyJSON** -- Converts data, for example the result of gets or lsdir, into an pretty-printed JSON object, indented by four spaces. </summary>
+
 ```
 {{ gets("/myapp/database/*") | toPrettyJson}}
 ```
@@ -73,6 +81,7 @@ weight: 20
 
 <details>
 <summary> **toYAML** -- Converts data, for example the result of gets or lsdir, into a YAML string. </summary>
+
 ```
 {{ gets("/myapp/database/*") | toJson}}
 ```
