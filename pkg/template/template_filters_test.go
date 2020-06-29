@@ -156,6 +156,48 @@ func (s *FilterSuite) TestFilterSortByLengthKVPair(t *C) {
 	t.Check(m1, DeepEquals, expected)
 }
 
+func (s *FilterSuite) TestFilterMapValue(t *C) {
+	a := map[string]int{
+		"hallo": 1,
+		"moin":  2,
+	}
+	fm, err := filterMapValue(pongo2.AsValue(a), pongo2.AsValue("moin"))
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+	t.Check(fm.Interface(), DeepEquals, 2)
+
+	b := map[string]string{
+		"servus": "one",
+		"hi":     "oneone",
+	}
+	fm, err = filterMapValue(pongo2.AsValue(b), pongo2.AsValue("servus"))
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+	t.Check(fm.Interface(), DeepEquals, "one")
+
+	c := map[string]interface{}{
+		"servus": "one",
+		"hi":     100,
+	}
+	fm, err = filterMapValue(pongo2.AsValue(c), pongo2.AsValue("hi"))
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+	t.Check(fm.Interface(), DeepEquals, 100)
+
+	d := map[int]string{
+		1: "one",
+		2: "oneone",
+	}
+	fm, err = filterMapValue(pongo2.AsValue(d), pongo2.AsValue(2))
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+	t.Check(fm.Interface(), DeepEquals, "oneone")
+}
+
 func (s *FilterSuite) TestFilterIndex(t *C) {
 	in := pongo2.AsValue([]string{"Hallo", "Test", "123", "Moin"})
 	expected := "123"

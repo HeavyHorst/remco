@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"path"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -36,6 +37,7 @@ func init() {
 	pongo2.RegisterFilter("base", filterBase)
 	pongo2.RegisterFilter("base64", filterBase64)
 	pongo2.RegisterFilter("index", filterIndex)
+	pongo2.RegisterFilter("mapValue", filterMapValue)
 }
 
 // RegisterCustomJsFilters loads all filters from the given directory.
@@ -165,6 +167,30 @@ func filterIndex(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.
 	}
 
 	return pongo2.AsValue(in.Index(index)), nil
+}
+
+func filterMapValue(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if in == nil || in.IsNil() {
+		return pongo2.AsValue(nil), nil
+	}
+
+	val := reflect.ValueOf(in.Interface())
+	if val.Kind() == reflect.Map {
+		valueType := val.Type().Key().Kind()
+		paramValue := reflect.ValueOf(param.Interface())
+
+		if paramValue.Kind() != valueType {
+			return pongo2.AsValue(nil), nil
+		}
+
+		mv := val.MapIndex(paramValue)
+		if !mv.IsValid() {
+			return pongo2.AsValue(nil), nil
+		}
+
+		return pongo2.AsValue(mv.Interface()), nil
+	}
+	return pongo2.AsValue(nil), nil
 }
 
 func filterSortByLength(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

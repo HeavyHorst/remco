@@ -40,6 +40,13 @@ weight: 20
 </details>
 
 <details>
+<summary> **mapValue** -- Returns an map element by key  </summary>
+```
+{{ getv("/some_yaml_config") | parseYAML | mapValue:"key" }}
+```
+</details>
+
+<details>
 <summary> **index** -- Returns an array element by index  </summary>
 ```
 {{ "/home/user/test" | split:"/" | index:"1" }}
