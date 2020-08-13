@@ -22,7 +22,7 @@ import (
 	"github.com/HeavyHorst/memkv"
 	"github.com/HeavyHorst/pongo2"
 	"github.com/dop251/goja"
-	"github.com/mickep76/iodatafmt/yaml_mapstr"
+	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 )
 
@@ -133,7 +133,7 @@ func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 }
 
 func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	b, err := yaml_mapstr.Marshal(in.Interface())
+	b, err := yaml.Marshal(in.Interface())
 	if err != nil {
 		return nil, &pongo2.Error{
 			Sender:    "filter:filterToYAML",
@@ -191,7 +191,7 @@ func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, 
 	}
 
 	var ret interface{}
-	if err := yaml_mapstr.Unmarshal([]byte(in.String()), &ret); err != nil {
+	if err := yaml.Unmarshal([]byte(in.String()), &ret); err != nil {
 		return nil, &pongo2.Error{
 			Sender:    "filterUnmarshalYAML",
 			OrigError: err,

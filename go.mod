@@ -10,6 +10,7 @@ require (
 	github.com/HeavyHorst/pongo2 v3.3.0+incompatible
 	github.com/dlclark/regexp2 v1.2.0 // indirect
 	github.com/dop251/goja v0.0.0-20190912223329-aa89e6a4c733
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/hashicorp/consul-template v0.22.0
 	github.com/hashicorp/go-reap v0.0.0-20170704170343-bf58d8a43e7b
@@ -18,7 +19,6 @@ require (
 	github.com/juju/testing v0.0.0-20191001232224-ce9dec17d28b // indirect
 	github.com/mattn/go-shellwords v1.0.6
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
-	github.com/mickep76/iodatafmt v0.0.0-20181011194834-7c7e9a8f31cd
 	github.com/natefinch/pie v0.0.0-20170715172608-9a0d72014007
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
