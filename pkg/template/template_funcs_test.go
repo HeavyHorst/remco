@@ -101,3 +101,32 @@ func (s *FunctionTestSuite) TestGetEnvDefault(t *C) {
 
 	t.Check(getenv(key, "default"), Equals, expected)
 }
+
+func (s *FunctionTestSuite) TestInterfaceSet(t *C) {
+	set := createSet()
+	set.Append("Hallo")
+	set.Append("Hallo")
+	set.Append(1)
+	set.Append(true)
+	set.Append(false)
+
+	t.Check(len(set.S), Equals, 4)
+	t.Check(set.Contains("Hallo"), Equals, true)
+	set.Remove("Hallo")
+	t.Check(len(set.S), Equals, 3)
+	t.Check(set.Contains("Hallo"), Equals, false)
+	t.Check(set.Contains(false), Equals, true)
+}
+
+func (s *FunctionTestSuite) TestTemplateMap(t *C) {
+	m := createMap()
+	m.Set("Hallo", "OneOneOne")
+	m.Set("Test", "Snickers")
+	m.Set("One", 1)
+
+	t.Check(m.Get("Hallo"), DeepEquals, "OneOneOne")
+	t.Check(m.Get("One"), DeepEquals, 1)
+
+	m.Remove("One")
+	t.Check(m.Get("One"), DeepEquals, nil)
+}

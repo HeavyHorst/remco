@@ -15,6 +15,7 @@
 package template
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -25,6 +26,58 @@ import (
 
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
 )
+
+type interfaceSet struct {
+	S map[interface{}]struct{}
+}
+
+func (s *interfaceSet) Append(value interface{}) string {
+	s.S[value] = struct{}{}
+	return ""
+}
+
+func (s *interfaceSet) Remove(value string) string {
+	delete(s.S, value)
+	return ""
+}
+
+func (s *interfaceSet) Contains(value interface{}) bool {
+	_, c := s.S[value]
+	return c
+}
+
+func (s *interfaceSet) toSet() []interface{} {
+	var i []interface{}
+	for k := range s.S {
+		i = append(i, k)
+	}
+
+	return i
+}
+
+func (s *interfaceSet) MarshalYAML() (interface{}, error) {
+	return s.toSet(), nil
+}
+
+func (s *interfaceSet) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.toSet())
+}
+
+type templateMap map[string]interface{}
+
+func (t templateMap) Set(key string, value interface{}) string {
+	t[key] = value
+	return ""
+}
+
+func (t templateMap) Remove(key string) string {
+	delete(t, key)
+	return ""
+}
+
+func (t templateMap) Get(key string) interface{} {
+	return t[key]
+}
 
 func newFuncMap() map[string]interface{} {
 	m := map[string]interface{}{
@@ -37,6 +90,8 @@ func newFuncMap() map[string]interface{} {
 		"printf":      fmt.Sprintf,
 		"unixTS":      unixTimestampNow,
 		"dateRFC3339": dateRFC3339Now,
+		"createMap":   createMap,
+		"createSet":   createSet,
 	}
 
 	return m
@@ -77,6 +132,17 @@ func lookupIP(data string) ([]string, error) {
 	}
 	sort.Strings(ipStrings)
 	return ipStrings, nil
+}
+
+func createMap() templateMap {
+	tm := make(map[string]interface{})
+	return tm
+}
+
+func createSet() *interfaceSet {
+	return &interfaceSet{
+		S: make(map[interface{}]struct{}),
+	}
 }
 
 func lookupSRV(service, proto, name string) ([]*net.SRV, error) {

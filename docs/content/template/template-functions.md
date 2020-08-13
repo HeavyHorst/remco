@@ -145,3 +145,31 @@ something
 {% endfor %}
 ```
 </details>
+
+<details>
+<summary> **createMap** -- create a hashMap to store values at runtime. This can be useful if you want to generate json/yaml files. </summary>
+```
+{% set map = createMap() %}
+{{  map.Set("Moin", "Hallo2") }}
+{{  map.Set("Test", 105) }}
+{{ map | toYAML }}
+
+{% set map2 = createMap() %}
+{{  map2.Set("Moin", "Hallo") }}
+{{  map2.Set("Test", 300) }}
+{{  map2.Set("anotherMap", map) }}
+{{ map2 | toYAML }}
+```
+</details>
+
+<details>
+<summary> **createSet** -- create a Set to store values at runtime. This can be useful if you want to generate json/yaml files. </summary>
+```
+{% set s = createSet() %}
+{{  s.Append("Moin") }}
+{{  s.Append("Moin") }}
+{{  s.Append("Hallo") }}
+{{  s.Append(1) }}
+{{ s | toYAML }}
+```
+</details>
