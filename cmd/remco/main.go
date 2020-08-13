@@ -18,7 +18,7 @@ import (
 
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/hashicorp/consul-template/signals"
-	reap "github.com/hashicorp/go-reap"
+	"github.com/hashicorp/go-reap"
 	"github.com/sirupsen/logrus"
 )
 

@@ -17,7 +17,7 @@ import (
 
 	"github.com/HeavyHorst/consul-template/child"
 	"github.com/hashicorp/consul-template/signals"
-	shellwords "github.com/mattn/go-shellwords"
+	"github.com/mattn/go-shellwords"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -52,7 +52,7 @@ type childSignal struct {
 }
 
 type exitC struct {
-	exitChan (<-chan int)
+	exitChan <-chan int
 	valid    bool
 }
 

@@ -70,8 +70,8 @@ func (p *plug) GetValues(keys []string) (result map[string]string, err error) {
 
 // Close closes the client connection
 func (p *plug) Close() {
-	p.client.Call("Plugin.Close", nil, nil)
-	p.client.Close()
+	_ = p.client.Call("Plugin.Close", nil, nil)
+	_ = p.client.Close()
 }
 
 // WatchConfig holds all data needed by the plugins WatchPrefix method.

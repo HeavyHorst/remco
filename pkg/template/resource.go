@@ -367,7 +367,10 @@ retryloop:
 				}
 			}
 		case s := <-t.SignalChan:
-			t.exec.SignalChild(s)
+			err := t.exec.SignalChild(s)
+			if err != nil {
+				t.logger.Error(err)
+			}
 		case err := <-errChan:
 			t.logger.WithField("backend", err.Backend).Error(err.Message)
 		case <-ctx.Done():

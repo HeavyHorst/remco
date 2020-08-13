@@ -18,10 +18,10 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"time"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
 )

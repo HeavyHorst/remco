@@ -97,8 +97,8 @@ func SameFile(src, dest string, logger *logrus.Entry) (bool, error) {
 	if d.Mode != s.Mode {
 		logger.WithFields(logrus.Fields{
 			"config":  dest,
-			"current": os.FileMode(d.Mode),
-			"new":     os.FileMode(s.Mode),
+			"current": d.Mode,
+			"new":     s.Mode,
 		}).Info("wrong filemode")
 	}
 	if d.Hash != s.Hash {
