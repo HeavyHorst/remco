@@ -43,6 +43,26 @@ func (s *FilterSuite) TestFilterBase(t *C) {
 	t.Check(res.String(), Equals, "bar")
 }
 
+func (s *FilterSuite) TestFilterParseInt(t *C) {
+	in := pongo2.AsValue("100")
+	res, err := filterParseInt(in, nil)
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+
+	t.Check(res.Integer(), Equals, 100)
+}
+
+func (s *FilterSuite) TestFilterParseFloat(t *C) {
+	in := pongo2.AsValue("22.45")
+	res, err := filterParseFloat(in, nil)
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+
+	t.Check(res.Float(), Equals, 22.45)
+}
+
 func (s *FilterSuite) TestFilterDir(t *C) {
 	in := pongo2.AsValue("/etc/foo/bar")
 	res, err := filterDir(in, nil)

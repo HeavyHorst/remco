@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/HeavyHorst/memkv"
@@ -27,6 +28,8 @@ import (
 
 func init() {
 	pongo2.RegisterFilter("sortByLength", filterSortByLength)
+	pongo2.RegisterFilter("parseInt", filterParseInt)
+	pongo2.RegisterFilter("parseFloat", filterParseFloat)
 	pongo2.RegisterFilter("parseYAML", filterUnmarshalYAML)
 	pongo2.RegisterFilter("parseJSON", filterUnmarshalYAML)      // just an alias
 	pongo2.RegisterFilter("parseYAMLArray", filterUnmarshalYAML) // deprecated
@@ -138,6 +141,48 @@ func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 		}
 	}
 	return pongo2.AsValue(string(b)), nil
+}
+
+func filterParseInt(in, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.IsString() {
+		return in, nil
+	}
+
+	ins := in.String()
+	if ins == "" {
+		return pongo2.AsValue(0), nil
+	}
+
+	result, err := strconv.ParseInt(ins, 10, 64)
+	if err != nil {
+		return nil, &pongo2.Error{
+			Sender:    "filter:filterParseInt",
+			OrigError: err,
+		}
+	}
+
+	return pongo2.AsValue(result), nil
+}
+
+func filterParseFloat(in, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.IsString() {
+		return in, nil
+	}
+
+	ins := in.String()
+	if ins == "" {
+		return pongo2.AsValue(0.0), nil
+	}
+
+	result, err := strconv.ParseFloat(ins, 10)
+	if err != nil {
+		return nil, &pongo2.Error{
+			Sender:    "filter:filterParseFloat",
+			OrigError: err,
+		}
+	}
+
+	return pongo2.AsValue(result), nil
 }
 
 func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

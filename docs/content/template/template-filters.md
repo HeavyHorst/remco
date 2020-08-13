@@ -10,6 +10,22 @@ weight: 20
 ## Builtin filters
 
 <details>
+<summary> **parseInt** -- Takes the given string and parses it as a base-10 integer (64bit) </summary>
+
+```
+{{ "12000" | parseInt }}
+```
+</details>
+
+<details>
+<summary> **parseFloat** -- Takes the given string and parses it as a float64 </summary>
+
+```
+{{ "12000.45" | parseFloat }}
+```
+</details>
+
+<details>
 <summary> **base64** -- Encodes a string as base64 </summary>
 
 ```
