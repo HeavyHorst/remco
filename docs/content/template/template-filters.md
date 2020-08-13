@@ -99,7 +99,7 @@ weight: 20
 <summary> **toYAML** -- Converts data, for example the result of gets or lsdir, into a YAML string. </summary>
 
 ```
-{{ gets("/myapp/database/*") | toJson}}
+{{ gets("/myapp/database/*") | toYAML}}
 ```
 </details>
 
