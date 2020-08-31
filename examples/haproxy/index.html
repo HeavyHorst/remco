@@ -542,7 +542,7 @@ name = &quot;haproxy&quot;
 [[resource.template]]
   src = &quot;/etc/remco/templates/haproxy.tmpl&quot;
   dst = &quot;/etc/haproxy/haproxy.cfg&quot;
-  reload_cmd 	  = &quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&quot;
+  reload_cmd 	  = &quot;haproxy -f {{.dst}} -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&quot;
 
   [resource.backend]
     [resource.backend.etcd]

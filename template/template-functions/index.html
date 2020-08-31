@@ -527,6 +527,22 @@ something
 <p></details></p>
 
 <p><details>
+<summary> <strong>unixTS</strong> &ndash; Wrapper for <a href="https://golang.org/pkg/time/#Unix">time.Now().Unix()</a>. </summary></p>
+
+<pre><code>{{ unixTS }}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary> <strong>dateRFC3339</strong> &ndash; Wrapper for <a href="https://golang.org/pkg/time/">time.Now().Format(time.RFC3339)</a>. </summary></p>
+
+<pre><code>{{ dateRFC3339 }}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
 <summary> <strong>lookupIP</strong> &ndash; Wrapper for the <a href="https://golang.org/pkg/net/#LookupIP">net.LookupIP</a> function. The wrapper returns the IP addresses in alphabetical order. </summary></p>
 
 <pre><code>{% for ip in lookupIP(&quot;kube-master&quot;) %}
@@ -545,6 +561,36 @@ something
   priority: {{ srv.Priority }}
   weight: {{ srv.Weight }}
 {% endfor %}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary> <strong>createMap</strong> &ndash; create a hashMap to store values at runtime. This can be useful if you want to generate json/yaml files. </summary></p>
+
+<pre><code>{% set map = createMap() %}
+{{  map.Set(&quot;Moin&quot;, &quot;Hallo2&quot;) }}
+{{  map.Set(&quot;Test&quot;, 105) }}
+{{ map | toYAML }}
+
+{% set map2 = createMap() %}
+{{  map2.Set(&quot;Moin&quot;, &quot;Hallo&quot;) }}
+{{  map2.Set(&quot;Test&quot;, 300) }}
+{{  map2.Set(&quot;anotherMap&quot;, map) }}
+{{ map2 | toYAML }}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary> <strong>createSet</strong> &ndash; create a Set to store values at runtime. This can be useful if you want to generate json/yaml files. </summary></p>
+
+<pre><code>{% set s = createSet() %}
+{{  s.Append(&quot;Moin&quot;) }}
+{{  s.Append(&quot;Moin&quot;) }}
+{{  s.Append(&quot;Hallo&quot;) }}
+{{  s.Append(1) }}
+{{ s | toYAML }}
 </code></pre>
 
 <p></details></p>

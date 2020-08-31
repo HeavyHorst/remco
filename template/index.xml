@@ -156,6 +156,22 @@ something
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;unixTS&lt;/strong&gt; &amp;ndash; Wrapper for &lt;a href=&#34;https://golang.org/pkg/time/#Unix&#34;&gt;time.Now().Unix()&lt;/a&gt;. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ unixTS }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;dateRFC3339&lt;/strong&gt; &amp;ndash; Wrapper for &lt;a href=&#34;https://golang.org/pkg/time/&#34;&gt;time.Now().Format(time.RFC3339)&lt;/a&gt;. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ dateRFC3339 }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;lookupIP&lt;/strong&gt; &amp;ndash; Wrapper for the &lt;a href=&#34;https://golang.org/pkg/net/#LookupIP&#34;&gt;net.LookupIP&lt;/a&gt; function. The wrapper returns the IP addresses in alphabetical order. &lt;/summary&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;{% for ip in lookupIP(&amp;quot;kube-master&amp;quot;) %}
@@ -177,6 +193,36 @@ something
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;createMap&lt;/strong&gt; &amp;ndash; create a hashMap to store values at runtime. This can be useful if you want to generate json/yaml files. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% set map = createMap() %}
+{{  map.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo2&amp;quot;) }}
+{{  map.Set(&amp;quot;Test&amp;quot;, 105) }}
+{{ map | toYAML }}
+
+{% set map2 = createMap() %}
+{{  map2.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo&amp;quot;) }}
+{{  map2.Set(&amp;quot;Test&amp;quot;, 300) }}
+{{  map2.Set(&amp;quot;anotherMap&amp;quot;, map) }}
+{{ map2 | toYAML }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;createSet&lt;/strong&gt; &amp;ndash; create a Set to store values at runtime. This can be useful if you want to generate json/yaml files. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% set s = createSet() %}
+{{  s.Append(&amp;quot;Moin&amp;quot;) }}
+{{  s.Append(&amp;quot;Moin&amp;quot;) }}
+{{  s.Append(&amp;quot;Hallo&amp;quot;) }}
+{{  s.Append(1) }}
+{{ s | toYAML }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -189,6 +235,22 @@ something
       <description>
 
 &lt;h2 id=&#34;builtin-filters&#34;&gt;Builtin filters&lt;/h2&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;parseInt&lt;/strong&gt; &amp;ndash; Takes the given string and parses it as a base-10 integer (64bit) &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ &amp;quot;12000&amp;quot; | parseInt }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;parseFloat&lt;/strong&gt; &amp;ndash; Takes the given string and parses it as a float64 &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ &amp;quot;12000.45&amp;quot; | parseFloat }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;base64&lt;/strong&gt; &amp;ndash; Encodes a string as base64 &lt;/summary&gt;&lt;/p&gt;
@@ -225,6 +287,22 @@ something
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;mapValue&lt;/strong&gt; &amp;ndash; Returns an map element by key  &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ getv(&amp;quot;/some_yaml_config&amp;quot;) | parseYAML | mapValue:&amp;quot;key&amp;quot; }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;index&lt;/strong&gt; &amp;ndash; Returns an array element by index  &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ &amp;quot;/home/user/test&amp;quot; | split:&amp;quot;/&amp;quot; | index:&amp;quot;1&amp;quot; }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an interface{} of the yaml/json value.&lt;/summary&gt;
 &lt;/details&gt;&lt;/p&gt;
 
@@ -247,7 +325,7 @@ something
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;toYAML&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into a YAML string. &lt;/summary&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toJson}}
+&lt;pre&gt;&lt;code&gt;{{ gets(&amp;quot;/myapp/database/*&amp;quot;) | toYAML}}
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;

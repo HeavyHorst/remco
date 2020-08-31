@@ -300,6 +300,22 @@ something
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;unixTS&lt;/strong&gt; &amp;ndash; Wrapper for &lt;a href=&#34;https://golang.org/pkg/time/#Unix&#34;&gt;time.Now().Unix()&lt;/a&gt;. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ unixTS }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;dateRFC3339&lt;/strong&gt; &amp;ndash; Wrapper for &lt;a href=&#34;https://golang.org/pkg/time/&#34;&gt;time.Now().Format(time.RFC3339)&lt;/a&gt;. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{ dateRFC3339 }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;lookupIP&lt;/strong&gt; &amp;ndash; Wrapper for the &lt;a href=&#34;https://golang.org/pkg/net/#LookupIP&#34;&gt;net.LookupIP&lt;/a&gt; function. The wrapper returns the IP addresses in alphabetical order. &lt;/summary&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;{% for ip in lookupIP(&amp;quot;kube-master&amp;quot;) %}
@@ -318,6 +334,36 @@ something
   priority: {{ srv.Priority }}
   weight: {{ srv.Weight }}
 {% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;createMap&lt;/strong&gt; &amp;ndash; create a hashMap to store values at runtime. This can be useful if you want to generate json/yaml files. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% set map = createMap() %}
+{{  map.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo2&amp;quot;) }}
+{{  map.Set(&amp;quot;Test&amp;quot;, 105) }}
+{{ map | toYAML }}
+
+{% set map2 = createMap() %}
+{{  map2.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo&amp;quot;) }}
+{{  map2.Set(&amp;quot;Test&amp;quot;, 300) }}
+{{  map2.Set(&amp;quot;anotherMap&amp;quot;, map) }}
+{{ map2 | toYAML }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;createSet&lt;/strong&gt; &amp;ndash; create a Set to store values at runtime. This can be useful if you want to generate json/yaml files. &lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% set s = createSet() %}
+{{  s.Append(&amp;quot;Moin&amp;quot;) }}
+{{  s.Append(&amp;quot;Moin&amp;quot;) }}
+{{  s.Append(&amp;quot;Hallo&amp;quot;) }}
+{{  s.Append(1) }}
+{{ s | toYAML }}
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
@@ -461,7 +507,7 @@ name = &amp;quot;haproxy&amp;quot;
 [[resource.template]]
   src = &amp;quot;/etc/remco/templates/haproxy.tmpl&amp;quot;
   dst = &amp;quot;/etc/haproxy/haproxy.cfg&amp;quot;
-  reload_cmd 	  = &amp;quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&amp;quot;
+  reload_cmd 	  = &amp;quot;haproxy -f {{.dst}} -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&amp;quot;
 
   [resource.backend]
     [resource.backend.etcd]
@@ -799,12 +845,12 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;check_cmd(string, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The command to check config. Use {{.src}} to reference the rendered source template.&lt;/li&gt;
+&lt;li&gt;An optional command to check the rendered source template before writing it to the destination. If this command returns non-zero, the destination will not be overwritten by the rendered source template. We can use &lt;code&gt;{{.src}}&lt;/code&gt; here to reference the rendered source template.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;reload_cmd(string, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The command to reload config.&lt;/li&gt;
+&lt;li&gt;An optional command to run after the destination is updated. We can use &lt;code&gt;{{.dst}}&lt;/code&gt; here to reference the destination.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;mode(string, optional):&lt;/strong&gt;
 
@@ -955,7 +1001,12 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;filepath(string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The filepath to a yaml or json file containing the key-value pairs. This can be a local file or a remote http/https location.
+&lt;li&gt;The filepath to a yaml or json file containing the key-value pairs. This can be a local file or a remote http/https location.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;httpheaders(map[string]string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Optional HTTP-headers to append to the request if the file path is a remote http/https location.
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -999,7 +1050,7 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;auth_type(string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The vault authentication type. (token, approle, app-id, userpass, github, cert)&lt;/li&gt;
+&lt;li&gt;The vault authentication type. (token, approle, app-id, userpass, github, cert, kubernetes)&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;auth_token(string):&lt;/strong&gt;
 
@@ -1009,7 +1060,7 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;li&gt;&lt;strong&gt;role_id(string):&lt;/strong&gt;
 
 &lt;ul&gt;
-&lt;li&gt;The vault app role. Only used with auth_type=approle.&lt;/li&gt;
+&lt;li&gt;The vault app role. Only used with auth_type=approle and kubernetes.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;secret_id(string):&lt;/strong&gt;
 
@@ -1160,6 +1211,7 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
       keys     = [&amp;quot;/&amp;quot;]
 
     [resource.backend.file]
+      httpheader = { X-Test-Token = &amp;quot;XXX&amp;quot;, X-Test-Token2 = &amp;quot;YYY&amp;quot; } 
       filepath = &amp;quot;/etc/remco/test.yml&amp;quot;
 	    watch    = true
 	    keys     = [&amp;quot;/prefix&amp;quot;]

@@ -409,6 +409,22 @@
 <h2 id="builtin-filters">Builtin filters</h2>
 
 <p><details>
+<summary> <strong>parseInt</strong> &ndash; Takes the given string and parses it as a base-10 integer (64bit) </summary></p>
+
+<pre><code>{{ &quot;12000&quot; | parseInt }}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary> <strong>parseFloat</strong> &ndash; Takes the given string and parses it as a float64 </summary></p>
+
+<pre><code>{{ &quot;12000.45&quot; | parseFloat }}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
 <summary> <strong>base64</strong> &ndash; Encodes a string as base64 </summary></p>
 
 <pre><code>{{ &quot;somestring&quot; | base64}}
@@ -443,6 +459,22 @@
 <p></details></p>
 
 <p><details>
+<summary> <strong>mapValue</strong> &ndash; Returns an map element by key  </summary></p>
+
+<pre><code>{{ getv(&quot;/some_yaml_config&quot;) | parseYAML | mapValue:&quot;key&quot; }}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary> <strong>index</strong> &ndash; Returns an array element by index  </summary></p>
+
+<pre><code>{{ &quot;/home/user/test&quot; | split:&quot;/&quot; | index:&quot;1&quot; }}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
 <summary> <strong>parseYAML</strong> &ndash; Returns an interface{} of the yaml/json value.</summary>
 </details></p>
 
@@ -465,7 +497,7 @@
 <p><details>
 <summary> <strong>toYAML</strong> &ndash; Converts data, for example the result of gets or lsdir, into a YAML string. </summary></p>
 
-<pre><code>{{ gets(&quot;/myapp/database/*&quot;) | toJson}}
+<pre><code>{{ gets(&quot;/myapp/database/*&quot;) | toYAML}}
 </code></pre>
 
 <p></details></p>

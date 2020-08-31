@@ -513,12 +513,12 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 <li><strong>check_cmd(string, optional):</strong>
 
 <ul>
-<li>The command to check config. Use {{.src}} to reference the rendered source template.</li>
+<li>An optional command to check the rendered source template before writing it to the destination. If this command returns non-zero, the destination will not be overwritten by the rendered source template. We can use <code>{{.src}}</code> here to reference the rendered source template.</li>
 </ul></li>
 <li><strong>reload_cmd(string, optional):</strong>
 
 <ul>
-<li>The command to reload config.</li>
+<li>An optional command to run after the destination is updated. We can use <code>{{.dst}}</code> here to reference the destination.</li>
 </ul></li>
 <li><strong>mode(string, optional):</strong>
 
@@ -669,7 +669,12 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 <li><strong>filepath(string):</strong>
 
 <ul>
-<li>The filepath to a yaml or json file containing the key-value pairs. This can be a local file or a remote http/https location.
+<li>The filepath to a yaml or json file containing the key-value pairs. This can be a local file or a remote http/https location.</li>
+</ul></li>
+<li><strong>httpheaders(map[string]string):</strong>
+
+<ul>
+<li>Optional HTTP-headers to append to the request if the file path is a remote http/https location.
 </details></li>
 </ul></li>
 </ul>
@@ -713,7 +718,7 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 <li><strong>auth_type(string):</strong>
 
 <ul>
-<li>The vault authentication type. (token, approle, app-id, userpass, github, cert)</li>
+<li>The vault authentication type. (token, approle, app-id, userpass, github, cert, kubernetes)</li>
 </ul></li>
 <li><strong>auth_token(string):</strong>
 
@@ -723,7 +728,7 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 <li><strong>role_id(string):</strong>
 
 <ul>
-<li>The vault app role. Only used with auth_type=approle.</li>
+<li>The vault app role. Only used with auth_type=approle and kubernetes.</li>
 </ul></li>
 <li><strong>secret_id(string):</strong>
 
