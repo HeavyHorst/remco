@@ -2,7 +2,7 @@
 
 BIN_NAME := bin/remco
 
-VERSION := 0.12.0-beta.1
+VERSION := 0.12.0
 GIT_COMMIT := $(shell git rev-parse HEAD)
 GIT_DIRTY := $(shell test -n "`git status --porcelain`" && echo "+CHANGES" || true)
 BUILD_DATE := $(shell date '+%Y-%m-%d-%H:%M:%S')
