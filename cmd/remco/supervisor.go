@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/HeavyHorst/remco/pkg/log"
+	"github.com/HeavyHorst/remco/pkg/telemetry"
 	"github.com/HeavyHorst/remco/pkg/template"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -38,7 +39,8 @@ type Supervisor struct {
 	signalChans      map[string]chan os.Signal
 	signalChansMutex sync.RWMutex
 
-	pidFile string
+	pidFile   string
+	telemetry telemetry.Telemetry
 
 	reapLock *sync.RWMutex
 }
@@ -53,6 +55,7 @@ func NewSupervisor(cfg Configuration, reapLock *sync.RWMutex, done chan struct{}
 	}
 
 	w.pidFile = cfg.PidFile
+	w.telemetry = cfg.Telemetry
 	pid := os.Getpid()
 	err := w.writePid(pid)
 	if err != nil {
@@ -62,6 +65,10 @@ func NewSupervisor(cfg Configuration, reapLock *sync.RWMutex, done chan struct{}
 	stopChan := make(chan struct{})
 	stoppedChan := make(chan struct{})
 
+	_, err = w.telemetry.Init()
+	if err != nil {
+		log.Error(fmt.Sprintf("error starting telemetry: %v", err))
+	}
 	go w.runResource(cfg.Resource, stopChan, stoppedChan)
 	w.wg.Add(1)
 	go func() {
@@ -84,6 +91,14 @@ func NewSupervisor(cfg Configuration, reapLock *sync.RWMutex, done chan struct{}
 					if err != nil {
 						log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
 					}
+				}
+				err = w.telemetry.Stop()
+				if err != nil {
+					log.Error(fmt.Sprintf("error stopping telemetry: %v", err))
+				}
+				_, err = rs.c.Telemetry.Init()
+				if err != nil {
+					log.Error(fmt.Sprintf("error starting telemetry: %v", err))
 				}
 				stopChan <- struct{}{}
 				<-stoppedChan

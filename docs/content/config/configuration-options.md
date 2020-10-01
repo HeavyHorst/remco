@@ -184,3 +184,43 @@ See the example configuration to see how global default values can be set for in
  - **srv_record(string, optional):**
    - A DNS server record to discover the zookeeper nodes.
 </details>
+
+## Telemetry configuration options
+ - **enabled(bool):**
+   - Flag to enable telemetry.
+ - **service_name(string):**
+   - Service name to add to every metric name. "remco" by default
+
+## Sink configuration options
+
+<details>
+<summary> **inmem** </summary>
+
+ - **interval(int):**
+   - How long is each aggregation interval (seconds).
+ - **retain(int):**
+   - Retain controls how many metrics interval we keep.
+</details>
+
+<details>
+<summary> **prometheus** </summary>
+
+ - **addr(string):**
+   - Address to expose metrics on
+ - **expiration(int):**
+   - Expiration is the duration a metric is valid for, after which it will be untracked. If the value is zero, a metric is never expired.
+</details>
+
+<details>
+<summary> **statsd** </summary>
+
+ - **addr(string):**
+   - Statsd/Statsite server address
+</details>
+
+<details>
+<summary> **statsite** </summary>
+
+  - **addr(string):**
+   - Statsd/Statsite server address
+ </details>

@@ -25,6 +25,7 @@ package template
 import (
 	"context"
 	"fmt"
+	"github.com/armon/go-metrics"
 	"math/rand"
 	"os"
 	"path"
@@ -200,13 +201,17 @@ func (t *Resource) createStageFileAndSync(runCommands bool) (bool, error) {
 	for _, s := range t.sources {
 		err := s.createStageFile(t.funcMap)
 		if err != nil {
+			metrics.IncrCounter([]string{"files", "stage_errors_total"}, 1)
 			return changed, errors.Wrap(err, "create stage file failed")
 		}
+		metrics.IncrCounter([]string{"files", "staged_total"}, 1)
 		c, err := s.syncFiles(runCommands)
 		changed = changed || c
 		if err != nil {
+			metrics.IncrCounter([]string{"files", "sync_errors_total"}, 1)
 			return changed, errors.Wrap(err, "sync files failed")
 		}
+		metrics.IncrCounter([]string{"files", "synced_total"}, 1)
 	}
 	return changed, nil
 }
@@ -220,12 +225,15 @@ func (t *Resource) process(storeClients []Backend, runCommands bool) (bool, erro
 	var changed bool
 	var err error
 	for _, storeClient := range storeClients {
+		labels := []metrics.Label{{Name: "name", Value: storeClient.Name}}
 		if err = t.setVars(storeClient); err != nil {
+			metrics.IncrCounterWithLabels([]string{"backends", "sync_errors_total"}, 1, labels)
 			return changed, berr.BackendError{
 				Message: errors.Wrap(err, "setVars failed").Error(),
 				Backend: storeClient.Name,
 			}
 		}
+		metrics.IncrCounterWithLabels([]string{"backends", "synced_total"}, 1, labels)
 	}
 	if changed, err = t.createStageFileAndSync(runCommands); err != nil {
 		return changed, errors.Wrap(err, "createStageFileAndSync failed")

@@ -8,6 +8,7 @@ require (
 	github.com/HeavyHorst/easykv v1.2.5
 	github.com/HeavyHorst/memkv v1.0.1
 	github.com/HeavyHorst/pongo2 v3.3.0+incompatible
+	github.com/armon/go-metrics v0.3.4
 	github.com/dlclark/regexp2 v1.2.0 // indirect
 	github.com/dop251/goja v0.0.0-20190912223329-aa89e6a4c733
 	github.com/ghodss/yaml v1.0.0
@@ -24,6 +25,7 @@ require (
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/pborman/uuid v1.2.0
 	github.com/pkg/errors v0.8.1
+	github.com/prometheus/client_golang v1.4.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15

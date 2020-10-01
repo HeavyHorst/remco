@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/HeavyHorst/remco/pkg/backends"
+	"github.com/HeavyHorst/remco/pkg/telemetry"
 	"github.com/HeavyHorst/remco/pkg/template"
 
 	. "gopkg.in/check.v1"
@@ -45,6 +46,11 @@ const (
 			  watch = false
 			  interval = 1
 
+	[telemetry]
+	  enabled = true
+	  [telemetry.sinks.prometheus]
+		addr = ":2112"
+		expiration = 600
 `
 	resourceFile string = `
         [[template]]
@@ -95,6 +101,16 @@ var expected = Configuration{
 			Name:     "test.toml",
 			Template: expectedTemplates,
 			Backends: expectedBackend,
+		},
+	},
+	Telemetry: telemetry.Telemetry{
+		Enabled:     true,
+		ServiceName: "",
+		Sinks: telemetry.Sinks{
+			Prometheus: &telemetry.PrometheusSink{
+				Addr:       ":2112",
+				Expiration: 600,
+			},
 		},
 	},
 }

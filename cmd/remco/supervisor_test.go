@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/HeavyHorst/remco/pkg/backends"
+	"github.com/HeavyHorst/remco/pkg/telemetry"
 	"github.com/HeavyHorst/remco/pkg/template"
 
 	. "gopkg.in/check.v1"
@@ -48,6 +49,11 @@ var exampleConfiguration = Configuration{
 			Backends: exampleBackend,
 		},
 	},
+	Telemetry: telemetry.Telemetry{
+		Enabled:     true,
+		ServiceName: "test",
+		Sinks:       telemetry.Sinks{},
+	},
 }
 
 type RunnerTestSuite struct {
@@ -66,6 +72,7 @@ func (s *RunnerTestSuite) TestNew(t *C) {
 	t.Check(s.runner.signalChans, NotNil)
 	t.Check(s.runner.reapLock, IsNil)
 	t.Check(s.runner.pidFile, Equals, "/tmp/remco_test.pid")
+	t.Check(s.runner.telemetry, DeepEquals, exampleConfiguration.Telemetry)
 }
 
 func (s *RunnerTestSuite) TestWritePid(t *C) {
@@ -94,6 +101,7 @@ func (s *RunnerTestSuite) TestSignalChan(t *C) {
 func (s *RunnerTestSuite) TestReload(t *C) {
 	new := exampleConfiguration
 	new.PidFile = "/tmp/remco_test2.pid"
+	new.Telemetry.ServiceName = "test2"
 	s.runner.Reload(new)
 }
 
