@@ -63,8 +63,8 @@ func (s *TelemetryTestSuite) TestInit(t *C) {
 }
 
 func (s *TelemetryTestSuite) TestStop(t *C) {
-	_, err := s.telemetry.Init()
-	err = s.telemetry.Stop()
+	s.telemetry.Init()
+	err := s.telemetry.Stop()
 	t.Assert(err, IsNil)
 	resp, err := http.Get("http://127.0.0.1:2112/metrics")
 	t.Assert(err, NotNil)
@@ -72,8 +72,8 @@ func (s *TelemetryTestSuite) TestStop(t *C) {
 }
 
 func (s *TelemetryTestSuite) TestReInit(t *C) {
-	_, err := s.telemetry.Init()
-	err = s.telemetry.Stop()
+	s.telemetry.Init()
+	err := s.telemetry.Stop()
 	t.Assert(err, IsNil)
 	s.telemetry.ServiceName = "mock2"
 	m2, err := s.telemetry.Init()
