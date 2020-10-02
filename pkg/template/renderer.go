@@ -21,9 +21,11 @@ import (
 	"strconv"
 	"sync"
 	"text/template"
+	"time"
 
 	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
+	"github.com/armon/go-metrics"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -81,11 +83,13 @@ func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 		return errors.Wrap(err, "couldn't create tempfile")
 	}
 
+	executionStartTime := time.Now()
 	if err = tmpl.ExecuteWriter(funcMap, temp); err != nil {
 		temp.Close()
 		os.Remove(temp.Name())
 		return errors.Wrap(err, "template execution failed")
 	}
+	metrics.MeasureSince([]string{"files", "template_execution_duration"}, executionStartTime)
 
 	temp.Close()
 
@@ -197,6 +201,7 @@ func (s *Renderer) check(stageFile string) error {
 	if s.CheckCmd == "" {
 		return nil
 	}
+	defer metrics.MeasureSince([]string{"files", "check_command_duration"}, time.Now())
 	cmd, err := renderTemplate(s.CheckCmd, map[string]string{"src": stageFile})
 	if err != nil {
 		return errors.Wrap(err, "rendering check command failed")
@@ -216,6 +221,7 @@ func (s *Renderer) reload(renderedFile string) error {
 	if s.ReloadCmd == "" {
 		return nil
 	}
+	defer metrics.MeasureSince([]string{"files", "reload_command_duration"}, time.Now())
 	cmd, err := renderTemplate(s.ReloadCmd, map[string]string{"dst": renderedFile})
 	if err != nil {
 		return errors.Wrap(err, "rendering reload command failed")

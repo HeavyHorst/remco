@@ -18,6 +18,7 @@ import (
 	"github.com/HeavyHorst/remco/pkg/backends"
 	"github.com/HeavyHorst/remco/pkg/backends/plugin"
 	"github.com/HeavyHorst/remco/pkg/log"
+	"github.com/HeavyHorst/remco/pkg/telemetry"
 	"github.com/HeavyHorst/remco/pkg/template"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -60,6 +61,7 @@ type Configuration struct {
 	PidFile    string `toml:"pid_file"`
 	LogFile    string `toml:"log_file"`
 	Resource   []Resource
+	Telemetry  telemetry.Telemetry
 }
 
 type DefaultBackends struct {

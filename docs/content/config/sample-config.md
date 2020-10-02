@@ -72,5 +72,13 @@ log_file    = "/var/log/remco.log"
 	    watch    = true
 	    keys     = ["/prefix"]
 
+################################################################
+# Telemetry configuration
+################################################################
+[telemetry]
+  enabled = true
+  [telemetry.sinks.prometheus]
+    addr = ":2112"
+    expiration = 600
 ```      
 

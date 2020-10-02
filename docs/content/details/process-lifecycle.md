@@ -1,6 +1,6 @@
 ---
 date: 2016-12-03T14:33:41+01:00
-next: /config/
+next: /details/telemetry/
 prev: /details/plugins/
 title: process lifecycle
 toc: true
