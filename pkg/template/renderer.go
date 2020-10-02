@@ -13,7 +13,6 @@ package template
 import (
 	"bytes"
 	"fmt"
-	"github.com/armon/go-metrics"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -26,6 +25,7 @@ import (
 
 	"github.com/HeavyHorst/pongo2"
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
+	"github.com/armon/go-metrics"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )

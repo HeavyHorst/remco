@@ -1,3 +1,11 @@
+/*
+ * This file is part of remco.
+ * © 2016 The Remco Authors
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 package telemetry
 
 import (
@@ -13,6 +21,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+// PrometheusSink represents prometheus sink and prometheus stats endpoint configuration
 type PrometheusSink struct {
 	Addr       string
 	Expiration int
@@ -21,6 +30,7 @@ type PrometheusSink struct {
 	prometheusSink *metricsPrometheus.PrometheusSink
 }
 
+// Creates a new prometheus sink from config and starts a goroutine with prometheus stats endpoint
 func (p *PrometheusSink) Init() (metrics.MetricSink, error) {
 	if p == nil {
 		return nil, ErrNilConfig
@@ -33,7 +43,7 @@ func (p *PrometheusSink) Init() (metrics.MetricSink, error) {
 	go func() {
 		err := p.httpServer.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			log.Error(fmt.Sprintf("error starting prometheus server: %v", err))
+			log.Error(fmt.Sprintf("error starting prometheus stats endpoint: %v", err))
 		}
 	}()
 
@@ -48,6 +58,7 @@ func (p *PrometheusSink) Init() (metrics.MetricSink, error) {
 	return p.prometheusSink, nil
 }
 
+// Unregisters prometheus sink and stops prometheus stats endpoint
 func (p *PrometheusSink) Finalize() error {
 	if p == nil {
 		return ErrNilConfig

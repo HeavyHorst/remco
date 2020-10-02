@@ -25,7 +25,6 @@ package template
 import (
 	"context"
 	"fmt"
-	"github.com/armon/go-metrics"
 	"math/rand"
 	"os"
 	"path"
@@ -36,6 +35,7 @@ import (
 	"github.com/HeavyHorst/memkv"
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
+	"github.com/armon/go-metrics"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )

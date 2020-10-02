@@ -206,7 +206,7 @@ See the example configuration to see how global default values can be set for in
 <summary> **prometheus** </summary>
 
  - **addr(string):**
-   - Address to expose metrics on
+   - Address to expose metrics on. Prometheus stats will be available at /metrics endpoint.
  - **expiration(int):**
    - Expiration is the duration a metric is valid for, after which it will be untracked. If the value is zero, a metric is never expired.
 </details>
