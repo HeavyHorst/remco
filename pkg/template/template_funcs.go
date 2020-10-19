@@ -27,39 +27,40 @@ import (
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
 )
 
-type interfaceSet struct {
-	S map[interface{}]struct{}
-}
+type interfaceSet map[string]struct{}
 
-func (s *interfaceSet) Append(value interface{}) string {
-	s.S[value] = struct{}{}
+func (s interfaceSet) Append(value interface{}) string {
+	v := fmt.Sprintf("%v", value)
+	s[v] = struct{}{}
 	return ""
 }
 
-func (s *interfaceSet) Remove(value string) string {
-	delete(s.S, value)
+func (s interfaceSet) Remove(value string) string {
+	v := fmt.Sprintf("%v", value)
+	delete(s, v)
 	return ""
 }
 
-func (s *interfaceSet) Contains(value interface{}) bool {
-	_, c := s.S[value]
+func (s interfaceSet) Contains(value interface{}) bool {
+	v := fmt.Sprintf("%v", value)
+	_, c := s[v]
 	return c
 }
 
-func (s *interfaceSet) toSet() []interface{} {
-	var i []interface{}
-	for k := range s.S {
+func (s interfaceSet) toSet() []string {
+	var i []string
+	for k := range s {
 		i = append(i, k)
 	}
 
 	return i
 }
 
-func (s *interfaceSet) MarshalYAML() (interface{}, error) {
+func (s interfaceSet) MarshalYAML() (interface{}, error) {
 	return s.toSet(), nil
 }
 
-func (s *interfaceSet) MarshalJSON() ([]byte, error) {
+func (s interfaceSet) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.toSet())
 }
 
@@ -139,10 +140,8 @@ func createMap() templateMap {
 	return tm
 }
 
-func createSet() *interfaceSet {
-	return &interfaceSet{
-		S: make(map[interface{}]struct{}),
-	}
+func createSet() interfaceSet {
+	return make(map[string]struct{})
 }
 
 func lookupSRV(service, proto, name string) ([]*net.SRV, error) {
