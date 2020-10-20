@@ -9,9 +9,12 @@
 package template
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net/url"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -22,8 +25,9 @@ import (
 	"github.com/HeavyHorst/memkv"
 	"github.com/HeavyHorst/pongo2"
 	"github.com/dop251/goja"
-	"github.com/ghodss/yaml"
+	gyml "github.com/ghodss/yaml"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 func init() {
@@ -88,6 +92,12 @@ func pongoJSFilter(js string) func(in *pongo2.Value, param *pongo2.Value) (*pong
 	}
 }
 
+func parseParamMap(in string) (url.Values, error) {
+	in = strings.ReplaceAll(in, ", ", ",")
+	in = strings.ReplaceAll(in, ",", "&")
+	return url.ParseQuery(in)
+}
+
 func filterBase64(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	if !in.IsString() {
 		return in, nil
@@ -133,14 +143,37 @@ func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 }
 
 func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	b, err := yaml.Marshal(in.Interface())
+	b := bytes.Buffer{}
+	yamlEncoder := yaml.NewEncoder(&b)
+
+	if param.String() != "" {
+		pm, err := parseParamMap(param.String())
+		if err != nil {
+			return nil, &pongo2.Error{
+				Sender:    "filter:filterToYAML",
+				OrigError: fmt.Errorf("could't parese parameter list: %w", err),
+			}
+		}
+
+		indent, err := strconv.Atoi(pm.Get("indent"))
+		if err != nil {
+			return nil, &pongo2.Error{
+				Sender:    "filter:filterToYAML",
+				OrigError: fmt.Errorf("couldn't parse integer: %w", err),
+			}
+		}
+
+		yamlEncoder.SetIndent(indent)
+	}
+
+	err := yamlEncoder.Encode(in.Interface())
 	if err != nil {
 		return nil, &pongo2.Error{
 			Sender:    "filter:filterToYAML",
 			OrigError: err,
 		}
 	}
-	return pongo2.AsValue(string(b)), nil
+	return pongo2.AsValue(string(b.Bytes())), nil
 }
 
 func filterParseInt(in, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -191,7 +224,7 @@ func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, 
 	}
 
 	var ret interface{}
-	if err := yaml.Unmarshal([]byte(in.String()), &ret); err != nil {
+	if err := gyml.Unmarshal([]byte(in.String()), &ret); err != nil {
 		return nil, &pongo2.Error{
 			Sender:    "filterUnmarshalYAML",
 			OrigError: err,

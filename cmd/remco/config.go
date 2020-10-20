@@ -40,7 +40,7 @@ type BackendConfigs struct {
 
 // GetBackends returns a slice with all BackendConfigs for easy iteration.
 func (c *BackendConfigs) GetBackends() []template.BackendConnector {
-	return []template.BackendConnector{
+	bc := []template.BackendConnector{
 		c.Etcd,
 		c.File,
 		c.Env,
@@ -50,6 +50,12 @@ func (c *BackendConfigs) GetBackends() []template.BackendConnector {
 		c.Zookeeper,
 		c.Mock,
 	}
+
+	for _, v := range c.Plugin {
+		bc = append(bc, &v)
+	}
+
+	return bc
 }
 
 // Configuration is the representation of an config file

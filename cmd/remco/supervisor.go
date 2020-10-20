@@ -193,18 +193,13 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 		go func(r Resource) {
 			defer wait.Done()
 
-			backendConfigs := r.Backends.GetBackends()
-			for _, v := range r.Backends.Plugin {
-				backendConfigs = append(backendConfigs, &v)
-			}
-
 			rsc := template.ResourceConfig{
 				Exec:       r.Exec,
 				Template:   r.Template,
 				Name:       r.Name,
 				StartCmd:   r.StartCmd,
 				ReloadCmd:  r.ReloadCmd,
-				Connectors: backendConfigs,
+				Connectors: r.Backends.GetBackends(),
 			}
 			res, err := template.NewResourceFromResourceConfig(ctx, ru.reapLock, rsc)
 			if err != nil {
