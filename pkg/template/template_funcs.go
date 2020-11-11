@@ -93,6 +93,8 @@ func newFuncMap() map[string]interface{} {
 		"dateRFC3339": dateRFC3339Now,
 		"createMap":   createMap,
 		"createSet":   createSet,
+		"json":        UnmarshalJsonObject,
+		"jsonArray":   UnmarshalJsonArray,
 	}
 
 	return m
@@ -163,4 +165,16 @@ func unixTimestampNow() string {
 
 func dateRFC3339Now() string {
 	return time.Now().Format(time.RFC3339)
+}
+
+func UnmarshalJsonObject(data string) (map[string]interface{}, error) {
+	var ret map[string]interface{}
+	err := json.Unmarshal([]byte(data), &ret)
+	return ret, err
+}
+
+func UnmarshalJsonArray(data string) ([]interface{}, error) {
+	var ret []interface{}
+	err := json.Unmarshal([]byte(data), &ret)
+	return ret, err
 }
