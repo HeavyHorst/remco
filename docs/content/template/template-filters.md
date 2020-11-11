@@ -76,7 +76,25 @@ weight: 20
 </details>
 
 <details>
-<summary> **parseYAML** -- Returns an interface{} of the yaml/json value.</summary>
+<summary> **parseYAML** -- Returns an interface{} of the yaml value.</summary>
+
+```
+{% for value in getvs("/cache1/domains/*") %}
+{% set data = value | parseYAML %}
+{{ data.type }} {{ data.name }} {{ data.addr }}
+{% endfor %}
+```
+</details>
+
+<details>
+<summary> **parseJSON** -- Returns an interface{} of the json value.</summary>
+
+```
+{% for value in getvs("/cache1/domains/*") %}
+{% set data = value | parseJSON %}
+{{ data.type }} {{ data.name }} {{ data.addr }}
+{% endfor %}
+```
 </details>
 
 <details>
