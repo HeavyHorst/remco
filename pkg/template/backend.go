@@ -43,6 +43,8 @@ type Backend struct {
 	// Enable/Disable watch support.
 	Watch bool
 
+	WatchKeys []string
+
 	// The key-path prefix.
 	Prefix string
 
@@ -95,7 +97,7 @@ func (s Backend) watch(ctx context.Context, processChan chan Backend, errChan ch
 	}
 
 	var lastIndex uint64
-	keysPrefix := appendPrefix(s.Prefix, s.Keys)
+	keysPrefix := appendPrefix(s.Prefix, s.WatchKeys)
 
 	var backendError bool
 

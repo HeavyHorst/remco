@@ -42,7 +42,8 @@ const (
 	        mode = "0644"
 	      [resource.backend]
 	      [resource.backend.mock]
-		      keys = ["/"]
+			  keys = ["/"]
+			  watchKeys = ["/"]
 			  watch = false
 			  interval = 1
 
@@ -61,7 +62,8 @@ const (
         mode = "0644"
         [backend]
         [backend.mock]
-	      keys = ["/"]
+		  keys = ["/"]
+		  watchKeys = ["/"]
 		  watch = false
 		  interval = 1
 `
@@ -78,11 +80,12 @@ var expectedTemplates = []*template.Renderer{
 var expectedBackend = BackendConfigs{
 	Mock: &backends.MockConfig{
 		Backend: template.Backend{
-			Watch:    false,
-			Keys:     []string{"/"},
-			Interval: 1,
-			Onetime:  false,
-			Prefix:   "Hallo",
+			Watch:     false,
+			Keys:      []string{"/"},
+			WatchKeys: []string{"/"},
+			Interval:  1,
+			Onetime:   false,
+			Prefix:    "Hallo",
 		},
 	},
 }
