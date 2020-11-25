@@ -149,6 +149,7 @@ name = "haproxy"
     [resource.backend.etcd]
       nodes = ["${ETCD_NODE}"]
       keys = ["/services", "/config"]
+      watchKeys = ["/haproxy/reload"]
       watch = true
       interval = 60
 ```

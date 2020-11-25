@@ -26,6 +26,7 @@ weight: 20
   [backend.etcd]
     nodes    = ["http://localhost:2379"]
     keys     = ["/service-registry"]
+    watchKeys = ["/haproxy/reload"] 
     watch    = true
     interval = 60
     version  = 3

@@ -65,6 +65,7 @@ log_file    = "/var/log/remco.log"
       onetime  = true
       interval = 1
       keys     = ["/"]
+      watchKeys = ["/haproxy/reload"]
 
     [resource.backend.file]
       httpheader = { X-Test-Token = "XXX", X-Test-Token2 = "YYY" } 
