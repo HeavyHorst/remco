@@ -44,7 +44,7 @@ build: ${BIN_NAME}
 
 ${BIN_NAME}: $(GO_SRC)
 	@echo "building ${BIN_NAME} ${VERSION}"
-	$(GO) build -a -tags netgo -ldflags "-X main.version=${VERSION} \
+	$(GO) build -a -tags netgo -ldflags "-s -w -X main.version=${VERSION} \
 		-X main.buildDate=${BUILD_DATE} \
 		-X main.commit=${GIT_COMMIT}${GIT_DIRTY}" \
 		-o ${BIN_NAME} ${GO_OPTS} ./cmd/remco/

@@ -74,6 +74,8 @@ See the example configuration to see how global default values can be set for in
    - Enable watch support. Default is false.
  - **prefix(string, optional):**
    - Key path prefix. Default is "".
+ - **watchKeys([]string, optional):**
+   - Keys list to watch. Default is same as keys
  - **interval(int, optional):**
    - The backend polling interval. Can be used as a reconciliation loop for watch or standalone.
  - **onetime(bool, optional):**
