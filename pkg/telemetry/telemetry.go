@@ -28,9 +28,13 @@ var ErrNilConfig = errors.New("config is nil")
 
 // Telemetry represents telemetry configuration
 type Telemetry struct {
-	Enabled     bool
-	ServiceName string `toml:"service_name"`
-	Sinks       Sinks
+	Enabled              bool
+	ServiceName          string `toml:"service_name"`
+	HostName             string
+	EnableHostname       bool `toml:"enable_hostname"`
+	EnableHostnameLabel  bool `toml:"enable_hostname_label"`
+	EnableRuntimeMetrics bool `toml:"enable_runtime_metrics"`
+	Sinks                Sinks
 }
 
 // Configures metrics and adds FanoutSink with all configured sinks
@@ -46,6 +50,12 @@ func (t Telemetry) Init() (*metrics.Metrics, error) {
 			serviceName = t.ServiceName
 		}
 		metricsConf := metrics.DefaultConfig(serviceName)
+		if t.HostName != "" {
+			metricsConf.HostName = t.HostName
+		}
+		metricsConf.EnableHostname = t.EnableHostname
+		metricsConf.EnableRuntimeMetrics = t.EnableRuntimeMetrics
+		metricsConf.EnableHostnameLabel = t.EnableHostnameLabel
 		var sinks metrics.FanoutSink
 		for _, sc := range t.Sinks.GetSinks() {
 			sink, err := sc.Init()

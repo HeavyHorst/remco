@@ -192,7 +192,14 @@ See the example configuration to see how global default values can be set for in
    - Flag to enable telemetry.
  - **service_name(string):**
    - Service name to add to every metric name. "remco" by default
-
+ - **hostname(string):**
+   - Hostname to use. If not provided and enable_hostname, it will be os.Hostname
+ - **enable_hostname(bool):**
+   - Enable prefixing gauge values with hostname. `true` by default
+ - **enable_hostname_label(bool):**
+   - Put hostname into label instead of metric name. `false` by default
+ - **enable_runtime_metrics(bool):**
+   - Enables profiling of runtime metrics (GC, Goroutines, Memory). `true` by default
 ## Sink configuration options
 
 <details>
@@ -211,6 +218,12 @@ See the example configuration to see how global default values can be set for in
    - Address to expose metrics on. Prometheus stats will be available at /metrics endpoint.
  - **expiration(int):**
    - Expiration is the duration a metric is valid for, after which it will be untracked. If the value is zero, a metric is never expired.
+
+{{% notice note %}}
+If you are using only prometheus sink you may want to disable runtime metrics with **enable_runtime_metrics** option,
+because they will duplicate prometheus builtin runtime metrics reporting. Also, consider using **enable_hostname_label**
+to put hostname in gauge metrics to label instead of metric name.
+{{% /notice %}}
 </details>
 
 <details>

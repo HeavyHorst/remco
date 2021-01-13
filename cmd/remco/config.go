@@ -118,6 +118,10 @@ func NewConfiguration(path string) (Configuration, error) {
 		c.Resource[i].Backends = dbc.Backends
 	}
 
+	// Set defaults as in go-metrics DefaultConfig
+	c.Telemetry.EnableHostname = true
+	c.Telemetry.EnableRuntimeMetrics = true
+
 	if err := toml.Unmarshal(buf, &c); err != nil {
 		return c, errors.Wrapf(err, "toml unmarshal failed: %s", path)
 	}

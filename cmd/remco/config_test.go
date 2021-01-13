@@ -49,6 +49,9 @@ const (
 
 	[telemetry]
 	  enabled = true
+	  enable_hostname = false
+	  enable_hostname_label = false
+	  enable_runtime_metrics = false
 	  [telemetry.sinks.prometheus]
 		addr = ":2112"
 		expiration = 600
@@ -107,8 +110,12 @@ var expected = Configuration{
 		},
 	},
 	Telemetry: telemetry.Telemetry{
-		Enabled:     true,
-		ServiceName: "",
+		Enabled:              true,
+		ServiceName:          "",
+		HostName:             "",
+		EnableHostname:       false,
+		EnableHostnameLabel:  false,
+		EnableRuntimeMetrics: false,
 		Sinks: telemetry.Sinks{
 			Prometheus: &telemetry.PrometheusSink{
 				Addr:       ":2112",
