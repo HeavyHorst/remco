@@ -110,10 +110,10 @@ func (s *FunctionTestSuite) TestInterfaceSet(t *C) {
 	set.Append(true)
 	set.Append(false)
 
-	t.Check(len(set.S), Equals, 4)
+	t.Check(len(set), Equals, 4)
 	t.Check(set.Contains("Hallo"), Equals, true)
 	set.Remove("Hallo")
-	t.Check(len(set.S), Equals, 3)
+	t.Check(len(set), Equals, 3)
 	t.Check(set.Contains("Hallo"), Equals, false)
 	t.Check(set.Contains(false), Equals, true)
 }
