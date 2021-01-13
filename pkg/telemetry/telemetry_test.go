@@ -28,8 +28,11 @@ var _ = Suite(&TelemetryTestSuite{})
 
 func (s *TelemetryTestSuite) SetUpSuite(t *C) {
 	s.telemetry = Telemetry{
-		Enabled:     true,
-		ServiceName: "mock",
+		Enabled:              true,
+		ServiceName:          "mock",
+		HostName:             "test-hostname",
+		EnableHostname:       false,
+		EnableRuntimeMetrics: false,
 		Sinks: Sinks{
 			Inmem: &InmemSink{
 				Interval: 10,
@@ -67,6 +70,8 @@ func (s *TelemetryTestSuite) TestInit(t *C) {
 	t.Assert(err, IsNil)
 
 	t.Assert(string(body), Matches, "(?s).*mock_test_sample.*")
+	t.Assert(string(body), Not(Matches), "(?s).*_runtime_.*")
+	t.Assert(string(body), Not(Matches), "(?s).*test_hostname.*")
 	s.telemetry.Stop()
 }
 
