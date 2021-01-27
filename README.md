@@ -1,4 +1,3 @@
-
 [![Build Status](https://travis-ci.org/HeavyHorst/remco.svg?branch=master)](https://travis-ci.org/HeavyHorst/remco) [![Go Report Card](https://goreportcard.com/badge/github.com/HeavyHorst/remco)](https://goreportcard.com/report/github.com/HeavyHorst/remco) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/HeavyHorst/remco/master/LICENSE)
 
 # Remco
@@ -20,9 +19,10 @@ Remcos main purposes are (like confd's):
    - [Exec](https://heavyhorst.github.io/remco/details/exec-mode/) mode similar to consul-template.
 
 ## Overview
+
 ![remco overview](https://cdn.rawgit.com/HeavyHorst/remco/master/docs/images/Remco-overview.svg)
 
-## Documentation 
+## Documentation
 
 See: https://heavyhorst.github.io/remco/
 
@@ -34,7 +34,7 @@ $ go get github.com/HeavyHorst/remco/cmd/remco
 $ go install github.com/HeavyHorst/remco/cmd/remco
 ```
 
-  You should now have `remco` in your `$GOPATH/bin` directory
+You should now have `remco` in your `$GOPATH/bin` directory
 
 ### Building from the repository
 
@@ -59,16 +59,17 @@ remco_0.11.1_darwin_amd64.zip  remco_0.11.1_linux_amd64.zip  remco_0.11.1_window
 ### Using a pre-built release
 
 Download the releases and extract the binary.
+
 ```shell
-REMCO_VER=0.11.1
-wget https://github.com/HeavyHorst/remco/releases/download/v${REMCO_VER}/remco_${REMCO_VER}_linux_amd64.zip
-unzip remco_${REMCO_VER}_linux_amd64.zip
+$ REMCO_VER=0.11.1
+$ wget https://github.com/HeavyHorst/remco/releases/download/v${REMCO_VER}/remco_${REMCO_VER}_linux_amd64.zip
+$ unzip remco_${REMCO_VER}_linux_amd64.zip
 ```
 
 Optionally move the binary to your PATH
 
 ```shell
-mv remco_linux /usr/local/bin/remco
+$ mv remco_linux /usr/local/bin/remco
 ```
 
 Now you can run the remco command!
@@ -76,4 +77,3 @@ Now you can run the remco command!
 ## Contributing
 
 See [Contributing](https://github.com/HeavyHorst/remco/blob/master/CONTRIBUTING) for details on submitting patches.
-
