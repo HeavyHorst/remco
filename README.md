@@ -1,3 +1,4 @@
+
 [![Build Status](https://travis-ci.org/HeavyHorst/remco.svg?branch=master)](https://travis-ci.org/HeavyHorst/remco) [![Go Report Card](https://goreportcard.com/badge/github.com/HeavyHorst/remco)](https://goreportcard.com/report/github.com/HeavyHorst/remco) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/HeavyHorst/remco/master/LICENSE)
 
 # Remco
@@ -31,7 +32,7 @@ See: https://heavyhorst.github.io/remco/
 ```shell
 $ go get github.com/HeavyHorst/remco/cmd/remco
 $ go install github.com/HeavyHorst/remco/cmd/remco
-```shell
+```
 
   You should now have `remco` in your `$GOPATH/bin` directory
 
