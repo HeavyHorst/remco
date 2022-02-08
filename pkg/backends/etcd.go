@@ -13,7 +13,6 @@ import (
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"
-	"github.com/sirupsen/logrus"
 )
 
 // EtcdConfig represents the config for the etcd backend.
@@ -87,10 +86,10 @@ func (c *EtcdConfig) Connect() (template.Backend, error) {
 		}
 	}
 
-	log.WithFields(logrus.Fields{
-		"backend": c.Backend.Name,
-		"nodes":   c.Nodes,
-	}).Info("set backend nodes")
+	log.WithFields(
+		"backend", c.Backend.Name,
+		"nodes", c.Nodes,
+	).Info("set backend nodes")
 
 	client, err := etcd.New(c.Nodes,
 		etcd.WithBasicAuth(etcd.BasicAuthOptions{

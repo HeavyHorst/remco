@@ -21,7 +21,6 @@ import (
 	"github.com/HeavyHorst/remco/pkg/telemetry"
 	"github.com/HeavyHorst/remco/pkg/template"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // BackendConfigs holds every individually backend config.
@@ -141,9 +140,9 @@ func NewConfiguration(path string) (Configuration, error) {
 			if strings.HasSuffix(file.Name(), ".toml") {
 				fp := filepath.Join(c.IncludeDir, file.Name())
 
-				log.WithFields(logrus.Fields{
-					"path": fp,
-				}).Info("loading resource configuration")
+				log.WithFields(
+					"path", fp,
+				).Info("loading resource configuration")
 
 				buf, err := readFileAndExpandEnv(fp)
 				if err != nil {
@@ -180,14 +179,5 @@ func NewConfiguration(path string) (Configuration, error) {
 // configureLogger configures the global logger.
 // It sets the log level and log formatting.
 func (c *Configuration) configureLogger() {
-	err := log.SetLevel(c.LogLevel)
-	if err != nil {
-		log.Error(err)
-	}
-	log.SetFormatter(c.LogFormat)
-
-	err = log.SetOutput(c.LogFile)
-	if err != nil {
-		log.Error(err)
-	}
+	log.InitializeLogging(c.LogFormat, c.LogLevel)
 }

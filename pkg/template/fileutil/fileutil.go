@@ -12,12 +12,12 @@
 package fileutil
 
 import (
+	"github.com/hashicorp/go-hclog"
 	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // FileInfo describes a configuration file and is returned by filestat.
@@ -41,7 +41,7 @@ func IsFileExist(fpath string) bool {
 // ReplaceFile just renames (move) the file if possible.
 // If that fails it will read the src file and write the content to the destination file.
 // It returns an error if any.
-func ReplaceFile(src, dest string, mode os.FileMode, logger *logrus.Entry) error {
+func ReplaceFile(src, dest string, mode os.FileMode, logger hclog.Logger) error {
 	err := os.Rename(src, dest)
 	if err != nil {
 		if strings.Contains(err.Error(), "device or resource busy") {
@@ -68,7 +68,7 @@ func ReplaceFile(src, dest string, mode os.FileMode, logger *logrus.Entry) error
 // Two config files are equal when they have the same file contents and
 // Unix permissions. The owner, group, and mode must match.
 // It return false in other cases.
-func SameFile(src, dest string, logger *logrus.Entry) (bool, error) {
+func SameFile(src, dest string, logger hclog.Logger) (bool, error) {
 	if !IsFileExist(dest) {
 		return false, nil
 	}
@@ -81,32 +81,32 @@ func SameFile(src, dest string, logger *logrus.Entry) (bool, error) {
 		return false, err
 	}
 	if d.Uid != s.Uid {
-		logger.WithFields(logrus.Fields{
-			"config":  dest,
-			"current": d.Uid,
-			"new":     s.Uid,
-		}).Info("wrong UID")
+		logger.With(
+			"config", dest,
+			"current", d.Uid,
+			"new", s.Uid,
+		).Info("wrong UID")
 	}
 	if d.Gid != s.Gid {
-		logger.WithFields(logrus.Fields{
-			"config":  dest,
-			"current": d.Gid,
-			"new":     s.Gid,
-		}).Info("wrong GID")
+		logger.With(
+			"config", dest,
+			"current", d.Gid,
+			"new", s.Gid,
+		).Info("wrong GID")
 	}
 	if d.Mode != s.Mode {
-		logger.WithFields(logrus.Fields{
-			"config":  dest,
-			"current": d.Mode,
-			"new":     s.Mode,
-		}).Info("wrong filemode")
+		logger.With(
+			"config", dest,
+			"current", d.Mode,
+			"new", s.Mode,
+		).Info("wrong filemode")
 	}
 	if d.Hash != s.Hash {
-		logger.WithFields(logrus.Fields{
-			"config":  dest,
-			"current": d.Hash,
-			"new":     s.Hash,
-		}).Info("wrong hashsum")
+		logger.With(
+			"config", dest,
+			"current", d.Hash,
+			"new", s.Hash,
+		).Info("wrong hashsum")
 	}
 	if d.Uid != s.Uid || d.Gid != s.Gid || d.Mode != s.Mode || d.Hash != s.Hash {
 		return false, nil

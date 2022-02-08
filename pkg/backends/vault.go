@@ -13,7 +13,6 @@ import (
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"
-	"github.com/sirupsen/logrus"
 )
 
 // VaultConfig represents the config for the vault backend.
@@ -60,10 +59,10 @@ func (c *VaultConfig) Connect() (template.Backend, error) {
 	}
 
 	c.Backend.Name = "vault"
-	log.WithFields(logrus.Fields{
-		"backend": c.Backend.Name,
-		"nodes":   []string{c.Node},
-	}).Info("set backend nodes")
+	log.WithFields(
+		"backend", c.Backend.Name,
+		"nodes", []string{c.Node},
+	).Info("set backend nodes")
 
 	tlsOps := vault.TLSOptions{
 		ClientCert:   c.ClientCert,
@@ -92,9 +91,9 @@ func (c *VaultConfig) Connect() (template.Backend, error) {
 	c.Backend.ReadWatcher = client
 
 	if c.Backend.Watch {
-		log.WithFields(logrus.Fields{
-			"backend": c.Backend.Name,
-		}).Warn("Watch is not supported, using interval instead")
+		log.WithFields(
+			"backend", c.Backend.Name,
+		).Warn("Watch is not supported, using interval instead")
 		c.Backend.Watch = false
 	}
 

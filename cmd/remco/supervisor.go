@@ -23,7 +23,6 @@ import (
 	"github.com/HeavyHorst/remco/pkg/template"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type reloadSignal struct {
@@ -62,7 +61,7 @@ func NewSupervisor(cfg Configuration, reapLock *sync.RWMutex, done chan struct{}
 	pid := os.Getpid()
 	err := w.writePid(pid)
 	if err != nil {
-		log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
+		log.WithFields("pid_file", w.pidFile).Error("failed to write pidfile", err)
 	}
 
 	stopChan := make(chan struct{})
@@ -87,12 +86,12 @@ func NewSupervisor(cfg Configuration, reapLock *sync.RWMutex, done chan struct{}
 				if rs.c.PidFile != w.pidFile {
 					err := w.deletePid()
 					if err != nil {
-						log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
+						log.WithFields("pid_file", w.pidFile).Error("failed to delete pidfile", err)
 					}
 					w.pidFile = rs.c.PidFile
 					err = w.writePid(pid)
 					if err != nil {
-						log.WithFields(logrus.Fields{"pid_file": w.pidFile}).Error(err)
+						log.WithFields("pid_file", w.pidFile).Error("failed to write pidfile", err)
 					}
 				}
 				err = w.telemetry.Stop()
@@ -214,7 +213,7 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 			}
 			res, err := template.NewResourceFromResourceConfig(ctx, ru.reapLock, rsc)
 			if err != nil {
-				log.Error(err)
+				log.Error("failed to create new resource", err)
 				ru.incResourceError()
 				return
 			}
@@ -240,9 +239,10 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 						go func() {
 							// try to restart the resource after a random amount of time
 							rn := rand.Int63n(30)
-							log.WithFields(logrus.Fields{
-								"resource": r.Name,
-							}).Error(fmt.Sprintf("resource execution failed, restarting after %d seconds", rn))
+							log.WithFields(
+								"resource", r.Name,
+								"restartDelay", rn,
+							).Error("resource execution failed, restarting after delay")
 							time.Sleep(time.Duration(rn) * time.Second)
 							select {
 							case <-ctx.Done():
@@ -297,7 +297,7 @@ func (ru *Supervisor) Stop() int32 {
 	// remove the pidfile
 	err := ru.deletePid()
 	if err != nil {
-		log.WithFields(logrus.Fields{"pid_file": ru.pidFile}).Error(err)
+		log.WithFields("pid_file", ru.pidFile).Error("failed to delete pidfile", err)
 	}
 	return ru.getNumResourceErrors()
 }

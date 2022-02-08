@@ -9,14 +9,14 @@
 package template
 
 import (
+	"bytes"
 	"context"
+	"github.com/hashicorp/go-hclog"
 	"io/ioutil"
 	"os"
 	"syscall"
 	"testing"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 func TestNew(t *testing.T) {
@@ -25,7 +25,7 @@ func TestNew(t *testing.T) {
 	killSignal := "SIGKILL"
 	killTimeout := 1
 	splay := 0
-	logger := &logrus.Entry{}
+	logger := hclog.Default()
 
 	exec := NewExecutor(command, reloadSignal, killSignal, killTimeout, splay, logger)
 
@@ -48,14 +48,10 @@ func TestNew(t *testing.T) {
 	if exec.splay != time.Duration(splay)*time.Second {
 		t.Errorf("splay should be: %v", time.Duration(splay)*time.Second)
 	}
-
-	if exec.logger != logger {
-		t.Errorf("logger should be: %v", logger)
-	}
 }
 
 func TestNewDefaults(t *testing.T) {
-	exec := NewExecutor("", "", "", 0, 0, &logrus.Entry{})
+	exec := NewExecutor("", "", "", 0, 0, hclog.Default())
 
 	if exec.killSignal != syscall.SIGTERM {
 		t.Errorf("default killSignal should be: %v", syscall.SIGTERM)
@@ -71,9 +67,8 @@ func TestNewDefaults(t *testing.T) {
 }
 
 func TestNewInvalidSignals(t *testing.T) {
-	logger := logrus.New()
-	logger.Out = ioutil.Discard
-	exec := NewExecutor("", "SIGBLA", "SIGBLA", 0, 0, logrus.NewEntry(logger))
+	logger := hclog.New(&hclog.LoggerOptions{Output: ioutil.Discard})
+	exec := NewExecutor("", "SIGBLA", "SIGBLA", 0, 0, logger)
 
 	if exec.reloadSignal != nil {
 		t.Error("reloadSignal should be nil")
@@ -88,10 +83,9 @@ func spawnChild(command string) (Executor, error) {
 	reloadSignal := "SIGINT"
 	killSignal := "SIGTERM"
 	killTimeout := 2
-	logger := logrus.New()
-	logger.Out = ioutil.Discard
+	logger := hclog.New(&hclog.LoggerOptions{Output: ioutil.Discard})
 
-	exec := NewExecutor(command, reloadSignal, killSignal, killTimeout, 0, logrus.NewEntry(logger))
+	exec := NewExecutor(command, reloadSignal, killSignal, killTimeout, 0, logger)
 	err := exec.SpawnChild()
 
 	return exec, err
@@ -172,10 +166,9 @@ func TestWaitCancel(t *testing.T) {
 
 func TestReload(t *testing.T) {
 	command := "bash -c 'sleep 5'"
-	logger := logrus.New()
-	logger.Out = ioutil.Discard
+	logger := hclog.New(&hclog.LoggerOptions{Output: ioutil.Discard})
 
-	exec := NewExecutor(command, "", "", 0, 0, logrus.NewEntry(logger))
+	exec := NewExecutor(command, "", "", 0, 0, logger)
 	err := exec.SpawnChild()
 	if err != nil {
 		t.Error(err)
@@ -209,7 +202,6 @@ func TestReload(t *testing.T) {
 	}
 
 	// should be different after the reload
-	//nexitChan := exec.child.ExitCh()
 	nexitChan, valid := exec.getExitChan()
 	if !valid {
 		t.Error("we should have a valid exitChan")
@@ -223,10 +215,9 @@ func TestReload(t *testing.T) {
 
 func TestSignalChild(t *testing.T) {
 	command := "bash -c 'sleep 5'"
-	logger := logrus.New()
-	logger.Out = ioutil.Discard
+	logger := hclog.New(&hclog.LoggerOptions{Output: ioutil.Discard})
 
-	exec := NewExecutor(command, "", "", 0, 0, logrus.NewEntry(logger))
+	exec := NewExecutor(command, "", "", 0, 0, logger)
 	err := exec.SpawnChild()
 	if err != nil {
 		t.Error(err)
@@ -250,4 +241,23 @@ func TestSignalChild(t *testing.T) {
 	}
 
 	exec.StopChild()
+}
+
+func TestExecutorLogging(t *testing.T) {
+	command := "bash -c 'echo \"Hello\"'"
+	var buf bytes.Buffer
+	logger := hclog.New(&hclog.LoggerOptions{Output: &buf, DisableTime: true}).With("k1", "v1", "k2", "v2")
+
+	exec := NewExecutor(command, "", "", 0, 0, logger)
+	err := exec.SpawnChild()
+	if err != nil {
+		t.Error(err)
+	}
+	exec.StopChild()
+	s := buf.String()
+	if s != `[INFO]  (child) spawning: bash -c echo "Hello": k1=v1 k2=v2
+[INFO]  (child) stopping process: k1=v1 k2=v2
+` {
+		t.Errorf("Log output did not match out expectations. Was '%s'", s)
+	}
 }

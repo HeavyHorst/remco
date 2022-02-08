@@ -9,12 +9,11 @@
 package fileutil
 
 import (
+	"github.com/hashicorp/go-hclog"
 	"io/ioutil"
 	"os"
 	"testing"
 
-	"github.com/HeavyHorst/remco/pkg/log"
-	"github.com/sirupsen/logrus"
 	. "gopkg.in/check.v1"
 )
 
@@ -31,10 +30,6 @@ type TestSuite struct {
 }
 
 var _ = Suite(&TestSuite{})
-
-func init() {
-	log.SetLevel("debug")
-}
 
 func writeFile(t *C, file *os.File, value string) {
 	_, err := file.WriteString(value)
@@ -87,7 +82,7 @@ func (s *TestSuite) TearDownSuite(t *C) {
 }
 
 func (s *TestSuite) TestSameFileTrue(t *C) {
-	status, err := SameFile(s.file.Name(), s.sameFile.Name(), logrus.NewEntry(logrus.StandardLogger()))
+	status, err := SameFile(s.file.Name(), s.sameFile.Name(), hclog.Default())
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -95,7 +90,7 @@ func (s *TestSuite) TestSameFileTrue(t *C) {
 }
 
 func (s *TestSuite) TestSameFileFalse(t *C) {
-	status, err := SameFile(s.file.Name(), s.differentHash.Name(), logrus.NewEntry(logrus.StandardLogger()))
+	status, err := SameFile(s.file.Name(), s.differentHash.Name(), hclog.Default())
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -108,7 +103,7 @@ func (s *TestSuite) TestReplaceFile(t *C) {
 		t.Error(err.Error())
 	}
 
-	err = ReplaceFile(s.replaceFile.Name(), s.replaceFile1.Name(), fileStat.Mode, logrus.NewEntry(logrus.StandardLogger()))
+	err = ReplaceFile(s.replaceFile.Name(), s.replaceFile1.Name(), fileStat.Mode, hclog.Default())
 	if err != nil {
 		t.Error(err.Error())
 	}

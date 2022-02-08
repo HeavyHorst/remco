@@ -13,7 +13,6 @@ import (
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"
-	"github.com/sirupsen/logrus"
 )
 
 // FileConfig represents the config for the file backend.
@@ -34,10 +33,10 @@ func (c *FileConfig) Connect() (template.Backend, error) {
 	}
 
 	c.Backend.Name = "file"
-	log.WithFields(logrus.Fields{
-		"backend":  c.Backend.Name,
-		"filepath": c.Filepath,
-	}).Info("set file path")
+	log.WithFields(
+		"backend", c.Backend.Name,
+		"filepath", c.Filepath,
+	).Info("set file path")
 
 	client, err := file.New(c.Filepath, file.WithHeaders(c.HTTPHeaders))
 	if err != nil {

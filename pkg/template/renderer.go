@@ -13,6 +13,7 @@ package template
 import (
 	"bytes"
 	"fmt"
+	"github.com/hashicorp/go-hclog"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -27,7 +28,6 @@ import (
 	"github.com/HeavyHorst/remco/pkg/template/fileutil"
 	"github.com/armon/go-metrics"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -45,7 +45,7 @@ type Renderer struct {
 	ReloadCmd string `toml:"reload_cmd" json:"reload_cmd"`
 	CheckCmd  string `toml:"check_cmd" json:"check_cmd"`
 	stageFile *os.File
-	logger    *logrus.Entry
+	logger    hclog.Logger
 	ReapLock  *sync.RWMutex
 }
 
@@ -58,9 +58,9 @@ func (s *Renderer) createStageFile(funcMap map[string]interface{}) error {
 		return fmt.Errorf("missing template: %s", s.Src)
 	}
 
-	s.logger.WithFields(logrus.Fields{
-		"template": s.Src,
-	}).Debug("compiling source template")
+	s.logger.With(
+		"template", s.Src,
+	).Debug("compiling source template")
 
 	set := pongo2.NewSet("local", &pongo2.LocalFilesystemLoader{})
 	set.Options = &pongo2.Options{
@@ -117,10 +117,10 @@ func (s *Renderer) syncFiles(runCommands bool) (bool, error) {
 	staged := s.stageFile.Name()
 	defer os.Remove(staged)
 
-	s.logger.WithFields(logrus.Fields{
-		"staged": path.Base(staged),
-		"dest":   s.Dst,
-	}).Debug("comparing staged and dest config files")
+	s.logger.With(
+		"staged", path.Base(staged),
+		"dest", s.Dst,
+	).Debug("comparing staged and dest config files")
 
 	ok, err := fileutil.SameFile(staged, s.Dst, s.logger)
 	if err != nil {
@@ -128,9 +128,9 @@ func (s *Renderer) syncFiles(runCommands bool) (bool, error) {
 	}
 
 	if !ok {
-		s.logger.WithFields(logrus.Fields{
-			"config": s.Dst,
-		}).Info("target config out of sync")
+		s.logger.With(
+			"config", s.Dst,
+		).Info("target config out of sync")
 
 		if runCommands {
 			if err := s.check(staged); err != nil {
@@ -138,9 +138,9 @@ func (s *Renderer) syncFiles(runCommands bool) (bool, error) {
 			}
 		}
 
-		s.logger.WithFields(logrus.Fields{
-			"config": s.Dst,
-		}).Debug("overwriting target config")
+		s.logger.With(
+			"config", s.Dst,
+		).Debug("overwriting target config")
 
 		fileMode, err := s.getFileMode()
 		if err != nil {
@@ -160,14 +160,14 @@ func (s *Renderer) syncFiles(runCommands bool) (bool, error) {
 			}
 		}
 
-		s.logger.WithFields(logrus.Fields{
-			"config": s.Dst,
-		}).Info("target config has been updated")
+		s.logger.With(
+			"config", s.Dst,
+		).Info("target config has been updated")
 
 	} else {
-		s.logger.WithFields(logrus.Fields{
-			"config": s.Dst,
-		}).Debug("target config in sync")
+		s.logger.With(
+			"config", s.Dst,
+		).Debug("target config in sync")
 
 	}
 	return changed, nil
@@ -247,8 +247,8 @@ func renderTemplate(unparsed string, data interface{}) (string, error) {
 	return rendered.String(), nil
 }
 
-func execCommand(cmd string, logger *logrus.Entry, rl *sync.RWMutex) ([]byte, error) {
-	logger.Debugf("Running %q", cmd)
+func execCommand(cmd string, logger hclog.Logger, rl *sync.RWMutex) ([]byte, error) {
+	logger.Debug("Running cmd", "command", cmd)
 	c := exec.Command("/bin/sh", "-c", cmd)
 
 	if rl != nil {

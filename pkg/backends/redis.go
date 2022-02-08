@@ -13,7 +13,6 @@ import (
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"
-	"github.com/sirupsen/logrus"
 )
 
 // RedisConfig represents the config for the redis backend.
@@ -50,10 +49,10 @@ func (c *RedisConfig) Connect() (template.Backend, error) {
 		}
 	}
 
-	log.WithFields(logrus.Fields{
-		"backend": c.Backend.Name,
-		"nodes":   c.Nodes,
-	}).Info("set backend nodes")
+	log.WithFields(
+		"backend", c.Backend.Name,
+		"nodes", c.Nodes,
+	).Info("set backend nodes")
 
 	client, err := redis.New(c.Nodes, redis.WithPassword(c.Password), redis.WithDatabase(c.Database))
 	if err != nil {
@@ -63,9 +62,9 @@ func (c *RedisConfig) Connect() (template.Backend, error) {
 	c.Backend.ReadWatcher = client
 
 	if c.Backend.Watch {
-		log.WithFields(logrus.Fields{
-			"backend": c.Backend.Name,
-		}).Warn("Watch is not supported, using interval instead")
+		log.WithFields(
+			"backend", c.Backend.Name,
+		).Warn("Watch is not supported, using interval instead")
 		c.Backend.Watch = false
 	}
 

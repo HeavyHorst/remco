@@ -13,7 +13,6 @@ import (
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/HeavyHorst/remco/pkg/template"
-	"github.com/sirupsen/logrus"
 )
 
 // ConsulConfig represents the config for the consul backend.
@@ -56,10 +55,10 @@ func (c *ConsulConfig) Connect() (template.Backend, error) {
 		}
 	}
 
-	log.WithFields(logrus.Fields{
-		"backend": c.Backend.Name,
-		"nodes":   c.Nodes,
-	}).Info("set backend nodes")
+	log.WithFields(
+		"backend", c.Backend.Name,
+		"nodes", c.Nodes,
+	).Info("set backend nodes")
 
 	client, err := consul.New(c.Nodes, consul.WithScheme(c.Scheme), consul.WithTLSOptions(consul.TLSOptions{
 		ClientCert:   c.ClientCert,

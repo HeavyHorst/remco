@@ -25,6 +25,7 @@ package template
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/go-hclog"
 	"math/rand"
 	"os"
 	"path"
@@ -37,7 +38,6 @@ import (
 	"github.com/HeavyHorst/remco/pkg/log"
 	"github.com/armon/go-metrics"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // Resource is the representation of a parsed template resource.
@@ -46,7 +46,7 @@ type Resource struct {
 	funcMap  map[string]interface{}
 	store    *memkv.Store
 	sources  []*Renderer
-	logger   *logrus.Entry
+	logger   hclog.Logger
 
 	exec      Executor
 	startCmd  string
@@ -97,7 +97,7 @@ func NewResourceFromResourceConfig(ctx context.Context, reapLock *sync.RWMutex, 
 		p.ReapLock = reapLock
 	}
 
-	logger := log.WithFields(logrus.Fields{"resource": r.Name})
+	logger := log.WithFields("resource", r.Name)
 	exec := NewExecutor(r.Exec.Command, r.Exec.ReloadSignal, r.Exec.KillSignal, r.Exec.KillTimeout, r.Exec.Splay, logger)
 	res, err := NewResource(backendList, r.Template, r.Name, exec, r.StartCmd, r.ReloadCmd)
 	if err != nil {
@@ -114,7 +114,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 		return nil, fmt.Errorf("a valid StoreClient is required")
 	}
 
-	logger := log.WithFields(logrus.Fields{"resource": name})
+	logger := log.WithFields("resource", name)
 
 	for _, v := range sources {
 		if v.Src == "" {
@@ -141,7 +141,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 		tr.backends[i].store = store
 
 		if tr.backends[i].Interval <= 0 && !tr.backends[i].Onetime && !tr.backends[i].Watch {
-			logger.Warning("interval needs to be > 0: setting interval to 60")
+			logger.Warn("interval needs to be > 0: setting interval to 60")
 			tr.backends[i].Interval = 60
 		}
 	}
@@ -160,9 +160,9 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 // Close closes the connection to all underlying backends.
 func (t *Resource) Close() {
 	for _, v := range t.backends {
-		t.logger.WithFields(logrus.Fields{
-			"backend": v.Name,
-		}).Debug("closing client connection")
+		t.logger.With(
+			"backend", v.Name,
+		).Debug("closing client connection")
 		v.Close()
 	}
 }
@@ -176,10 +176,10 @@ func (t *Resource) Close() {
 func (t *Resource) setVars(storeClient Backend) error {
 	var err error
 
-	t.logger.WithFields(logrus.Fields{
-		"backend":    storeClient.Name,
-		"key_prefix": storeClient.Prefix,
-	}).Debug("retrieving keys")
+	t.logger.With(
+		"backend", storeClient.Name,
+		"key_prefix", storeClient.Prefix,
+	).Debug("retrieving keys")
 
 	result, err := storeClient.GetValues(appendPrefix(storeClient.Prefix, storeClient.Keys))
 	if err != nil {
@@ -197,7 +197,7 @@ func (t *Resource) setVars(storeClient Backend) error {
 	for _, v := range t.backends {
 		for _, kv := range v.store.GetAllKVs() {
 			if t.store.Exists(kv.Key) {
-				t.logger.Warning("key collision - " + kv.Key)
+				t.logger.Warn("key collision", "key", kv.Key)
 			}
 			t.store.Set(kv.Key, kv.Value)
 		}
@@ -279,11 +279,12 @@ retryloop:
 			if _, err := t.process(t.backends, t.startCmd == ""); err != nil {
 				switch err := err.(type) {
 				case berr.BackendError:
-					t.logger.WithFields(logrus.Fields{
-						"backend": err.Backend,
-					}).Error(err)
+					t.logger.With(
+						"backend", err.Backend,
+						"error", err,
+					).Error("backend error")
 				default:
-					t.logger.Error(err)
+					t.logger.Error("failed to process", "error", err)
 				}
 
 				if t.OnetimeOnly {
@@ -322,7 +323,7 @@ retryloop:
 
 	err := t.exec.SpawnChild()
 	if err != nil {
-		t.logger.Error(err)
+		t.logger.Error("failed to spawn child", "error", err)
 		t.Failed = true
 		cancel()
 	} else {
@@ -375,29 +376,29 @@ retryloop:
 			if err != nil {
 				switch err.(type) {
 				case berr.BackendError:
-					t.logger.WithField("backend", storeClient.Name).Error(err)
+					t.logger.With("backend", storeClient.Name, "error", err).Error("backend error")
 				default:
-					t.logger.Error(err)
+					t.logger.Error("default handler", "error", err)
 				}
 			} else if changed {
 				if err := t.exec.Reload(); err != nil {
-					t.logger.Error(err)
+					t.logger.Error("failed to reload", "error", err)
 				}
 
 				if t.reloadCmd != "" {
 					output, err := execCommand(t.reloadCmd, t.logger, nil)
 					if err != nil {
-						t.logger.Error(fmt.Sprintf("failed to execute the resource reload cmd - %q", string(output)))
+						t.logger.Error("failed to execute the resource reload cmd", "output", string(output), "error", err)
 					}
 				}
 			}
 		case s := <-t.SignalChan:
 			err := t.exec.SignalChild(s)
 			if err != nil {
-				t.logger.Error(err)
+				t.logger.Error("failed to signal child", "error", err)
 			}
 		case err := <-errChan:
-			t.logger.WithField("backend", err.Backend).Error(err.Message)
+			t.logger.With("backend", err.Backend).Error("error", "message", err.Message)
 		case <-ctx.Done():
 			go func() {
 				for range processChan {
