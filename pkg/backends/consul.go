@@ -75,3 +75,8 @@ func (c *ConsulConfig) Connect() (template.Backend, error) {
 
 	return c.Backend, nil
 }
+
+// return Backend config to allow modification before connect() for onetime param or similar
+func (c *ConsulConfig) GetBackend() *template.Backend {
+	return &c.Backend
+}

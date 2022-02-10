@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"reflect"
 	"sync"
 	"syscall"
 
@@ -25,12 +26,14 @@ import (
 var (
 	configPath          string
 	printVersionAndExit bool
+	onetime             bool
 )
 
 func init() {
 	const defaultConfig = "/etc/remco/config"
 	flag.StringVar(&configPath, "config", defaultConfig, "path to the configuration file")
 	flag.BoolVar(&printVersionAndExit, "version", false, "print version and exit")
+	flag.BoolVar(&onetime, "onetime", false, "run templating process once and exit")
 }
 
 func run() {
@@ -44,6 +47,17 @@ func run() {
 	cfg, err := NewConfiguration(configPath)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if onetime {
+		for _, res := range cfg.Resource {
+			for _, b := range res.Backends.GetBackends() {
+				if !reflect.ValueOf(b).IsZero() {
+					backend := b.GetBackend()
+					backend.Onetime = true
+				}
+			}
+		}
 	}
 
 	run := NewSupervisor(cfg, reapLock, done)
