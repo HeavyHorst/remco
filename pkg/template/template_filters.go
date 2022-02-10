@@ -25,9 +25,9 @@ import (
 	"github.com/HeavyHorst/memkv"
 	"github.com/HeavyHorst/pongo2"
 	"github.com/dop251/goja"
-	gyml "github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
+	gyml "sigs.k8s.io/yaml"
 )
 
 func init() {
