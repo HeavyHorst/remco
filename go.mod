@@ -29,6 +29,7 @@ require (
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	sigs.k8s.io/yaml v1.2.0
 )
