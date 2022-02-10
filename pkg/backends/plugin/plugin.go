@@ -55,6 +55,11 @@ func (p *Plugin) Connect() (template.Backend, error) {
 	return p.Backend, nil
 }
 
+// return Backend config to allow modification before connect() for onetime param or similar
+func (p *Plugin) GetBackend() *template.Backend {
+	return &p.Backend
+}
+
 // initPlugin sends the config map to the plugin
 // the plugin can then run some initialization tasks
 func (p *plug) initPlugin(config map[string]interface{}) error {

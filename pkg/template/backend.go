@@ -27,6 +27,7 @@ import (
 // Connect should also set the name and the StoreClient of the Backend. The other values of Backend will be loaded from the configuration file.
 type BackendConnector interface {
 	Connect() (Backend, error)
+	GetBackend() *Backend
 }
 
 // Backend is the representation of a template backend like etcd or consul

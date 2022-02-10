@@ -74,6 +74,18 @@ $ mv remco_linux /usr/local/bin/remco
 
 Now you can run the remco command!
 
+## Execution
+
+run remco from local dir, configuration is read as default from `/etc/remco/config`
+
+Command line params:
+
+| parameter | description |
+| --- | --- |
+| -config <file> | path to the configuration file |
+| -onetime | flag to one run templating once, overriding "Onetime" flag for all backend resources |
+| -version | print version and exit |
+
 ## Contributing
 
 See [Contributing](https://github.com/HeavyHorst/remco/blob/master/CONTRIBUTING) for details on submitting patches.

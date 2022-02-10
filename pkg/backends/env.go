@@ -34,3 +34,8 @@ func (c *EnvConfig) Connect() (template.Backend, error) {
 	c.Backend.ReadWatcher = client
 	return c.Backend, nil
 }
+
+// return Backend config to allow modification before connect() for onetime param or similar
+func (c *EnvConfig) GetBackend() *template.Backend {
+	return &c.Backend
+}

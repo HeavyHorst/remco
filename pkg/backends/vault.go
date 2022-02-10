@@ -100,3 +100,8 @@ func (c *VaultConfig) Connect() (template.Backend, error) {
 
 	return c.Backend, nil
 }
+
+// return Backend config to allow modification before connect() for onetime param or similar
+func (c *VaultConfig) GetBackend() *template.Backend {
+	return &c.Backend
+}

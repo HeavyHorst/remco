@@ -71,3 +71,8 @@ func (c *RedisConfig) Connect() (template.Backend, error) {
 
 	return c.Backend, nil
 }
+
+// return Backend config to allow modification before connect() for onetime param or similar
+func (c *RedisConfig) GetBackend() *template.Backend {
+	return &c.Backend
+}

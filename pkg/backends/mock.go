@@ -35,3 +35,8 @@ func (c *MockConfig) Connect() (template.Backend, error) {
 
 	return c.Backend, nil
 }
+
+// return Backend config to allow modification before connect() for onetime param or similar
+func (c *MockConfig) GetBackend() *template.Backend {
+	return &c.Backend
+}
