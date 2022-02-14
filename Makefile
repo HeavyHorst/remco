@@ -1,4 +1,4 @@
-.PHONY: build clean test help default tag fmt vendor install release
+.PHONY: build clean test help default tag fmt vendor vet install release
 
 BIN_NAME := bin/remco
 
@@ -35,8 +35,9 @@ help:
 	@echo '    make build           Compile the project.'
 	@echo '    make release         Create all the releases for [$(OS_LIST)]'
 	@echo '    make test            Run the unit tests.'
-	@echo '    make get-deps        Recover the deps (put them in /vendor)'
+	@echo '    make vendor          Recover the deps (put them in /vendor)'
 	@echo '    make fmt             use go fmt on the code.'
+	@echo '    make vet             use go vet on the code.'
 	@echo '    make clean           Clean the directory tree.'
 	@echo
 
@@ -68,6 +69,9 @@ test: coverage.out
 
 fmt:
 	$(GO) fmt ...
+
+vet:
+	$(GO) vet ...
 
 coverage.out: $(GO_SRC) $(GO_TEST_SRC) build
 	@echo "Running the test"
