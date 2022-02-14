@@ -36,7 +36,7 @@ func init() {
 	flag.BoolVar(&onetime, "onetime", false, "run templating process once and exit")
 }
 
-func run() {
+func run() int {
 	// catch all signals
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan)
@@ -91,7 +91,7 @@ func run() {
 			case signals.SignalLookup["SIGCHLD"]:
 			case os.Interrupt, syscall.SIGTERM:
 				log.Info(fmt.Sprintf("Captured %v. Exiting...", s))
-				return
+				return 0
 			default:
 				run.SendSignal(s)
 			}
@@ -100,7 +100,7 @@ func run() {
 		case err := <-errorReapChan:
 			log.Error(fmt.Sprintf("Error reaping child process %v", err))
 		case <-done:
-			return
+			return run.resourcesWithError
 		}
 	}
 }
@@ -112,6 +112,10 @@ func main() {
 		printVersion()
 		return
 	}
-
-	run()
+	rc := run()
+	// be on the safe side for portability and lots of backend resources
+	if rc > 125 {
+		rc = 125
+	}
+	os.Exit(rc)
 }

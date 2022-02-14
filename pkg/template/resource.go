@@ -58,6 +58,10 @@ type Resource struct {
 	// If the monitor context is canceled as usual Failed is false.
 	// Failed is used to restart the Resource on failure.
 	Failed bool
+
+	// Set to true if this resource has backends only using "Onetime=true" flag to
+	// exit on failure if the resource has some templating error
+	OnetimeOnly bool
 }
 
 // ResourceConfig is a configuration struct to create a new resource.
@@ -131,7 +135,7 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 		reloadCmd:  reloadCmd,
 	}
 
-	// initialize the inidividual backend memkv Stores
+	// initialize the individual backend memkv Stores
 	for i := range tr.backends {
 		store := memkv.New()
 		tr.backends[i].store = store
@@ -143,6 +147,12 @@ func NewResource(backends []Backend, sources []*Renderer, name string, exec Exec
 	}
 
 	addFuncs(tr.funcMap, tr.store.FuncMap)
+
+	// check all backends for onetime or interval/watch, used for global error handling
+	tr.OnetimeOnly = true
+	for _, b := range tr.backends {
+		tr.OnetimeOnly = tr.OnetimeOnly && b.Onetime
+	}
 
 	return tr, nil
 }
@@ -243,7 +253,7 @@ func (t *Resource) process(storeClients []Backend, runCommands bool) (bool, erro
 
 // Monitor will start to monitor all given Backends for changes.
 // It accepts a ctx.Context for cancelation.
-// It will process all given tamplates on changes.
+// It will process all given templates on changes.
 func (t *Resource) Monitor(ctx context.Context) {
 	t.Failed = false
 	wg := &sync.WaitGroup{}
@@ -275,18 +285,25 @@ retryloop:
 				default:
 					t.logger.Error(err)
 				}
-				go func() {
-					rn := rand.Int63n(30)
-					t.logger.Error(fmt.Sprintf("not all templates could be rendered, trying again after %d seconds", rn))
-					time.Sleep(time.Duration(rn) * time.Second)
-					select {
-					case <-ctx.Done():
-						return
-					default:
-						retryChan <- struct{}{}
-					}
-				}()
-				continue retryloop
+
+				if t.OnetimeOnly {
+					t.Failed = true
+					cancel()
+					return
+				} else {
+					go func() {
+						rn := rand.Int63n(30)
+						t.logger.Error(fmt.Sprintf("not all templates could be rendered, trying again after %d seconds", rn))
+						time.Sleep(time.Duration(rn) * time.Second)
+						select {
+						case <-ctx.Done():
+							return
+						default:
+							retryChan <- struct{}{}
+						}
+					}()
+					continue retryloop
+				}
 			}
 			break retryloop
 		}

@@ -43,6 +43,8 @@ type Supervisor struct {
 	telemetry telemetry.Telemetry
 
 	reapLock *sync.RWMutex
+
+	resourcesWithError int
 }
 
 // NewSupervisor creates a new Supervisor
@@ -204,6 +206,7 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 			res, err := template.NewResourceFromResourceConfig(ctx, ru.reapLock, rsc)
 			if err != nil {
 				log.Error(err)
+				ru.resourcesWithError++
 				return
 			}
 			defer res.Close()
@@ -221,7 +224,10 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 					return
 				case <-restartChan:
 					res.Monitor(ctx)
-					if res.Failed {
+					if res.Failed && res.OnetimeOnly {
+						ru.resourcesWithError++
+						return
+					} else if res.Failed {
 						go func() {
 							// try to restart the resource after a random amount of time
 							rn := rand.Int63n(30)
@@ -274,7 +280,7 @@ func (ru *Supervisor) Reload(cfg Configuration) {
 }
 
 // Stop stops the Supervisor gracefully.
-func (ru *Supervisor) Stop() {
+func (ru *Supervisor) Stop() int {
 	close(ru.stopChan)
 	// wait for the main routine to exit
 	ru.wg.Wait()
@@ -284,4 +290,5 @@ func (ru *Supervisor) Stop() {
 	if err != nil {
 		log.WithFields(logrus.Fields{"pid_file": ru.pidFile}).Error(err)
 	}
+	return ru.resourcesWithError
 }
