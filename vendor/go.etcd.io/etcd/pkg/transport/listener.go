@@ -31,6 +31,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coreos/etcd/pkg/fileutil"
 	"github.com/coreos/etcd/pkg/tlsutil"
 )
 
@@ -101,7 +102,8 @@ func (info TLSInfo) Empty() bool {
 }
 
 func SelfCert(dirpath string, hosts []string, additionalUsages ...x509.ExtKeyUsage) (info TLSInfo, err error) {
-	if err = os.MkdirAll(dirpath, 0700); err != nil {
+	err = fileutil.TouchDirAll(dirpath)
+	if err != nil {
 		return
 	}
 
