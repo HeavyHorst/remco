@@ -15,6 +15,7 @@ import (
 	"math/rand"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/HeavyHorst/remco/pkg/log"
@@ -44,7 +45,7 @@ type Supervisor struct {
 
 	reapLock *sync.RWMutex
 
-	resourcesWithError int
+	resourcesWithError int32
 }
 
 // NewSupervisor creates a new Supervisor
@@ -206,7 +207,7 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 			res, err := template.NewResourceFromResourceConfig(ctx, ru.reapLock, rsc)
 			if err != nil {
 				log.Error(err)
-				ru.resourcesWithError++
+				atomic.AddInt32(&ru.resourcesWithError, 1)
 				return
 			}
 			defer res.Close()
@@ -225,7 +226,7 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 				case <-restartChan:
 					res.Monitor(ctx)
 					if res.Failed && res.OnetimeOnly {
-						ru.resourcesWithError++
+						atomic.AddInt32(&ru.resourcesWithError, 1)
 						return
 					} else if res.Failed {
 						go func() {
@@ -280,7 +281,7 @@ func (ru *Supervisor) Reload(cfg Configuration) {
 }
 
 // Stop stops the Supervisor gracefully.
-func (ru *Supervisor) Stop() int {
+func (ru *Supervisor) Stop() int32 {
 	close(ru.stopChan)
 	// wait for the main routine to exit
 	ru.wg.Wait()
@@ -290,5 +291,5 @@ func (ru *Supervisor) Stop() int {
 	if err != nil {
 		log.WithFields(logrus.Fields{"pid_file": ru.pidFile}).Error(err)
 	}
-	return ru.resourcesWithError
+	return atomic.LoadInt32(&ru.resourcesWithError)
 }

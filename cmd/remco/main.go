@@ -15,6 +15,7 @@ import (
 	"os/signal"
 	"reflect"
 	"sync"
+	"sync/atomic"
 	"syscall"
 
 	"github.com/HeavyHorst/remco/pkg/log"
@@ -36,7 +37,7 @@ func init() {
 	flag.BoolVar(&onetime, "onetime", false, "run templating process once and exit")
 }
 
-func run() int {
+func run() int32 {
 	// catch all signals
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan)
@@ -100,7 +101,7 @@ func run() int {
 		case err := <-errorReapChan:
 			log.Error(fmt.Sprintf("Error reaping child process %v", err))
 		case <-done:
-			return run.resourcesWithError
+			return atomic.LoadInt32(&run.resourcesWithError)
 		}
 	}
 }
@@ -117,5 +118,5 @@ func main() {
 	if rc > 125 {
 		rc = 125
 	}
-	os.Exit(rc)
+	os.Exit(int(rc))
 }
