@@ -81,9 +81,11 @@ func connectAllBackends(ctx context.Context, bc []BackendConnector) ([]Backend, 
 						"backend": b.Name,
 					}).Error(errors.Wrap(err, "connect failed"))
 
-					//try again after 2 seconds
-					time.Sleep(2 * time.Second)
-					continue retryloop
+					//try again after 2 seconds to watch
+					if config.GetBackend().Onetime != true {
+						time.Sleep(2 * time.Second)
+						continue retryloop
+					}
 				}
 				break retryloop
 			}
