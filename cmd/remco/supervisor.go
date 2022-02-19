@@ -120,6 +120,14 @@ func NewSupervisor(cfg Configuration, reapLock *sync.RWMutex, done chan struct{}
 	return w
 }
 
+func (ru *Supervisor) getNumResourceErrors() int32 {
+	return atomic.LoadInt32(&ru.resourcesWithError)
+}
+
+func (ru *Supervisor) incResourceError() {
+	atomic.AddInt32(&ru.resourcesWithError, 1)
+}
+
 func (ru *Supervisor) writePid(pid int) error {
 	if ru.pidFile == "" {
 		return nil
@@ -207,7 +215,7 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 			res, err := template.NewResourceFromResourceConfig(ctx, ru.reapLock, rsc)
 			if err != nil {
 				log.Error(err)
-				atomic.AddInt32(&ru.resourcesWithError, 1)
+				ru.incResourceError()
 				return
 			}
 			defer res.Close()
@@ -226,7 +234,7 @@ func (ru *Supervisor) runResource(r []Resource, stop, stopped chan struct{}) {
 				case <-restartChan:
 					res.Monitor(ctx)
 					if res.Failed && res.OnetimeOnly {
-						atomic.AddInt32(&ru.resourcesWithError, 1)
+						ru.incResourceError()
 						return
 					} else if res.Failed {
 						go func() {
@@ -291,5 +299,5 @@ func (ru *Supervisor) Stop() int32 {
 	if err != nil {
 		log.WithFields(logrus.Fields{"pid_file": ru.pidFile}).Error(err)
 	}
-	return atomic.LoadInt32(&ru.resourcesWithError)
+	return ru.getNumResourceErrors()
 }

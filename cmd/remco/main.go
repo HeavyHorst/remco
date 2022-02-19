@@ -15,7 +15,6 @@ import (
 	"os/signal"
 	"reflect"
 	"sync"
-	"sync/atomic"
 	"syscall"
 
 	"github.com/HeavyHorst/remco/pkg/log"
@@ -101,7 +100,7 @@ func run() int32 {
 		case err := <-errorReapChan:
 			log.Error(fmt.Sprintf("Error reaping child process %v", err))
 		case <-done:
-			return atomic.LoadInt32(&run.resourcesWithError)
+			return run.getNumResourceErrors()
 		}
 	}
 }
