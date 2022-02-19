@@ -49,11 +49,11 @@ remco
 ### Building a given release
 
 ```shell
-$ export VERSION=v0.11.1
+$ export VERSION=v0.12.2
 $ git checkout ${VERSION}
 $ make release -j
 $ ls bin/
-remco_0.11.1_darwin_amd64.zip  remco_0.11.1_linux_amd64.zip  remco_0.11.1_windows_amd64.zip  remco_darwin  remco_linux  remco_windows
+remco_0.12.2_darwin_amd64.zip  remco_0.12.2_linux_amd64.zip  remco_0.12.2_windows_amd64.zip  remco_darwin  remco_linux  remco_windows
 ```
 
 ### Using a pre-built release
@@ -61,7 +61,7 @@ remco_0.11.1_darwin_amd64.zip  remco_0.11.1_linux_amd64.zip  remco_0.11.1_window
 Download the releases and extract the binary.
 
 ```shell
-$ REMCO_VER=0.11.1
+$ REMCO_VER=0.12.2
 $ wget https://github.com/HeavyHorst/remco/releases/download/v${REMCO_VER}/remco_${REMCO_VER}_linux_amd64.zip
 $ unzip remco_${REMCO_VER}_linux_amd64.zip
 ```
