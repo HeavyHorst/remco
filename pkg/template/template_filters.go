@@ -146,7 +146,7 @@ func filterToYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	b := bytes.Buffer{}
 	yamlEncoder := yaml.NewEncoder(&b)
 
-	if param.String() != "" {
+	if param != nil && param.String() != "" {
 		pm, err := parseParamMap(param.String())
 		if err != nil {
 			return nil, &pongo2.Error{
