@@ -83,7 +83,7 @@ func pongoJSFilter(name string, js string) func(in *pongo2.Value, param *pongo2.
 		v, err := vm.RunString(js)
 		if err != nil {
 			return nil, &pongo2.Error{
-				Sender:    "javascript-filter@" + name,
+				Sender:    "javascript-filter:" + name,
 				OrigError: err,
 			}
 		}
@@ -135,7 +135,7 @@ func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	b, err := json.Marshal(in.Interface())
 	if err != nil {
 		return nil, &pongo2.Error{
-			Sender:    "filterToJSON",
+			Sender:    "filter:filterToJSON",
 			OrigError: err,
 		}
 	}
@@ -226,7 +226,7 @@ func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, 
 	var ret interface{}
 	if err := gyml.Unmarshal([]byte(in.String()), &ret); err != nil {
 		return nil, &pongo2.Error{
-			Sender:    "filterUnmarshalYAML",
+			Sender:    "filter:filterUnmarshalYAML",
 			OrigError: err,
 		}
 	}
