@@ -61,7 +61,7 @@ func RegisterCustomJsFilters(folder string) error {
 			name := file.Name()
 			name = name[0 : len(name)-3]
 
-			filterFunc := pongoJSFilter(string(buf))
+			filterFunc := pongoJSFilter(name, string(buf))
 
 			if err := pongo2.RegisterFilter(name, filterFunc); err != nil {
 				if err := pongo2.ReplaceFilter(name, filterFunc); err != nil {
@@ -73,7 +73,7 @@ func RegisterCustomJsFilters(folder string) error {
 	return nil
 }
 
-func pongoJSFilter(js string) func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+func pongoJSFilter(name string, js string) func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	return func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 		vm := goja.New()
 
@@ -83,7 +83,7 @@ func pongoJSFilter(js string) func(in *pongo2.Value, param *pongo2.Value) (*pong
 		v, err := vm.RunString(js)
 		if err != nil {
 			return nil, &pongo2.Error{
-				Sender:    "filterToEnv",
+				Sender:    "javascript-filter:" + name,
 				OrigError: err,
 			}
 		}
@@ -135,7 +135,7 @@ func filterToJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	b, err := json.Marshal(in.Interface())
 	if err != nil {
 		return nil, &pongo2.Error{
-			Sender:    "filterToJSON",
+			Sender:    "filter:filterToJSON",
 			OrigError: err,
 		}
 	}
@@ -226,7 +226,7 @@ func filterUnmarshalYAML(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, 
 	var ret interface{}
 	if err := gyml.Unmarshal([]byte(in.String()), &ret); err != nil {
 		return nil, &pongo2.Error{
-			Sender:    "filterUnmarshalYAML",
+			Sender:    "filter:filterUnmarshalYAML",
 			OrigError: err,
 		}
 	}

@@ -142,14 +142,26 @@ The filter code could look like:
 In.split("/").join("_").substr(1).toUpperCase();
 ```
 
-There are two predifined variables:
+There are two predefined variables:
 
-  - In: the filter input
-  - Param: the optional filter parameter
- 
+  - In: the filter input (string)
+  - Param: the optional filter parameter (string)
+
+As the parameter one string is possible only, the parameter string is added with a double-colon to the filter name (""yadda" | filter:"paramstr").
+When the filter function needs multiple parameter all of them must be put into this one string and parsed inside the filter to extract all 
+parameter from this string (example "replace" filter below).
+
+Remark:
+
+* "console" object for logging does not exist, therefore no output (for debugging and similar) possible.
+* variable declaration must use "var" as other keywords like "const" or "let" are not defined
+* the main script must not use "return" keyword, last output is the filter result.
+
 ### Examples
 **reverse filter**
- 
+
+Put file `reverse.js` into the configured "filter_dir" with following content: 
+
 ```javascript
 function reverse(s) {
      var o = "";
@@ -159,4 +171,58 @@ function reverse(s) {
 }
 
 reverse(In);
+```
+Call this filter inside your template (e,g, "my-reverse-template.tmpl") with
+
+```
+{% set myString = "hip-hip-hooray" %}
+myString is {{ myString }}
+reversed myString is {{ myString | reverse }}
+```
+
+Output is:
+
+```text
+myString is hip-hip-hooray
+reversed myString is yarooh-pih-pih
+```
+
+**replace filter**
+
+Put file `replace.js` into the configured "filter_dir" with following content:
+
+```javascript
+function replace(str, p) {
+    var params = [' ','_'];  // default: replace all spaces with underscore
+    if (p) {
+        params = p.split(',');  // split all params given at comma
+    }
+  // if third param is a "g" like "global" change search string to regexp
+    if (params.length > 2 && params[2] == 'g') {
+        params[0] = new RegExp(params[0], params[2]);
+    }
+    // javascript string.replace replaces first occurence only if search param is a string
+    // need regexp object to replace all occurences
+    return str.replace(params[0], params[1]);
+}
+replace(In, Param)
+```
+
+Use this inside the template as:
+
+```
+{% set myString = "hip-hip-hooray" %}
+myString is {{ myString }}
+replace with default params (spaces): {{ myString | replace }}
+only replace first "-" with underscore is {{ myString | replace:"-,_" }}
+replace all "-" with underscore is {{ myString | replace:"-,_,g" }}
+```
+
+Output is:
+
+```text
+myString is hip-hip-hooray
+replace with default params (spaces): hip-hip-hooray
+only replace first "-" with underscore is hip_hip-hooray
+replace all "-" with underscore is hip_hip_hooray
 ```
