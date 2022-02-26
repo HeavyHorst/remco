@@ -33,6 +33,7 @@ type BackendConfigs struct {
 	Vault     *backends.VaultConfig
 	Redis     *backends.RedisConfig
 	Zookeeper *backends.ZookeeperConfig
+	Nats      *backends.NatsConfig
 	Mock      *backends.MockConfig
 	Plugin    []plugin.Plugin
 }
@@ -48,6 +49,7 @@ func (c *BackendConfigs) GetBackends() []template.BackendConnector {
 		c.Redis,
 		c.Zookeeper,
 		c.Mock,
+		c.Nats,
 	}
 
 	for _, v := range c.Plugin {

@@ -106,6 +106,23 @@ See the example configuration to see how global default values can be set for in
 </details>
 
 <details>
+<summary> **nats** </summary>
+
+ - **nodes([]string, optional):**
+   - List of backend nodes. If none is provided nats.DefaultURL is used.
+ - **bucket(string):**
+   - The nats kv bucket where your config keys are stored
+ - **username(string, optional):**
+   - The username for the basic_auth authentication.
+ - **password(string, optional):**
+   - The password for the basic_auth authentication.
+ - **token(string, optional):**
+   - The athentication token for the nats server
+ - **creds(string, optional):**
+   - The path to an NATS 2.0 and NATS NGS compatible user credentials file
+</details>
+
+<details>
 <summary> **consul** </summary>
 
  - **nodes([]string):**
