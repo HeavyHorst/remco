@@ -16,8 +16,6 @@ import (
 	"github.com/HeavyHorst/memkv"
 	berr "github.com/HeavyHorst/remco/pkg/backends/error"
 	"github.com/HeavyHorst/remco/pkg/log"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // A BackendConnector - Every backend implements this interface.
@@ -77,9 +75,10 @@ func connectAllBackends(ctx context.Context, bc []BackendConnector) ([]Backend, 
 				if err == nil {
 					backendList = append(backendList, b)
 				} else if err != berr.ErrNilConfig {
-					log.WithFields(logrus.Fields{
-						"backend": b.Name,
-					}).Error(errors.Wrap(err, "connect failed"))
+					log.WithFields(
+						"backend", b.Name,
+						"error", err,
+					).Error("connect failed")
 
 					//try again after 2 seconds to watch
 					if config.GetBackend().Onetime != true {

@@ -11,15 +11,15 @@ package template
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/go-hclog"
 	"os"
 	"syscall"
 	"time"
 
-	"github.com/HeavyHorst/consul-template/child"
+	"github.com/hashicorp/consul-template/child"
 	"github.com/hashicorp/consul-template/signals"
 	"github.com/mattn/go-shellwords"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // ExecConfig represents the configuration values for the exec mode.
@@ -66,7 +66,7 @@ type Executor struct {
 	killSignal   os.Signal
 	killTimeout  time.Duration
 	splay        time.Duration
-	logger       *logrus.Entry
+	logger       hclog.Logger
 
 	stopChan   chan chan<- error
 	reloadChan chan chan<- error
@@ -75,18 +75,18 @@ type Executor struct {
 }
 
 // NewExecutor creates a new Executor.
-func NewExecutor(execCommand, reloadSignal, killSignal string, killTimeout, splay int, logger *logrus.Entry) Executor {
+func NewExecutor(execCommand, reloadSignal, killSignal string, killTimeout, splay int, logger hclog.Logger) Executor {
 	var rs, ks os.Signal
 	var err error
 
 	if logger == nil {
-		logger = logrus.NewEntry(logrus.New())
+		logger = hclog.Default()
 	}
 
 	if reloadSignal != "" {
 		rs, err = signals.Parse(reloadSignal)
 		if err != nil {
-			logger.Error(err)
+			logger.Error("failed to parse reload signal", err)
 		}
 	}
 
@@ -96,7 +96,7 @@ func NewExecutor(execCommand, reloadSignal, killSignal string, killTimeout, spla
 	}
 	ks, err = signals.Parse(killSignal)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("failed to parse kill signal", err)
 		ks = syscall.SIGTERM
 	}
 
@@ -144,7 +144,7 @@ func (e *Executor) SpawnChild() error {
 			KillSignal:   e.killSignal,
 			KillTimeout:  e.killTimeout,
 			Splay:        e.splay,
-			Logger:       e.logger,
+			Logger:       e.logger.StandardLogger(&hclog.StandardLoggerOptions{InferLevels: true}),
 		})
 
 		if err != nil {
