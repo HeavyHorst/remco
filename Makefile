@@ -20,7 +20,7 @@ GO_TEST_SRC := $(shell find ./ -type f -name '*_test.go')
 
 GO := go
 
-GO_OPTS := -mod=vendor
+GO_OPTS := -mod=mod
 
 OS_LIST := linux darwin windows
 
