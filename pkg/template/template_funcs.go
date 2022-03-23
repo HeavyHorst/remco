@@ -48,28 +48,20 @@ func (s interfaceSet) Contains(value interface{}) bool {
 }
 
 func (s interfaceSet) SortedSet() []string {
-	var out []string
-	for k := range s {
-		out = append(out, k)
-	}
-	sort.Strings(out)
-	return out
-}
-
-func (s interfaceSet) toSet() []string {
 	var i []string
 	for k := range s {
 		i = append(i, k)
 	}
+	sort.Strings(i)
 	return i
 }
 
 func (s interfaceSet) MarshalYAML() (interface{}, error) {
-	return s.toSet(), nil
+	return s.SortedSet(), nil
 }
 
 func (s interfaceSet) MarshalJSON() ([]byte, error) {
-	return json.Marshal(s.toSet())
+	return json.Marshal(s.SortedSet())
 }
 
 type templateMap map[string]interface{}
