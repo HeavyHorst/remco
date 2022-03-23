@@ -116,6 +116,11 @@ func (s *FunctionTestSuite) TestInterfaceSet(t *C) {
 	t.Check(len(set), Equals, 3)
 	t.Check(set.Contains("Hallo"), Equals, false)
 	t.Check(set.Contains(false), Equals, true)
+
+	t.Check(len(set.SortedSet()), Equals, 3)
+	t.Check(set.SortedSet()[0], Equals, "1")
+	t.Check(set.SortedSet()[1], Equals, "false")
+	t.Check(set.SortedSet()[2], Equals, "true")
 }
 
 func (s *FunctionTestSuite) TestTemplateMap(t *C) {

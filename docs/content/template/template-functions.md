@@ -166,16 +166,21 @@ something
 
 ```
 {% set map = createMap() %}
-{{  map.Set("Moin", "Hallo2") }}
-{{  map.Set("Test", 105) }}
+{{ map.Set("Moin", "Hallo2") }}
+{{ map.Set("Test", 105) }}
 {{ map | toYAML }}
 
 {% set map2 = createMap() %}
-{{  map2.Set("Moin", "Hallo") }}
-{{  map2.Set("Test", 300) }}
-{{  map2.Set("anotherMap", map) }}
+{{ map2.Set("Moin", "Hallo") }}
+{{ map2.Set("Test", 300) }}
+{{ map2.Set("anotherMap", map) }}
 {{ map2 | toYAML }}
 ```
+
+The hashmap supports the following methods:
+* `m.Set("key", value)` adds a new value of arbitrary type referenced by "key" to the map
+* `m.Get("key")` get the value for the given "key"
+* `m.Remove("key")` removes the key and value from the map
 </details>
 
 <details>
@@ -183,10 +188,38 @@ something
 
 ```
 {% set s = createSet() %}
-{{  s.Append("Moin") }}
-{{  s.Append("Moin") }}
-{{  s.Append("Hallo") }}
-{{  s.Append(1) }}
+{{ s.Append("Moin") }}
+{{ s.Append("Moin") }}
+{{ s.Append("Hallo") }}
+{{ s.Append(1) }}
+{{ s.Remove("Hallo") }}
 {{ s | toYAML }}
 ```
+The set created supports the following methods:
+* `s.Append("string")` adds a new string to the set. Attention - the set is not
+  sorted or the order of appended elements guaranteed.
+* `s.Remove("string")` removes the given element from the set.
+* `s.Contains("string")` check if the given string is part of the set, returns
+  true or false otherwise
+* `s.SortedSet()` return a new list where all elements are sorted in increasing
+  order. This method should be used inside the template with a for-in loop to generate
+ a stable output file not changing order of elements on every run. 
+
+```
+{% set s = createSet() %}
+{% s.Append("Moin") %}
+{% s.Append("Hi") %}
+{% s.Append("Hallo") %}
+
+{% for greeting in s %}
+{{ geeting }}
+{% endfor %}
+
+{% for greeting in s.SortedSet() %}
+{{ geeting }}
+{% endfor %}
+```
+
+The output of the first loop is not defined, it can be in every order (like `Moin Hallo Hi` or `Hi Hallo Moin` and so on)
+The second loop returns every time `Hallo Hi Moin` (items sorted as string in increasing order)
 </details>

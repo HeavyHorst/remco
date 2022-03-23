@@ -47,12 +47,20 @@ func (s interfaceSet) Contains(value interface{}) bool {
 	return c
 }
 
+func (s interfaceSet) SortedSet() []string {
+	var out []string
+	for k := range s {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
+}
+
 func (s interfaceSet) toSet() []string {
 	var i []string
 	for k := range s {
 		i = append(i, k)
 	}
-
 	return i
 }
 
