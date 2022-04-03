@@ -117,6 +117,7 @@ This is also the repository where the current implementations live.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;etcd 2 and 3&lt;/strong&gt; (interval and watch)&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;consul&lt;/strong&gt; (interval and watch)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;nats kv&lt;/strong&gt; (interval and watch)&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;zookeeper&lt;/strong&gt; (interval and watch)&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;redis&lt;/strong&gt; (only interval)&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;vault&lt;/strong&gt; (only interval)&lt;/li&gt;
@@ -124,7 +125,7 @@ This is also the repository where the current implementations live.&lt;/p&gt;
 &lt;li&gt;&lt;strong&gt;yaml/json files&lt;/strong&gt; (interval and watch)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;../config/configuration-options/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The different configuration parameters can be found here: &lt;a href=&#34;../config/configuration-options/#backend-configuration-options&#34;&gt;backend configuration&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
