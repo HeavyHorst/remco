@@ -143,6 +143,14 @@
             </li>
           
           
+          
+            <li class="dd-item " data-nav-id="/details/telemetry/">
+              <a href="../../details/telemetry/">
+                <span>Telemetry     </i></span>
+              </a>
+            </li>
+          
+          
         </ul>
         
       </li>
@@ -569,31 +577,62 @@ something
 <summary> <strong>createMap</strong> &ndash; create a hashMap to store values at runtime. This can be useful if you want to generate json/yaml files. </summary></p>
 
 <pre><code>{% set map = createMap() %}
-{{  map.Set(&quot;Moin&quot;, &quot;Hallo2&quot;) }}
-{{  map.Set(&quot;Test&quot;, 105) }}
+{{ map.Set(&quot;Moin&quot;, &quot;Hallo2&quot;) }}
+{{ map.Set(&quot;Test&quot;, 105) }}
 {{ map | toYAML }}
 
 {% set map2 = createMap() %}
-{{  map2.Set(&quot;Moin&quot;, &quot;Hallo&quot;) }}
-{{  map2.Set(&quot;Test&quot;, 300) }}
-{{  map2.Set(&quot;anotherMap&quot;, map) }}
+{{ map2.Set(&quot;Moin&quot;, &quot;Hallo&quot;) }}
+{{ map2.Set(&quot;Test&quot;, 300) }}
+{{ map2.Set(&quot;anotherMap&quot;, map) }}
 {{ map2 | toYAML }}
 </code></pre>
 
-<p></details></p>
+<p>The hashmap supports the following methods:
+* <code>m.Set(&quot;key&quot;, value)</code> adds a new value of arbitrary type referenced by &ldquo;key&rdquo; to the map
+* <code>m.Get(&quot;key&quot;)</code> get the value for the given &ldquo;key&rdquo;
+* <code>m.Remove(&quot;key&quot;)</code> removes the key and value from the map
+</details></p>
 
 <p><details>
 <summary> <strong>createSet</strong> &ndash; create a Set to store values at runtime. This can be useful if you want to generate json/yaml files. </summary></p>
 
 <pre><code>{% set s = createSet() %}
-{{  s.Append(&quot;Moin&quot;) }}
-{{  s.Append(&quot;Moin&quot;) }}
-{{  s.Append(&quot;Hallo&quot;) }}
-{{  s.Append(1) }}
+{{ s.Append(&quot;Moin&quot;) }}
+{{ s.Append(&quot;Moin&quot;) }}
+{{ s.Append(&quot;Hallo&quot;) }}
+{{ s.Append(1) }}
+{{ s.Remove(&quot;Hallo&quot;) }}
 {{ s | toYAML }}
 </code></pre>
 
-<p></details></p>
+<p>The set created supports the following methods:
+* <code>s.Append(&quot;string&quot;)</code> adds a new string to the set. Attention - the set is not
+  sorted or the order of appended elements guaranteed.
+* <code>s.Remove(&quot;string&quot;)</code> removes the given element from the set.
+* <code>s.Contains(&quot;string&quot;)</code> check if the given string is part of the set, returns
+  true or false otherwise
+* <code>s.SortedSet()</code> return a new list where all elements are sorted in increasing
+  order. This method should be used inside the template with a for-in loop to generate
+ a stable output file not changing order of elements on every run.</p>
+
+<pre><code>{% set s = createSet() %}
+{% s.Append(&quot;Moin&quot;) %}
+{% s.Append(&quot;Hi&quot;) %}
+{% s.Append(&quot;Hallo&quot;) %}
+
+{% for greeting in s %}
+{{ geeting }}
+{% endfor %}
+
+{% for greeting in s.SortedSet() %}
+{{ geeting }}
+{% endfor %}
+</code></pre>
+
+<p>The output of the first loop is not defined, it can be in every order (like <code>Moin Hallo Hi</code> or <code>Hi Hallo Moin</code> and so on)
+The second loop returns every time <code>Hallo Hi Moin</code> (items sorted as string in increasing order)
+</details></p>
 
 
       

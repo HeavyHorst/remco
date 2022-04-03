@@ -143,6 +143,14 @@
             </li>
           
           
+          
+            <li class="dd-item " data-nav-id="/details/telemetry/">
+              <a href="../../details/telemetry/">
+                <span>Telemetry     </i></span>
+              </a>
+            </li>
+          
+          
         </ul>
         
       </li>
@@ -389,6 +397,8 @@
 <li><a href="#exec-configuration-options">Exec configuration options</a></li>
 <li><a href="#template-configuration-options">Template configuration options</a></li>
 <li><a href="#backend-configuration-options">Backend configuration options</a></li>
+<li><a href="#telemetry-configuration-options">Telemetry configuration options</a></li>
+<li><a href="#sink-configuration-options">Sink configuration options</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -560,6 +570,11 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 <ul>
 <li>Key path prefix. Default is &ldquo;&rdquo;.</li>
 </ul></li>
+<li><strong>watchKeys([]string, optional):</strong>
+
+<ul>
+<li>Keys list to watch. Default is same as keys</li>
+</ul></li>
 <li><strong>interval(int, optional):</strong>
 
 <ul>
@@ -621,6 +636,43 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 
 <ul>
 <li>The etcd api-level to use (2 or 3). Default is 2.
+</details></li>
+</ul></li>
+</ul>
+
+<p><details>
+<summary> <strong>nats</strong> </summary></p>
+
+<ul>
+<li><strong>nodes([]string, optional):</strong>
+
+<ul>
+<li>List of backend nodes. If none is provided nats.DefaultURL is used.</li>
+</ul></li>
+<li><strong>bucket(string):</strong>
+
+<ul>
+<li>The nats kv bucket where your config keys are stored</li>
+</ul></li>
+<li><strong>username(string, optional):</strong>
+
+<ul>
+<li>The username for the basic_auth authentication.</li>
+</ul></li>
+<li><strong>password(string, optional):</strong>
+
+<ul>
+<li>The password for the basic_auth authentication.</li>
+</ul></li>
+<li><strong>token(string, optional):</strong>
+
+<ul>
+<li>The athentication token for the nats server</li>
+</ul></li>
+<li><strong>creds(string, optional):</strong>
+
+<ul>
+<li>The path to an NATS 2.0 and NATS NGS compatible user credentials file
 </details></li>
 </ul></li>
 </ul>
@@ -790,6 +842,108 @@ it will be terminated otherwise (like kill -9). The default value is &ldquo;SIGT
 
 <ul>
 <li>A DNS server record to discover the zookeeper nodes.
+</details></li>
+</ul></li>
+</ul>
+
+<h2 id="telemetry-configuration-options">Telemetry configuration options</h2>
+
+<ul>
+<li><strong>enabled(bool):</strong>
+
+<ul>
+<li>Flag to enable telemetry.</li>
+</ul></li>
+<li><strong>service_name(string):</strong>
+
+<ul>
+<li>Service name to add to every metric name. &ldquo;remco&rdquo; by default</li>
+</ul></li>
+<li><strong>hostname(string):</strong>
+
+<ul>
+<li>Hostname to use. If not provided and enable_hostname, it will be os.Hostname</li>
+</ul></li>
+<li><strong>enable_hostname(bool):</strong>
+
+<ul>
+<li>Enable prefixing gauge values with hostname. <code>true</code> by default</li>
+</ul></li>
+<li><strong>enable_hostname_label(bool):</strong>
+
+<ul>
+<li>Put hostname into label instead of metric name. <code>false</code> by default</li>
+</ul></li>
+
+<li><p><strong>enable_runtime_metrics(bool):</strong></p>
+
+<ul>
+<li><p>Enables profiling of runtime metrics (GC, Goroutines, Memory). <code>true</code> by default</p>
+
+<h2 id="sink-configuration-options">Sink configuration options</h2></li>
+</ul></li>
+</ul>
+
+<p><details>
+<summary> <strong>inmem</strong> </summary></p>
+
+<ul>
+<li><strong>interval(int):</strong>
+
+<ul>
+<li>How long is each aggregation interval (seconds).</li>
+</ul></li>
+<li><strong>retain(int):</strong>
+
+<ul>
+<li>Retain controls how many metrics interval we keep.
+</details></li>
+</ul></li>
+</ul>
+
+<p><details>
+<summary> <strong>prometheus</strong> </summary></p>
+
+<ul>
+<li><strong>addr(string):</strong>
+
+<ul>
+<li>Address to expose metrics on. Prometheus stats will be available at /metrics endpoint.</li>
+</ul></li>
+<li><strong>expiration(int):</strong>
+
+<ul>
+<li>Expiration is the duration a metric is valid for, after which it will be untracked. If the value is zero, a metric is never expired.</li>
+</ul></li>
+</ul>
+
+<p><div class="notices note" ><p>If you are using only prometheus sink you may want to disable runtime metrics with <strong>enable_runtime_metrics</strong> option,
+because they will duplicate prometheus builtin runtime metrics reporting. Also, consider using <strong>enable_hostname_label</strong>
+to put hostname in gauge metrics to label instead of metric name.</p>
+</div>
+
+</details></p>
+
+<p><details>
+<summary> <strong>statsd</strong> </summary></p>
+
+<ul>
+<li><strong>addr(string):</strong>
+
+<ul>
+<li>Statsd/Statsite server address
+</details></li>
+</ul></li>
+</ul>
+
+<p><details>
+<summary> <strong>statsite</strong> </summary></p>
+
+<ul>
+<li><strong>addr(string):</strong>
+
+<ul>
+<li>Statsd/Statsite server address
 </details></li>
 </ul></li>
 </ul>

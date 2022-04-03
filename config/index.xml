@@ -200,6 +200,11 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;ul&gt;
 &lt;li&gt;Key path prefix. Default is &amp;ldquo;&amp;rdquo;.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;watchKeys([]string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Keys list to watch. Default is same as keys&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;interval(int, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
@@ -261,6 +266,43 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 
 &lt;ul&gt;
 &lt;li&gt;The etcd api-level to use (2 or 3). Default is 2.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;nats&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;nodes([]string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;List of backend nodes. If none is provided nats.DefaultURL is used.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;bucket(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The nats kv bucket where your config keys are stored&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;username(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The username for the basic_auth authentication.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;password(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The password for the basic_auth authentication.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;token(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The athentication token for the nats server&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;creds(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The path to an NATS 2.0 and NATS NGS compatible user credentials file
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -433,6 +475,108 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h2 id=&#34;telemetry-configuration-options&#34;&gt;Telemetry configuration options&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;enabled(bool):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Flag to enable telemetry.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;service_name(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Service name to add to every metric name. &amp;ldquo;remco&amp;rdquo; by default&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;hostname(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Hostname to use. If not provided and enable_hostname, it will be os.Hostname&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;enable_hostname(bool):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Enable prefixing gauge values with hostname. &lt;code&gt;true&lt;/code&gt; by default&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;enable_hostname_label(bool):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Put hostname into label instead of metric name. &lt;code&gt;false&lt;/code&gt; by default&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;enable_runtime_metrics(bool):&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Enables profiling of runtime metrics (GC, Goroutines, Memory). &lt;code&gt;true&lt;/code&gt; by default&lt;/p&gt;
+
+&lt;h2 id=&#34;sink-configuration-options&#34;&gt;Sink configuration options&lt;/h2&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;inmem&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;interval(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;How long is each aggregation interval (seconds).&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;retain(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Retain controls how many metrics interval we keep.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;prometheus&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;addr(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Address to expose metrics on. Prometheus stats will be available at /metrics endpoint.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;expiration(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Expiration is the duration a metric is valid for, after which it will be untracked. If the value is zero, a metric is never expired.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;div class=&#34;notices note&#34; &gt;&lt;p&gt;If you are using only prometheus sink you may want to disable runtime metrics with &lt;strong&gt;enable_runtime_metrics&lt;/strong&gt; option,
+because they will duplicate prometheus builtin runtime metrics reporting. Also, consider using &lt;strong&gt;enable_hostname_label&lt;/strong&gt;
+to put hostname in gauge metrics to label instead of metric name.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;statsd&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;addr(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Statsd/Statsite server address
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;statsite&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;addr(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Statsd/Statsite server address
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
 </description>
     </item>
     
@@ -499,6 +643,7 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
       onetime  = true
       interval = 1
       keys     = [&amp;quot;/&amp;quot;]
+      watchKeys = [&amp;quot;/haproxy/reload&amp;quot;]
 
     [resource.backend.file]
       httpheader = { X-Test-Token = &amp;quot;XXX&amp;quot;, X-Test-Token2 = &amp;quot;YYY&amp;quot; } 
@@ -506,6 +651,14 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
 	    watch    = true
 	    keys     = [&amp;quot;/prefix&amp;quot;]
 
+################################################################
+# Telemetry configuration
+################################################################
+[telemetry]
+  enabled = true
+  [telemetry.sinks.prometheus]
+    addr = &amp;quot;:2112&amp;quot;
+    expiration = 600
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
@@ -534,6 +687,7 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
   [backend.etcd]
     nodes    = [&amp;quot;http://localhost:2379&amp;quot;]
     keys     = [&amp;quot;/service-registry&amp;quot;]
+    watchKeys = [&amp;quot;/haproxy/reload&amp;quot;] 
     watch    = true
     interval = 60
     version  = 3

@@ -198,31 +198,62 @@ something
 &lt;summary&gt; &lt;strong&gt;createMap&lt;/strong&gt; &amp;ndash; create a hashMap to store values at runtime. This can be useful if you want to generate json/yaml files. &lt;/summary&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;{% set map = createMap() %}
-{{  map.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo2&amp;quot;) }}
-{{  map.Set(&amp;quot;Test&amp;quot;, 105) }}
+{{ map.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo2&amp;quot;) }}
+{{ map.Set(&amp;quot;Test&amp;quot;, 105) }}
 {{ map | toYAML }}
 
 {% set map2 = createMap() %}
-{{  map2.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo&amp;quot;) }}
-{{  map2.Set(&amp;quot;Test&amp;quot;, 300) }}
-{{  map2.Set(&amp;quot;anotherMap&amp;quot;, map) }}
+{{ map2.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo&amp;quot;) }}
+{{ map2.Set(&amp;quot;Test&amp;quot;, 300) }}
+{{ map2.Set(&amp;quot;anotherMap&amp;quot;, map) }}
 {{ map2 | toYAML }}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+&lt;p&gt;The hashmap supports the following methods:
+* &lt;code&gt;m.Set(&amp;quot;key&amp;quot;, value)&lt;/code&gt; adds a new value of arbitrary type referenced by &amp;ldquo;key&amp;rdquo; to the map
+* &lt;code&gt;m.Get(&amp;quot;key&amp;quot;)&lt;/code&gt; get the value for the given &amp;ldquo;key&amp;rdquo;
+* &lt;code&gt;m.Remove(&amp;quot;key&amp;quot;)&lt;/code&gt; removes the key and value from the map
+&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;createSet&lt;/strong&gt; &amp;ndash; create a Set to store values at runtime. This can be useful if you want to generate json/yaml files. &lt;/summary&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;{% set s = createSet() %}
-{{  s.Append(&amp;quot;Moin&amp;quot;) }}
-{{  s.Append(&amp;quot;Moin&amp;quot;) }}
-{{  s.Append(&amp;quot;Hallo&amp;quot;) }}
-{{  s.Append(1) }}
+{{ s.Append(&amp;quot;Moin&amp;quot;) }}
+{{ s.Append(&amp;quot;Moin&amp;quot;) }}
+{{ s.Append(&amp;quot;Hallo&amp;quot;) }}
+{{ s.Append(1) }}
+{{ s.Remove(&amp;quot;Hallo&amp;quot;) }}
 {{ s | toYAML }}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+&lt;p&gt;The set created supports the following methods:
+* &lt;code&gt;s.Append(&amp;quot;string&amp;quot;)&lt;/code&gt; adds a new string to the set. Attention - the set is not
+  sorted or the order of appended elements guaranteed.
+* &lt;code&gt;s.Remove(&amp;quot;string&amp;quot;)&lt;/code&gt; removes the given element from the set.
+* &lt;code&gt;s.Contains(&amp;quot;string&amp;quot;)&lt;/code&gt; check if the given string is part of the set, returns
+  true or false otherwise
+* &lt;code&gt;s.SortedSet()&lt;/code&gt; return a new list where all elements are sorted in increasing
+  order. This method should be used inside the template with a for-in loop to generate
+ a stable output file not changing order of elements on every run.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% set s = createSet() %}
+{% s.Append(&amp;quot;Moin&amp;quot;) %}
+{% s.Append(&amp;quot;Hi&amp;quot;) %}
+{% s.Append(&amp;quot;Hallo&amp;quot;) %}
+
+{% for greeting in s %}
+{{ geeting }}
+{% endfor %}
+
+{% for greeting in s.SortedSet() %}
+{{ geeting }}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The output of the first loop is not defined, it can be in every order (like &lt;code&gt;Moin Hallo Hi&lt;/code&gt; or &lt;code&gt;Hi Hallo Moin&lt;/code&gt; and so on)
+The second loop returns every time &lt;code&gt;Hallo Hi Moin&lt;/code&gt; (items sorted as string in increasing order)
+&lt;/details&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -303,8 +334,26 @@ something
 &lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
-&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an interface{} of the yaml/json value.&lt;/summary&gt;
-&lt;/details&gt;&lt;/p&gt;
+&lt;summary&gt; &lt;strong&gt;parseYAML&lt;/strong&gt; &amp;ndash; Returns an interface{} of the yaml value.&lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% for value in getvs(&amp;quot;/cache1/domains/*&amp;quot;) %}
+{% set data = value | parseYAML %}
+{{ data.type }} {{ data.name }} {{ data.addr }}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;parseJSON&lt;/strong&gt; &amp;ndash; Returns an interface{} of the json value.&lt;/summary&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% for value in getvs(&amp;quot;/cache1/domains/*&amp;quot;) %}
+{% set data = value | parseJSON %}
+{{ data.type }} {{ data.name }} {{ data.addr }}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;toJSON&lt;/strong&gt; &amp;ndash; Converts data, for example the result of gets or lsdir, into an JSON object. &lt;/summary&gt;&lt;/p&gt;
@@ -352,16 +401,30 @@ If you want to create a &amp;lsquo;toEnv&amp;rsquo; filter, which transforms fil
 &lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;In.split(&amp;quot;/&amp;quot;).join(&amp;quot;_&amp;quot;).substr(1).toUpperCase();
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;There are two predifined variables:&lt;/p&gt;
+&lt;p&gt;There are two predefined variables:&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;In: the filter input&lt;/li&gt;
-&lt;li&gt;Param: the optional filter parameter&lt;/li&gt;
+&lt;li&gt;In: the filter input (string)&lt;/li&gt;
+&lt;li&gt;Param: the optional filter parameter (string)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;As the parameter one string is possible only, the parameter string is added with a double-colon to the filter name (&amp;ldquo;&amp;ldquo;yadda&amp;rdquo; | filter:&amp;ldquo;paramstr&amp;rdquo;).
+When the filter function needs multiple parameter all of them must be put into this one string and parsed inside the filter to extract all
+parameter from this string (example &amp;ldquo;replace&amp;rdquo; filter below).&lt;/p&gt;
+
+&lt;p&gt;Remark:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;console&amp;rdquo; object for logging does not exist, therefore no output (for debugging and similar) possible.&lt;/li&gt;
+&lt;li&gt;variable declaration must use &amp;ldquo;var&amp;rdquo; as other keywords like &amp;ldquo;const&amp;rdquo; or &amp;ldquo;let&amp;rdquo; are not defined&lt;/li&gt;
+&lt;li&gt;the main script must not use &amp;ldquo;return&amp;rdquo; keyword, last output is the filter result.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3 id=&#34;examples&#34;&gt;Examples&lt;/h3&gt;
 
 &lt;p&gt;&lt;strong&gt;reverse filter&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Put file &lt;code&gt;reverse.js&lt;/code&gt; into the configured &amp;ldquo;filter_dir&amp;rdquo; with following content:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function reverse(s) {
      var o = &amp;quot;&amp;quot;;
@@ -371,6 +434,56 @@ If you want to create a &amp;lsquo;toEnv&amp;rsquo; filter, which transforms fil
 }
 
 reverse(In);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Call this filter inside your template (e,g, &amp;ldquo;my-reverse-template.tmpl&amp;rdquo;) with&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% set myString = &amp;quot;hip-hip-hooray&amp;quot; %}
+myString is {{ myString }}
+reversed myString is {{ myString | reverse }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Output is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt;myString is hip-hip-hooray
+reversed myString is yarooh-pih-pih
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;replace filter&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Put file &lt;code&gt;replace.js&lt;/code&gt; into the configured &amp;ldquo;filter_dir&amp;rdquo; with following content:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function replace(str, p) {
+    var params = [&#39; &#39;,&#39;_&#39;];  // default: replace all spaces with underscore
+    if (p) {
+        params = p.split(&#39;,&#39;);  // split all params given at comma
+    }
+  // if third param is a &amp;quot;g&amp;quot; like &amp;quot;global&amp;quot; change search string to regexp
+    if (params.length &amp;gt; 2 &amp;amp;&amp;amp; params[2] == &#39;g&#39;) {
+        params[0] = new RegExp(params[0], params[2]);
+    }
+    // javascript string.replace replaces first occurence only if search param is a string
+    // need regexp object to replace all occurences
+    return str.replace(params[0], params[1]);
+}
+replace(In, Param)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Use this inside the template as:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% set myString = &amp;quot;hip-hip-hooray&amp;quot; %}
+myString is {{ myString }}
+replace with default params (spaces): {{ myString | replace }}
+only replace first &amp;quot;-&amp;quot; with underscore is {{ myString | replace:&amp;quot;-,_&amp;quot; }}
+replace all &amp;quot;-&amp;quot; with underscore is {{ myString | replace:&amp;quot;-,_,g&amp;quot; }}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Output is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt;myString is hip-hip-hooray
+replace with default params (spaces): hip-hip-hooray
+only replace first &amp;quot;-&amp;quot; with underscore is hip_hip-hooray
+replace all &amp;quot;-&amp;quot; with underscore is hip_hip_hooray
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>

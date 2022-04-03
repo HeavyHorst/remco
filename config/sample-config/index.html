@@ -143,6 +143,14 @@
             </li>
           
           
+          
+            <li class="dd-item " data-nav-id="/details/telemetry/">
+              <a href="../../details/telemetry/">
+                <span>Telemetry     </i></span>
+              </a>
+            </li>
+          
+          
         </ul>
         
       </li>
@@ -450,6 +458,7 @@ log_file    = &quot;/var/log/remco.log&quot;
       onetime  = true
       interval = 1
       keys     = [&quot;/&quot;]
+      watchKeys = [&quot;/haproxy/reload&quot;]
 
     [resource.backend.file]
       httpheader = { X-Test-Token = &quot;XXX&quot;, X-Test-Token2 = &quot;YYY&quot; } 
@@ -457,6 +466,14 @@ log_file    = &quot;/var/log/remco.log&quot;
 	    watch    = true
 	    keys     = [&quot;/prefix&quot;]
 
+################################################################
+# Telemetry configuration
+################################################################
+[telemetry]
+  enabled = true
+  [telemetry.sinks.prometheus]
+    addr = &quot;:2112&quot;
+    expiration = 600
 </code></pre>
 
 

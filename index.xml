@@ -342,31 +342,62 @@ something
 &lt;summary&gt; &lt;strong&gt;createMap&lt;/strong&gt; &amp;ndash; create a hashMap to store values at runtime. This can be useful if you want to generate json/yaml files. &lt;/summary&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;{% set map = createMap() %}
-{{  map.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo2&amp;quot;) }}
-{{  map.Set(&amp;quot;Test&amp;quot;, 105) }}
+{{ map.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo2&amp;quot;) }}
+{{ map.Set(&amp;quot;Test&amp;quot;, 105) }}
 {{ map | toYAML }}
 
 {% set map2 = createMap() %}
-{{  map2.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo&amp;quot;) }}
-{{  map2.Set(&amp;quot;Test&amp;quot;, 300) }}
-{{  map2.Set(&amp;quot;anotherMap&amp;quot;, map) }}
+{{ map2.Set(&amp;quot;Moin&amp;quot;, &amp;quot;Hallo&amp;quot;) }}
+{{ map2.Set(&amp;quot;Test&amp;quot;, 300) }}
+{{ map2.Set(&amp;quot;anotherMap&amp;quot;, map) }}
 {{ map2 | toYAML }}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+&lt;p&gt;The hashmap supports the following methods:
+* &lt;code&gt;m.Set(&amp;quot;key&amp;quot;, value)&lt;/code&gt; adds a new value of arbitrary type referenced by &amp;ldquo;key&amp;rdquo; to the map
+* &lt;code&gt;m.Get(&amp;quot;key&amp;quot;)&lt;/code&gt; get the value for the given &amp;ldquo;key&amp;rdquo;
+* &lt;code&gt;m.Remove(&amp;quot;key&amp;quot;)&lt;/code&gt; removes the key and value from the map
+&lt;/details&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;details&gt;
 &lt;summary&gt; &lt;strong&gt;createSet&lt;/strong&gt; &amp;ndash; create a Set to store values at runtime. This can be useful if you want to generate json/yaml files. &lt;/summary&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;{% set s = createSet() %}
-{{  s.Append(&amp;quot;Moin&amp;quot;) }}
-{{  s.Append(&amp;quot;Moin&amp;quot;) }}
-{{  s.Append(&amp;quot;Hallo&amp;quot;) }}
-{{  s.Append(1) }}
+{{ s.Append(&amp;quot;Moin&amp;quot;) }}
+{{ s.Append(&amp;quot;Moin&amp;quot;) }}
+{{ s.Append(&amp;quot;Hallo&amp;quot;) }}
+{{ s.Append(1) }}
+{{ s.Remove(&amp;quot;Hallo&amp;quot;) }}
 {{ s | toYAML }}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;/details&gt;&lt;/p&gt;
+&lt;p&gt;The set created supports the following methods:
+* &lt;code&gt;s.Append(&amp;quot;string&amp;quot;)&lt;/code&gt; adds a new string to the set. Attention - the set is not
+  sorted or the order of appended elements guaranteed.
+* &lt;code&gt;s.Remove(&amp;quot;string&amp;quot;)&lt;/code&gt; removes the given element from the set.
+* &lt;code&gt;s.Contains(&amp;quot;string&amp;quot;)&lt;/code&gt; check if the given string is part of the set, returns
+  true or false otherwise
+* &lt;code&gt;s.SortedSet()&lt;/code&gt; return a new list where all elements are sorted in increasing
+  order. This method should be used inside the template with a for-in loop to generate
+ a stable output file not changing order of elements on every run.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{% set s = createSet() %}
+{% s.Append(&amp;quot;Moin&amp;quot;) %}
+{% s.Append(&amp;quot;Hi&amp;quot;) %}
+{% s.Append(&amp;quot;Hallo&amp;quot;) %}
+
+{% for greeting in s %}
+{{ geeting }}
+{% endfor %}
+
+{% for greeting in s.SortedSet() %}
+{{ geeting }}
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The output of the first loop is not defined, it can be in every order (like &lt;code&gt;Moin Hallo Hi&lt;/code&gt; or &lt;code&gt;Hi Hallo Moin&lt;/code&gt; and so on)
+The second loop returns every time &lt;code&gt;Hallo Hi Moin&lt;/code&gt; (items sorted as string in increasing order)
+&lt;/details&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -513,6 +544,7 @@ name = &amp;quot;haproxy&amp;quot;
     [resource.backend.etcd]
       nodes = [&amp;quot;${ETCD_NODE}&amp;quot;]
       keys = [&amp;quot;/services&amp;quot;, &amp;quot;/config&amp;quot;]
+      watchKeys = [&amp;quot;/haproxy/reload&amp;quot;]
       watch = true
       interval = 60
 &lt;/code&gt;&lt;/pre&gt;
@@ -892,6 +924,11 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;ul&gt;
 &lt;li&gt;Key path prefix. Default is &amp;ldquo;&amp;rdquo;.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;watchKeys([]string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Keys list to watch. Default is same as keys&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;interval(int, optional):&lt;/strong&gt;
 
 &lt;ul&gt;
@@ -953,6 +990,43 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 
 &lt;ul&gt;
 &lt;li&gt;The etcd api-level to use (2 or 3). Default is 2.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;nats&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;nodes([]string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;List of backend nodes. If none is provided nats.DefaultURL is used.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;bucket(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The nats kv bucket where your config keys are stored&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;username(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The username for the basic_auth authentication.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;password(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The password for the basic_auth authentication.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;token(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The athentication token for the nats server&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;creds(string, optional):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The path to an NATS 2.0 and NATS NGS compatible user credentials file
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -1125,6 +1199,108 @@ it will be terminated otherwise (like kill -9). The default value is &amp;ldquo;
 &lt;/details&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h2 id=&#34;telemetry-configuration-options&#34;&gt;Telemetry configuration options&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;enabled(bool):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Flag to enable telemetry.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;service_name(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Service name to add to every metric name. &amp;ldquo;remco&amp;rdquo; by default&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;hostname(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Hostname to use. If not provided and enable_hostname, it will be os.Hostname&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;enable_hostname(bool):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Enable prefixing gauge values with hostname. &lt;code&gt;true&lt;/code&gt; by default&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;enable_hostname_label(bool):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Put hostname into label instead of metric name. &lt;code&gt;false&lt;/code&gt; by default&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;enable_runtime_metrics(bool):&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Enables profiling of runtime metrics (GC, Goroutines, Memory). &lt;code&gt;true&lt;/code&gt; by default&lt;/p&gt;
+
+&lt;h2 id=&#34;sink-configuration-options&#34;&gt;Sink configuration options&lt;/h2&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;inmem&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;interval(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;How long is each aggregation interval (seconds).&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;retain(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Retain controls how many metrics interval we keep.
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;prometheus&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;addr(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Address to expose metrics on. Prometheus stats will be available at /metrics endpoint.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;expiration(int):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Expiration is the duration a metric is valid for, after which it will be untracked. If the value is zero, a metric is never expired.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;div class=&#34;notices note&#34; &gt;&lt;p&gt;If you are using only prometheus sink you may want to disable runtime metrics with &lt;strong&gt;enable_runtime_metrics&lt;/strong&gt; option,
+because they will duplicate prometheus builtin runtime metrics reporting. Also, consider using &lt;strong&gt;enable_hostname_label&lt;/strong&gt;
+to put hostname in gauge metrics to label instead of metric name.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;/details&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;statsd&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;addr(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Statsd/Statsite server address
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;details&gt;
+&lt;summary&gt; &lt;strong&gt;statsite&lt;/strong&gt; &lt;/summary&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;addr(string):&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Statsd/Statsite server address
+&lt;/details&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
 </description>
     </item>
     
@@ -1209,6 +1385,7 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
       onetime  = true
       interval = 1
       keys     = [&amp;quot;/&amp;quot;]
+      watchKeys = [&amp;quot;/haproxy/reload&amp;quot;]
 
     [resource.backend.file]
       httpheader = { X-Test-Token = &amp;quot;XXX&amp;quot;, X-Test-Token2 = &amp;quot;YYY&amp;quot; } 
@@ -1216,6 +1393,14 @@ log_file    = &amp;quot;/var/log/remco.log&amp;quot;
 	    watch    = true
 	    keys     = [&amp;quot;/prefix&amp;quot;]
 
+################################################################
+# Telemetry configuration
+################################################################
+[telemetry]
+  enabled = true
+  [telemetry.sinks.prometheus]
+    addr = &amp;quot;:2112&amp;quot;
+    expiration = 600
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>

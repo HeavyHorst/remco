@@ -157,5 +157,48 @@ Every language that can provide a JSON-RPC API is ok.&lt;/p&gt;
 </description>
     </item>
     
+    <item>
+      <title>Telemetry</title>
+      <link>https://heavyhorst.github.io/remco/details/telemetry/</link>
+      <pubDate>Sat, 05 Sep 2020 21:12:31 +0300</pubDate>
+      
+      <guid>https://heavyhorst.github.io/remco/details/telemetry/</guid>
+      <description>&lt;p&gt;Remco can expose different metrics about it&amp;rsquo;s state using &lt;a href=&#34;https://github.com/armon/go-metrics&#34;&gt;go-metrics&lt;/a&gt;.
+You can configure any type of sink supported by go-metric using configuration file.
+All the configured sinks will be aggregated using FanoutSink.&lt;/p&gt;
+
+&lt;p&gt;Currently supported sinks are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;inmem&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;prometheus&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;statsd&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;statsite&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The different coniguration parameters can be found here: &lt;a href=&#34;../config/configuration-options/#telemetry-configuration-options&#34;&gt;telemetry configuration&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Exposed metrics:
+  - &lt;strong&gt;files.template_execution_duration&lt;/strong&gt;
+    - Duration of template execution
+  - &lt;strong&gt;files.check_command_duration&lt;/strong&gt;
+    - Duration of check_command execution
+  - &lt;strong&gt;files.reload_command_duration&lt;/strong&gt;
+    - Duration of reload_command execution
+  - &lt;strong&gt;files.stage_errors_total&lt;/strong&gt;
+    - Total number of errors in file staging action
+  - &lt;strong&gt;files.staged_total&lt;/strong&gt;
+    - Total number of successfully files staged
+  - &lt;strong&gt;files.sync_errors_total&lt;/strong&gt;
+    - Total number of errors in file syncing action
+  - &lt;strong&gt;files.synced_total&lt;/strong&gt;
+    - Total number of successfully files synced
+  - &lt;strong&gt;backends.sync_errors_total&lt;/strong&gt;
+    - Total errors in backend sync action
+  - &lt;strong&gt;backends.synced_total&lt;/strong&gt;
+    - Total number of successfully synced backends&lt;/p&gt;
+</description>
+    </item>
+    
   </channel>
 </rss>

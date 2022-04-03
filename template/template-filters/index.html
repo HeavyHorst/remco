@@ -143,6 +143,14 @@
             </li>
           
           
+          
+            <li class="dd-item " data-nav-id="/details/telemetry/">
+              <a href="../../details/telemetry/">
+                <span>Telemetry     </i></span>
+              </a>
+            </li>
+          
+          
         </ul>
         
       </li>
@@ -475,8 +483,26 @@
 <p></details></p>
 
 <p><details>
-<summary> <strong>parseYAML</strong> &ndash; Returns an interface{} of the yaml/json value.</summary>
-</details></p>
+<summary> <strong>parseYAML</strong> &ndash; Returns an interface{} of the yaml value.</summary></p>
+
+<pre><code>{% for value in getvs(&quot;/cache1/domains/*&quot;) %}
+{% set data = value | parseYAML %}
+{{ data.type }} {{ data.name }} {{ data.addr }}
+{% endfor %}
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary> <strong>parseJSON</strong> &ndash; Returns an interface{} of the json value.</summary></p>
+
+<pre><code>{% for value in getvs(&quot;/cache1/domains/*&quot;) %}
+{% set data = value | parseJSON %}
+{{ data.type }} {{ data.name }} {{ data.addr }}
+{% endfor %}
+</code></pre>
+
+<p></details></p>
 
 <p><details>
 <summary> <strong>toJSON</strong> &ndash; Converts data, for example the result of gets or lsdir, into an JSON object. </summary></p>
@@ -524,16 +550,30 @@ If you want to create a &lsquo;toEnv&rsquo; filter, which transforms file system
 <pre><code class="language-javascript">In.split(&quot;/&quot;).join(&quot;_&quot;).substr(1).toUpperCase();
 </code></pre>
 
-<p>There are two predifined variables:</p>
+<p>There are two predefined variables:</p>
 
 <ul>
-<li>In: the filter input</li>
-<li>Param: the optional filter parameter</li>
+<li>In: the filter input (string)</li>
+<li>Param: the optional filter parameter (string)</li>
+</ul>
+
+<p>As the parameter one string is possible only, the parameter string is added with a double-colon to the filter name (&ldquo;&ldquo;yadda&rdquo; | filter:&ldquo;paramstr&rdquo;).
+When the filter function needs multiple parameter all of them must be put into this one string and parsed inside the filter to extract all
+parameter from this string (example &ldquo;replace&rdquo; filter below).</p>
+
+<p>Remark:</p>
+
+<ul>
+<li>&ldquo;console&rdquo; object for logging does not exist, therefore no output (for debugging and similar) possible.</li>
+<li>variable declaration must use &ldquo;var&rdquo; as other keywords like &ldquo;const&rdquo; or &ldquo;let&rdquo; are not defined</li>
+<li>the main script must not use &ldquo;return&rdquo; keyword, last output is the filter result.</li>
 </ul>
 
 <h3 id="examples">Examples</h3>
 
 <p><strong>reverse filter</strong></p>
+
+<p>Put file <code>reverse.js</code> into the configured &ldquo;filter_dir&rdquo; with following content:</p>
 
 <pre><code class="language-javascript">function reverse(s) {
      var o = &quot;&quot;;
@@ -543,6 +583,56 @@ If you want to create a &lsquo;toEnv&rsquo; filter, which transforms file system
 }
 
 reverse(In);
+</code></pre>
+
+<p>Call this filter inside your template (e,g, &ldquo;my-reverse-template.tmpl&rdquo;) with</p>
+
+<pre><code>{% set myString = &quot;hip-hip-hooray&quot; %}
+myString is {{ myString }}
+reversed myString is {{ myString | reverse }}
+</code></pre>
+
+<p>Output is:</p>
+
+<pre><code class="language-text">myString is hip-hip-hooray
+reversed myString is yarooh-pih-pih
+</code></pre>
+
+<p><strong>replace filter</strong></p>
+
+<p>Put file <code>replace.js</code> into the configured &ldquo;filter_dir&rdquo; with following content:</p>
+
+<pre><code class="language-javascript">function replace(str, p) {
+    var params = [' ','_'];  // default: replace all spaces with underscore
+    if (p) {
+        params = p.split(',');  // split all params given at comma
+    }
+  // if third param is a &quot;g&quot; like &quot;global&quot; change search string to regexp
+    if (params.length &gt; 2 &amp;&amp; params[2] == 'g') {
+        params[0] = new RegExp(params[0], params[2]);
+    }
+    // javascript string.replace replaces first occurence only if search param is a string
+    // need regexp object to replace all occurences
+    return str.replace(params[0], params[1]);
+}
+replace(In, Param)
+</code></pre>
+
+<p>Use this inside the template as:</p>
+
+<pre><code>{% set myString = &quot;hip-hip-hooray&quot; %}
+myString is {{ myString }}
+replace with default params (spaces): {{ myString | replace }}
+only replace first &quot;-&quot; with underscore is {{ myString | replace:&quot;-,_&quot; }}
+replace all &quot;-&quot; with underscore is {{ myString | replace:&quot;-,_,g&quot; }}
+</code></pre>
+
+<p>Output is:</p>
+
+<pre><code class="language-text">myString is hip-hip-hooray
+replace with default params (spaces): hip-hip-hooray
+only replace first &quot;-&quot; with underscore is hip_hip-hooray
+replace all &quot;-&quot; with underscore is hip_hip_hooray
 </code></pre>
 
 
