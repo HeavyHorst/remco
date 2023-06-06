@@ -4,7 +4,7 @@ BIN_NAME := bin/remco
 
 GOARCH ?= amd64
 
-VERSION := 0.12.3
+VERSION := 0.12.4
 GIT_COMMIT := $(shell git rev-parse HEAD)
 GIT_DIRTY := $(shell test -n "`git status --porcelain`" && echo "+CHANGES" || true)
 BUILD_DATE := $(shell date '+%Y-%m-%d-%H:%M:%S')
