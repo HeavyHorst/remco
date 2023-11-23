@@ -38,6 +38,47 @@ type BackendConfigs struct {
 	Plugin    []plugin.Plugin
 }
 
+func (c *BackendConfigs) Copy() BackendConfigs {
+	newC := BackendConfigs{}
+	if c.Etcd != nil {
+		newC.Etcd = new(backends.EtcdConfig)
+		*newC.Etcd = *c.Etcd
+	}
+	if c.File != nil {
+		newC.File = new(backends.FileConfig)
+		*newC.File = *c.File
+	}
+	if c.Env != nil {
+		newC.Env = new(backends.EnvConfig)
+		*newC.Env = *c.Env
+	}
+	if c.Consul != nil {
+		newC.Consul = new(backends.ConsulConfig)
+		*newC.Consul = *c.Consul
+	}
+	if c.Vault != nil {
+		newC.Vault = new(backends.VaultConfig)
+		*newC.Vault = *c.Vault
+	}
+	if c.Redis != nil {
+		newC.Redis = new(backends.RedisConfig)
+		*newC.Redis = *c.Redis
+	}
+	if c.Zookeeper != nil {
+		newC.Zookeeper = new(backends.ZookeeperConfig)
+		*newC.Zookeeper = *c.Zookeeper
+	}
+	if c.Nats != nil {
+		newC.Nats = new(backends.NatsConfig)
+		*newC.Nats = *c.Nats
+	}
+	if c.Mock != nil {
+		newC.Mock = new(backends.MockConfig)
+		*newC.Mock = *c.Mock
+	}
+	return newC
+}
+
 // GetBackends returns a slice with all BackendConfigs for easy iteration.
 func (c *BackendConfigs) GetBackends() []template.BackendConnector {
 	bc := []template.BackendConnector{
@@ -116,7 +157,7 @@ func NewConfiguration(path string) (Configuration, error) {
 
 	c.Resource = dbc.Resource
 	for i := 0; i < len(c.Resource); i++ {
-		c.Resource[i].Backends = dbc.Backends
+		c.Resource[i].Backends = dbc.Backends.Copy()
 	}
 
 	// Set defaults as in go-metrics DefaultConfig
@@ -151,7 +192,7 @@ func NewConfiguration(path string) (Configuration, error) {
 					return c, err
 				}
 				r := Resource{
-					Backends: dbc.Backends,
+					Backends: dbc.Backends.Copy(),
 				}
 				if err := toml.Unmarshal(buf, &r); err != nil {
 					return c, errors.Wrapf(err, "toml unmarshal failed: %s", fp)
