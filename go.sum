@@ -40,6 +40,8 @@ github.com/HeavyHorst/easykv v1.2.11 h1:6ZCHIlkgvkvAvPsyCke6k7Rl5sPTdDfSqScoZIZp
 github.com/HeavyHorst/easykv v1.2.11/go.mod h1:/tXI8otxr9ZIHcmz5c+RAYSlzZBJQMAZkCZv2Asxh/8=
 github.com/HeavyHorst/memkv v1.0.1 h1:ZNwe8PpfBneRDovza3vrxGVdLutTOEMwPvR10U1xjNU=
 github.com/HeavyHorst/memkv v1.0.1/go.mod h1:SpQ+DDbiF1OkUooeyY0a6Am++0wTOSAHVNkiYe5btJg=
+github.com/HeavyHorst/memkv v1.0.2 h1:AHL5jJEbiVwS3Jl1p1dfilVIzzpnGMGhS4f0AQrVrMo=
+github.com/HeavyHorst/memkv v1.0.2/go.mod h1:TNxuvj0XYAtSroG5yjPEOyQtqSBnf6qX06njdmu1bdA=
 github.com/HeavyHorst/pongo2 v3.3.0+incompatible h1:BU/wL8NRGe3Z8dytXbF2z6wogoVtI1LuBQi+zftVOqE=
 github.com/HeavyHorst/pongo2 v3.3.0+incompatible/go.mod h1:JNOOTUQZvmugLRgOq2GqEQUloCkc++4gjpjk7ssl9EA=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=

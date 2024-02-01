@@ -1,11 +1,11 @@
 module github.com/HeavyHorst/remco
 
-go 1.17
+go 1.21.3
 
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/HeavyHorst/easykv v1.2.11
-	github.com/HeavyHorst/memkv v1.0.1
+	github.com/HeavyHorst/memkv v1.0.2
 	github.com/HeavyHorst/pongo2 v3.3.0+incompatible
 	github.com/armon/go-metrics v0.4.1
 	github.com/dlclark/regexp2 v1.2.0 // indirect
