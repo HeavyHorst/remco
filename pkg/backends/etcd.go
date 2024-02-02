@@ -49,6 +49,9 @@ type EtcdConfig struct {
 	// The default is 2.
 	Version int
 	template.Backend
+
+	// The timeout per request
+	RequestTimeout int `toml:"request_timeout"`
 }
 
 // Connect creates a new etcd{2,3}Client and fills the underlying template.Backend with the etcd-Backend specific data.
@@ -66,6 +69,11 @@ func (c *EtcdConfig) Connect() (template.Backend, error) {
 		c.Backend.Name = "etcdv3"
 	} else {
 		c.Backend.Name = "etcd"
+	}
+
+	// Use default request timeout of 3
+	if c.RequestTimeout == 0 {
+		c.RequestTimeout = 3
 	}
 
 	// No nodes are set but a SRVRecord is provided
@@ -101,7 +109,8 @@ func (c *EtcdConfig) Connect() (template.Backend, error) {
 			ClientKey:    c.ClientKey,
 			ClientCaKeys: c.ClientCaKeys,
 		}),
-		etcd.WithVersion(c.Version))
+		etcd.WithVersion(c.Version),
+		etcd.WithRequestTimeout(c.RequestTimeout))
 
 	if err != nil {
 		return c.Backend, err
