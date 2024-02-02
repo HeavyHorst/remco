@@ -44,6 +44,10 @@ type EtcdConfig struct {
 	// The password for the basic_auth authentication.
 	Password string
 
+	// Whether to use serializable reads rather than linearizable ones, see
+	// <https://etcd.io/docs/v3.3/learning/api_guarantees/#linearizability>.
+	UseSerializableReads bool `toml:"use_serializable_reads"`
+
 	// The etcd api-level to use (2 or 3).
 	//
 	// The default is 2.
@@ -101,6 +105,7 @@ func (c *EtcdConfig) Connect() (template.Backend, error) {
 			ClientKey:    c.ClientKey,
 			ClientCaKeys: c.ClientCaKeys,
 		}),
+		etcd.WithSerializableReads(c.UseSerializableReads),
 		etcd.WithVersion(c.Version))
 
 	if err != nil {
