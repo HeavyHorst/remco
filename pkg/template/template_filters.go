@@ -77,8 +77,8 @@ func pongoJSFilter(name string, js string) func(in *pongo2.Value, param *pongo2.
 	return func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 		vm := goja.New()
 
-		vm.Set("In", in.Interface())
-		vm.Set("Param", param.Interface())
+		vm.Set("In", in.String())
+		vm.Set("Param", param.String())
 
 		v, err := vm.RunString(js)
 		if err != nil {
