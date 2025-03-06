@@ -244,7 +244,7 @@ func filterIndex(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.
 		index = in.Len() + index
 	}
 
-	return pongo2.AsValue(in.Index(index)), nil
+	return pongo2.AsValue(in.Index(index).Interface()), nil
 }
 
 func filterMapValue(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
