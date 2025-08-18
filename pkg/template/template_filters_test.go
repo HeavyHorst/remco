@@ -33,6 +33,16 @@ func (s *FilterSuite) TestFilterBase64(t *C) {
 	t.Check(res.String(), Equals, "Zm9v")
 }
 
+func (s *FilterSuite) TestFilterBase64Decode(t *C) {
+	in := pongo2.AsValue("Zm9v")
+	res, err := filterBase64Decode(in, nil)
+	if err != nil {
+		t.Error(err.OrigError)
+	}
+
+	t.Check(res.String(), Equals, "foo")
+}
+
 func (s *FilterSuite) TestFilterBase(t *C) {
 	in := pongo2.AsValue("/etc/foo/bar")
 	res, err := filterBase(in, nil)

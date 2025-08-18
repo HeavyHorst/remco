@@ -43,6 +43,7 @@ func init() {
 	pongo2.RegisterFilter("dir", filterDir)
 	pongo2.RegisterFilter("base", filterBase)
 	pongo2.RegisterFilter("base64", filterBase64)
+	pongo2.RegisterFilter("base64decode", filterBase64Decode)
 	pongo2.RegisterFilter("index", filterIndex)
 	pongo2.RegisterFilter("mapValue", filterMapValue)
 }
@@ -104,6 +105,20 @@ func filterBase64(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	}
 	sEnc := base64.StdEncoding.EncodeToString([]byte(in.String()))
 	return pongo2.AsValue(sEnc), nil
+}
+
+func filterBase64Decode(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.IsString() {
+		return in, nil
+	}
+	val, err := base64.StdEncoding.DecodeString(in.String())
+	if err != nil {
+		return nil, &pongo2.Error{
+			Sender:    "filter:filterBase64Decode",
+			OrigError: err,
+		}
+	}
+	return pongo2.AsValue(string(val)), nil
 }
 
 func filterBase(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
