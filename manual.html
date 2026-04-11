@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>remco manual</title>
+<style>
+
+:root {
+	--page-bg: #f1f3f5;
+	--paper: #fafafa;
+	--panel: #f4f6f8;
+	--panel-muted: #f7f8fa;
+	--ink: #161514;
+	--muted: #5f6670;
+	--rule: #d7dde5;
+	--rule-strong: #aab3be;
+	--accent: #4b5563;
+	--shadow: rgba(0, 0, 0, 0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+	font-size: 15px;
+	-webkit-text-size-adjust: 100%;
+	background: linear-gradient(180deg, #e8eff3 0%, var(--page-bg) 18rem, #f5f7f9 100%);
+}
+
+body {
+	font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+	line-height: 1.7;
+	color: var(--ink);
+	max-width: 92rem;
+	margin: 0 auto 1.5rem;
+	padding: 2rem 2.25rem 3rem;
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	box-shadow: 0 12px 28px var(--shadow);
+	min-height: 80vh;
+}
+
+.manual-masthead {
+	border-bottom: 2px solid var(--rule-strong);
+	padding-bottom: 1.25rem;
+	margin-bottom: 1.5rem;
+}
+
+.manual-kicker,
+.section-meta,
+nav.toc,
+footer,
+th,
+.toc-toggle {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.manual-kicker {
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--accent);
+	margin-bottom: 0.35rem;
+}
+
+.manual-masthead h1 {
+	font-size: clamp(2.4rem, 5vw, 3.2rem);
+	line-height: 1;
+	margin: 0;
+	letter-spacing: -0.04em;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.manual-lede {
+	max-width: 48rem;
+	margin: 0.75rem 0 0;
+	color: var(--muted);
+	font-size: 1rem;
+}
+
+.manual-layout {
+	display: grid;
+	grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+	gap: 2rem;
+	align-items: start;
+}
+
+.manual-main {
+	min-width: 0;
+	max-width: 56rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	line-height: 1.2;
+	margin: 1.25rem 0 0.4rem;
+	scroll-margin-top: 1.5rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+h1 { font-size: 1.6rem; margin-top: 1.5rem; }
+h2 { font-size: 1.3rem; margin-top: 1.85rem; }
+h3 { font-size: 1.08rem; }
+h4 { font-size: 1rem; }
+
+h1:first-child { margin-top: 0; }
+
+p { margin: 0.7rem 0; }
+
+.heading-anchor {
+	color: inherit;
+	text-decoration: none;
+}
+
+.heading-anchor:hover { text-decoration: underline; }
+
+.section-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+	font-size: 0.78rem;
+	color: var(--muted);
+	margin-bottom: 1rem;
+	padding-bottom: 0.4rem;
+	border-bottom: 1px solid var(--rule);
+}
+
+.section-meta code {
+	background: transparent;
+	color: inherit;
+	padding: 0;
+}
+
+
+.section-divider {
+	border: none;
+	border-top: 1px solid var(--rule-strong);
+	margin: 4rem 0 3rem;
+}
+
+.section-header {
+	font-size: 1.8rem;
+	font-weight: 700;
+	margin: 0 0 0.5rem;
+	color: var(--ink);
+}
+
+.section-header a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.section-header a:hover { text-decoration: underline; }
+
+a {
+	color: var(--accent);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.12em;
+}
+
+a:hover { color: var(--ink); }
+
+code {
+	font-family: "Berkeley Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+	font-size: 0.85em;
+	background: var(--panel-muted);
+	padding: 0.08rem 0.25rem;
+	border-radius: 2px;
+}
+
+pre {
+	background: var(--panel-muted);
+	color: var(--ink);
+	padding: 0.9rem 0.75rem;
+	border-radius: 0;
+	border: 1px solid var(--rule);
+	counter-reset: line;
+	overflow-x: auto;
+	white-space: pre;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+pre code {
+	background: none;
+	color: inherit;
+	padding: 0;
+	font-size: 0.85rem;
+	border-radius: 0;
+}
+
+pre code .line {
+	display: block;
+	white-space: pre;
+	line-height: inherit;
+	margin: 0;
+	padding: 0;
+}
+
+pre code .line::before {
+	counter-increment: line;
+	content: counter(line);
+	display: inline-block;
+	width: 1.5rem;
+	margin-right: 0.5rem;
+	text-align: right;
+	color: #9ca3af;
+	user-select: none;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 1rem 0;
+	font-size: 0.87rem;
+}
+
+th, td {
+	border: 1px solid var(--rule-strong);
+	padding: 0.35rem 0.55rem;
+	text-align: left;
+}
+
+th {
+	font-weight: 700;
+	font-size: 0.78rem;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	background: var(--panel);
+}
+
+blockquote {
+	border-left: 3px solid var(--rule-strong);
+	margin: 1rem 0;
+	padding: 0.45rem 0.85rem;
+	color: var(--muted);
+	background: var(--panel-muted);
+}
+
+.admonition {
+	border-left: 4px solid #000;
+	padding: 0.65rem 0.85rem;
+	margin: 1rem 0;
+	background: var(--panel-muted);
+	border: 1px solid var(--rule);
+	border-radius: 0;
+}
+
+.admonition.note { border-left-color: var(--accent); }
+.admonition.note::before {
+	content: "[NOTE]";
+	display: block;
+	font-weight: 700;
+	color: var(--accent);
+	font-size: 0.85rem;
+	margin-bottom: 0.25rem;
+}
+.admonition.note strong { color: var(--accent); }
+
+.admonition.tip { border-left-color: #2e7d32; }
+.admonition.tip::before {
+	content: "[TIP]";
+	display: block;
+	font-weight: 700;
+	color: #2e7d32;
+	font-size: 0.85rem;
+	margin-bottom: 0.25rem;
+}
+.admonition.tip strong { color: #2e7d32; }
+
+.admonition.warning::before {
+	content: "[WARNING]";
+	display: block;
+	font-weight: 700;
+	color: #475569;
+	font-size: 0.85rem;
+	margin-bottom: 0.25rem;
+}
+.admonition.warning { border-left-color: #475569; }
+.admonition.warning strong { color: #475569; }
+
+.admonition strong { display: block; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; }
+
+hr { border: none; border-top: 1px solid var(--rule-strong); margin: 1rem 0; }
+
+footer {
+	border-top: 2px solid var(--rule-strong);
+	margin-top: 3rem;
+	padding-top: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.5rem 1rem;
+	font-size: 0.78rem;
+	color: var(--muted);
+}
+
+footer code {
+	background: transparent;
+	color: inherit;
+	padding: 0;
+}
+
+ul, ol { padding-left: 1.6rem; }
+li { margin-bottom: 0.2rem; }
+
+nav.toc {
+	position: sticky;
+	top: 1.5rem;
+	max-height: calc(100vh - 3rem);
+	overflow: auto;
+	padding: 1rem 1rem 1.1rem;
+	border: 1px solid var(--rule);
+	background: var(--paper);
+}
+
+nav.toc h2 {
+	margin-top: 0;
+	font-size: 1.05rem;
+	border-bottom: 1px solid var(--rule);
+	padding-bottom: 0.45rem;
+	margin-bottom: 0.5rem;
+}
+
+.toc-summary {
+	margin: 0 0 0.85rem;
+	font-size: 0.78rem;
+	color: var(--muted);
+}
+
+.toc-group {
+	margin: 0 0 0.9rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid var(--rule);
+}
+
+.toc-group-title {
+	display: block;
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--accent);
+	margin-bottom: 0.2rem;
+}
+
+.toc-group-summary {
+	margin: 0;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	color: var(--muted);
+}
+
+.toc-sep { border: none; border-top: 1px solid var(--rule); margin: 0.6rem 0; }
+
+.toc-section { margin-bottom: 0.65rem; }
+
+.manual-group {
+	margin: 0 0 1.35rem;
+	padding: 0.85rem 0 0.95rem;
+	border-top: 2px solid var(--rule-strong);
+	border-bottom: 1px solid var(--rule);
+}
+
+.manual-group-title {
+	margin: 0 0 0.25rem;
+	font-size: 1.02rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--accent);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.manual-group-summary {
+	margin: 0;
+	font-size: 0.92rem;
+	color: var(--muted);
+}
+
+.toc-section-title {
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.toc-path {
+	display: block;
+	font-size: 0.75rem;
+	color: var(--muted);
+	background: transparent;
+	padding: 0;
+	margin-top: 0.15rem;
+}
+
+.toc-entries {
+	list-style: none;
+	padding-left: 0;
+	margin: 0.35rem 0 0;
+}
+
+.toc-entries li {
+	margin-bottom: 0.15rem;
+}
+
+.toc-entry-line {
+	display: flex;
+	align-items: baseline;
+	gap: 0.45rem;
+}
+
+.toc-entries ul {
+	list-style: none;
+	padding-left: 0.9rem;
+	margin: 0.25rem 0 0.2rem;
+	border-left: 1px solid var(--rule);
+}
+
+.toc-num {
+	font-weight: 400;
+	color: var(--muted);
+	min-width: 2.55rem;
+	flex-shrink: 0;
+}
+
+nav.toc a { color: var(--ink); text-decoration: none; }
+nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+nav.toc a.active,
+nav.toc a[aria-current="location"] {
+	color: var(--accent);
+	text-decoration: underline;
+	font-weight: 700;
+}
+
+.toc-section-num {
+	font-weight: 700;
+	margin-right: 0.25rem;
+	color: var(--accent);
+}
+
+.toc-toggle {
+	display: none;
+	width: 100%;
+	padding: 0.6rem 0.75rem;
+	margin-bottom: 1rem;
+	background: var(--panel);
+	border: 1px solid var(--rule);
+	font-family: inherit;
+	font-size: 0.95rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	cursor: pointer;
+}
+
+.toc-toggle:hover { background: #eef1f4; }
+
+@media print {
+	body { max-width: none; padding: 0; border: none; box-shadow: none; background: #fff; }
+	html { background: #fff; }
+	.manual-layout { display: block; }
+	nav.toc { display: none; }
+	.toc-toggle { display: none; }
+	.manual-section { page-break-before: always; }
+	.manual-section:first-child { page-break-before: auto; }
+	footer { display: block; }
+}
+
+@media (max-width: 980px) {
+	body { padding: 1.25rem; margin: 0.5rem; min-height: auto; }
+	.manual-layout { display: block; }
+	.manual-main { max-width: none; }
+	.section-header { position: sticky; top: 0; background: var(--paper); padding: 0.5rem 0; border-bottom: 1px solid var(--rule); z-index: 100; }
+	.toc-toggle { display: block; }
+	nav.toc { display: none; margin-top: 0.5rem; }
+	nav.toc { position: static; max-height: none; }
+	nav.toc.expanded { display: block; }
+	table { display: block; overflow-x: auto; max-width: 100%; width: max-content; min-width: 100%; }
+}
+
+.code-block::before {
+	display: block;
+	margin-bottom: 0.55rem;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	white-space: normal;
+}
+
+.code-block-command {
+	border-left: 3px solid var(--accent);
+	background: #f5f6f8;
+}
+
+.code-block-command::before {
+	content: "Command";
+	color: var(--accent);
+}
+
+.code-block-example {
+	border-left: 3px solid var(--rule-strong);
+	background: #f3f4f6;
+}
+
+.code-block-example::before {
+	content: "Example";
+	color: var(--muted);
+}
+
+.code-block-output {
+	border-left: 3px solid #5d7488;
+	background: #f2f5f7;
+}
+
+.code-block-output::before {
+	content: "Output";
+	color: #5d7488;
+}
+
+.code-block-diagram {
+	border-left: 3px solid #6b7280;
+	background: #f3f4f6;
+}
+
+.code-block-diagram::before {
+	content: "Diagram";
+	color: #6b7280;
+}
+
+</style>
+</head>
+<body>
+<header id="manual-top" class="manual-masthead">
+<div class="manual-kicker">Reference Manual</div>
+<h1>remco</h1>
+<p class="manual-lede">Single-page operator and developer handbook generated from the repository documentation. Built for quick in-page search, long-form reading, and printable offline use.</p>
+</header>
+<button type="button" class="toc-toggle" aria-controls="manual-toc" aria-expanded="false" onclick="var toc=document.getElementById('manual-toc');var expanded=toc.classList.toggle('expanded');this.setAttribute('aria-expanded', expanded);">Table of Contents</button>
+<div class="manual-layout">
+<nav id="manual-toc" class="toc">
+<h2>Table of Contents</h2>
+<p class="toc-summary">Single-page handbook for quick in-page search, long-form reading, and printable offline use.</p>
+<div class="toc-group">
+<span class="toc-group-title">Overview</span>
+<p class="toc-group-summary">Start here for the high-level map of remco and the rest of the manual.</p>
+</div>
+<div class="toc-section">
+<span class="toc-section-num">1.</span><a href="#doc-index" class="toc-section-title">remco</a><code class="toc-path">index.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">1.1</span><a href="#sections">Sections</a></div>
+<ul>
+<li><div class="toc-entry-line"><span class="toc-num">1.1.1</span><a href="#runtime-operations">Runtime & Operations</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">1.1.2</span><a href="#configuration-backends">Configuration & Backends</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">1.1.3</span><a href="#template-authoring">Template Authoring</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">1.1.4</span><a href="#extensions-examples">Extensions & Examples</a></div></li>
+</ul>
+</li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-group">
+<span class="toc-group-title">Runtime & Operations</span>
+<p class="toc-group-summary">Process behavior, exec mode, commands, signals, CLI usage, and telemetry.</p>
+</div>
+<div class="toc-section">
+<span class="toc-section-num">2.</span><a href="#doc-details-template-resource" class="toc-section-title">Template resource</a><code class="toc-path">details/template-resource.md</code>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">3.</span><a href="#doc-details-exec-mode" class="toc-section-title">Exec mode</a><code class="toc-path">details/exec-mode.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">3.1</span><a href="#how-it-works">How it works</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">3.2</span><a href="#child-process-failure-and-restart">Child process failure and restart</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">3.3</span><a href="#signal-forwarding">Signal forwarding</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">3.4</span><a href="#configuration">Configuration</a></div></li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">4.</span><a href="#doc-details-commands" class="toc-section-title">Commands</a><code class="toc-path">details/commands.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">4.1</span><a href="#check-command-checkcmd">Check command (check_cmd)</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">4.2</span><a href="#reload-command-reloadcmd">Reload command (reload_cmd)</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">4.3</span><a href="#resource-level-commands">Resource-level commands</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">4.4</span><a href="#interaction-with-watch-mode">Interaction with watch mode</a></div></li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">5.</span><a href="#doc-details-process-lifecycle" class="toc-section-title">Process lifecycle</a><code class="toc-path">details/process-lifecycle.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">5.1</span><a href="#supported-signals">Supported signals</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">5.2</span><a href="#graceful-shutdown">Graceful shutdown</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">5.3</span><a href="#configuration-reload-sighup">Configuration reload (SIGHUP)</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">5.4</span><a href="#exec-mode-signal-forwarding">Exec-mode signal forwarding</a></div></li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">6.</span><a href="#doc-details-cli" class="toc-section-title">Command-line reference</a><code class="toc-path">details/cli.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">6.1</span><a href="#flags">Flags</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">6.2</span><a href="#exit-codes">Exit codes</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">6.3</span><a href="#version-output">Version output</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">6.4</span><a href="#configuration-reload">Configuration reload</a></div></li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">7.</span><a href="#doc-details-zombie-reaping" class="toc-section-title">Zombie reaping</a><code class="toc-path">details/zombie-reaping.md</code>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">8.</span><a href="#doc-details-telemetry" class="toc-section-title">Telemetry</a><code class="toc-path">details/telemetry.md</code>
+</div>
+<hr class="toc-sep">
+<div class="toc-group">
+<span class="toc-group-title">Configuration & Backends</span>
+<p class="toc-group-summary">Backend capabilities, backend configuration, and integration points.</p>
+</div>
+<div class="toc-section">
+<span class="toc-section-num">9.</span><a href="#doc-config-environment-variables" class="toc-section-title">Environment variables</a><code class="toc-path">config/environment-variables.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">9.1</span><a href="#how-it-works-1">How it works</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">9.2</span><a href="#quoting">Quoting</a></div></li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">10.</span><a href="#doc-config-configuration-options" class="toc-section-title">Configuration options</a><code class="toc-path">config/configuration-options.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">10.1</span><a href="#global-configuration-options">Global configuration options</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.2</span><a href="#resource-configuration-options">Resource configuration options</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.3</span><a href="#exec-configuration-options">Exec configuration options</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.4</span><a href="#template-configuration-options">Template configuration options</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5</span><a href="#backend-configuration-options">Backend configuration options</a></div>
+<ul>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.1</span><a href="#valid-in-every-backend">valid in every backend</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.2</span><a href="#etcd">etcd</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.3</span><a href="#nats">nats</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.4</span><a href="#consul">consul</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.5</span><a href="#file">file</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.6</span><a href="#redis">redis</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.7</span><a href="#vault">vault</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.8</span><a href="#env">env</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.9</span><a href="#zookeeper">zookeeper</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.5.10</span><a href="#plugin">plugin</a></div></li>
+</ul>
+</li>
+<li><div class="toc-entry-line"><span class="toc-num">10.6</span><a href="#telemetry-configuration-options">Telemetry configuration options</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.7</span><a href="#sink-configuration-options">Sink configuration options</a></div>
+<ul>
+<li><div class="toc-entry-line"><span class="toc-num">10.7.1</span><a href="#inmem">inmem</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.7.2</span><a href="#prometheus">prometheus</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.7.3</span><a href="#statsd">statsd</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">10.7.4</span><a href="#statsite">statsite</a></div></li>
+</ul>
+</li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">11.</span><a href="#doc-config-sample-config" class="toc-section-title">Sample config file</a><code class="toc-path">config/sample-config.md</code>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">12.</span><a href="#doc-config-sample-resource" class="toc-section-title">Sample resource</a><code class="toc-path">config/sample-resource.md</code>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">13.</span><a href="#doc-details-backends" class="toc-section-title">Backends</a><code class="toc-path">details/backends.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">13.1</span><a href="#supported-backends">Supported backends</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">13.2</span><a href="#backend-configuration">Backend configuration</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">13.3</span><a href="#default-backends">Default backends</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">13.4</span><a href="#plugin-backends">Plugin backends</a></div></li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">14.</span><a href="#doc-details-plugins" class="toc-section-title">Plugins</a><code class="toc-path">details/plugins.md</code>
+</div>
+<hr class="toc-sep">
+<div class="toc-group">
+<span class="toc-group-title">Template Authoring</span>
+<p class="toc-group-summary">Template syntax, built-in functions, and filters used while rendering files.</p>
+</div>
+<div class="toc-section">
+<span class="toc-section-num">15.</span><a href="#doc-template-template-engine" class="toc-section-title">Template engine</a><code class="toc-path">template/template-engine.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">15.1</span><a href="#syntax-overview">Syntax overview</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">15.2</span><a href="#whitespace-handling">Whitespace handling</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">15.3</span><a href="#available-functions-and-filters">Available functions and filters</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">15.4</span><a href="#memkv-store-functions">memkv store functions</a></div></li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">16.</span><a href="#doc-template-template-functions" class="toc-section-title">Template functions</a><code class="toc-path">template/template-functions.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">16.1</span><a href="#exists">exists</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.2</span><a href="#get">get</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.3</span><a href="#gets">gets</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.4</span><a href="#getv">getv</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.5</span><a href="#getvs">getvs</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.6</span><a href="#getenv">getenv</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.7</span><a href="#ls">ls</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.8</span><a href="#lsdir">lsdir</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.9</span><a href="#replace">replace</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.10</span><a href="#contains">contains</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.11</span><a href="#printf">printf</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.12</span><a href="#unixts">unixTS</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.13</span><a href="#daterfc3339">dateRFC3339</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.14</span><a href="#fileexists">fileExists</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.15</span><a href="#lookupip">lookupIP</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.16</span><a href="#lookupsrv">lookupSRV</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.17</span><a href="#createmap">createMap</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">16.18</span><a href="#createset">createSet</a></div></li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">17.</span><a href="#doc-template-template-filters" class="toc-section-title">Template filters</a><code class="toc-path">template/template-filters.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">17.1</span><a href="#builtin-filters">Builtin filters</a></div>
+<ul>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.1</span><a href="#parseint">parseInt</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.2</span><a href="#parsefloat">parseFloat</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.3</span><a href="#base64">base64</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.4</span><a href="#base64decode">base64decode</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.5</span><a href="#base">base</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.6</span><a href="#dir">dir</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.7</span><a href="#split">split</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.8</span><a href="#mapvalue">mapValue</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.9</span><a href="#index">index</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.10</span><a href="#parseyaml">parseYAML</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.11</span><a href="#parsejson">parseJSON</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.12</span><a href="#tojson">toJSON</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.13</span><a href="#toprettyjson">toPrettyJSON</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.14</span><a href="#toyaml">toYAML</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">17.1.15</span><a href="#sortbylength">sortByLength</a></div></li>
+</ul>
+</li>
+<li><div class="toc-entry-line"><span class="toc-num">17.2</span><a href="#custom-filters">Custom filters</a></div>
+<ul>
+<li><div class="toc-entry-line"><span class="toc-num">17.2.1</span><a href="#examples">Examples</a></div></li>
+</ul>
+</li>
+</ul>
+</div>
+<hr class="toc-sep">
+<div class="toc-group">
+<span class="toc-group-title">Extensions & Examples</span>
+<p class="toc-group-summary">Plugin examples and end-to-end tutorials for adapting remco to real systems.</p>
+</div>
+<div class="toc-section">
+<span class="toc-section-num">18.</span><a href="#doc-plugins-env-plugin-example" class="toc-section-title">Env plugin example</a><code class="toc-path">plugins/env-plugin-example.md</code>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">19.</span><a href="#doc-plugins-consul-plugin-example" class="toc-section-title">Consul plugin example</a><code class="toc-path">plugins/consul-plugin-example.md</code>
+</div>
+<hr class="toc-sep">
+<div class="toc-section">
+<span class="toc-section-num">20.</span><a href="#doc-examples-haproxy" class="toc-section-title">Dynamic haproxy configuration with Docker, registrator and etcd</a><code class="toc-path">examples/haproxy.md</code>
+<ul class="toc-entries">
+<li><div class="toc-entry-line"><span class="toc-num">20.1</span><a href="#the-haproxy-template">The haproxy template</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">20.2</span><a href="#the-remco-configuration-file">The remco configuration file</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">20.3</span><a href="#the-dockerfile">The Dockerfile</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">20.4</span><a href="#build-and-run-the-container">Build and run the container</a></div>
+<ul>
+<li><div class="toc-entry-line"><span class="toc-num">20.4.1</span><a href="#build-the-docker-container">Build the docker container</a></div></li>
+<li><div class="toc-entry-line"><span class="toc-num">20.4.2</span><a href="#optionally-test-the-container">Optionally test the container</a></div>
+<ul>
+<li><div class="toc-entry-line"><span class="toc-num">20.4.2.1</span><a href="#put-some-data-into-etcd">Put some data into etcd</a></div></li>
+</ul>
+</li>
+<li><div class="toc-entry-line"><span class="toc-num">20.4.3</span><a href="#run-registrator">Run registrator</a></div></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<main class="manual-main">
+<div class="manual-group">
+<h2 class="manual-group-title">Overview</h2>
+<p class="manual-group-summary">Start here for the high-level map of remco and the rest of the manual.</p>
+</div>
+<section id="doc-index" class="manual-section">
+<h1 class="section-header"><a href="#doc-index">1. remco</a></h1>
+<div class="section-meta"><span><code>index.md</code> · 217 words</span></div>
+<p>remco is a lightweight configuration management tool that renders templates from backend data and reloads services when values change.</p>
+<p>It watches backends like etcd, consul, vault, redis, zookeeper, NATS KV, or environment variables, pushes changes through template rendering, and optionally execs or signals a child process.</p>
+<h2 id="sections"><a class="heading-anchor" href="#sections">1.1 Sections</a></h2>
+<h3 id="runtime-operations"><a class="heading-anchor" href="#runtime-operations">1.1.1 Runtime &amp; Operations</a></h3>
+<ul>
+<li><a href="#doc-details-template-resource">Template resource</a> — how a template resource is structured</li>
+<li><a href="#doc-details-exec-mode">Exec mode</a> — running a child process per resource</li>
+<li><a href="#doc-details-commands">Commands</a> — check and reload commands</li>
+<li><a href="#doc-details-process-lifecycle">Process lifecycle</a> — signal handling</li>
+<li><a href="#doc-details-cli">CLI reference</a> — flags, exit codes, and version info</li>
+<li><a href="#doc-details-zombie-reaping">Zombie reaping</a> — automatic reaping when running as PID 1</li>
+<li><a href="#doc-details-telemetry">Telemetry</a> — metrics sinks</li>
+</ul>
+<h3 id="configuration-backends"><a class="heading-anchor" href="#configuration-backends">1.1.2 Configuration &amp; Backends</a></h3>
+<ul>
+<li><a href="#doc-config-environment-variables">Environment variables</a> — variable substitution in config</li>
+<li><a href="#doc-config-configuration-options">Configuration options</a> — full config reference</li>
+<li><a href="#doc-config-sample-config">Sample config</a> — complete TOML example</li>
+<li><a href="#doc-config-sample-resource">Sample resource</a> — resource block example</li>
+<li><a href="#doc-details-backends">Backends</a> — supported key-value stores</li>
+<li><a href="#doc-details-plugins">Plugins</a> — JSON-RPC backend plugins</li>
+</ul>
+<h3 id="template-authoring"><a class="heading-anchor" href="#template-authoring">1.1.3 Template Authoring</a></h3>
+<ul>
+<li><a href="#doc-template-template-engine">Template engine</a> — pongo2 syntax and whitespace handling</li>
+<li><a href="#doc-template-template-functions">Template functions</a> — available template functions</li>
+<li><a href="#doc-template-template-filters">Template filters</a> — built-in and custom filters</li>
+</ul>
+<h3 id="extensions-examples"><a class="heading-anchor" href="#extensions-examples">1.1.4 Extensions &amp; Examples</a></h3>
+<ul>
+<li><a href="#doc-plugins-env-plugin-example">Env plugin example</a> — environment backend as a plugin</li>
+<li><a href="#doc-plugins-consul-plugin-example">Consul plugin example</a> — consul service endpoint plugin</li>
+<li><a href="#doc-examples-haproxy">Dynamic haproxy configuration</a> — full tutorial with Docker</li>
+</ul>
+
+</section>
+<hr class="section-divider">
+<div class="manual-group">
+<h2 class="manual-group-title">Runtime & Operations</h2>
+<p class="manual-group-summary">Process behavior, exec mode, commands, signals, CLI usage, and telemetry.</p>
+</div>
+<section id="doc-details-template-resource" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-template-resource">2. Template resource</a></h1>
+<div class="section-meta"><span><code>details/template-resource.md</code> · 57 words</span></div>
+<p>A template resource in remco consists of the following parts:</p>
+<ul>
+<li><strong>one optional exec command.</strong></li>
+<li><strong>one or many templates.</strong></li>
+<li><strong>one or many backends.</strong></li>
+</ul>
+<div class="admonition note">
+<p>It is not possible to use the same backend more than once per template resource. For example, it is not possible to use two different redis servers.</p>
+</div>
+
+</section>
+<hr class="section-divider">
+<section id="doc-details-exec-mode" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-exec-mode">3. Exec mode</a></h1>
+<div class="section-meta"><span><code>details/exec-mode.md</code> · 205 words</span></div>
+<p>Remco can run one arbitrary child process per template resource. When any of the provided templates change and the check command (if any) succeeds, remco will notify or restart the child process.</p>
+<h2 id="how-it-works"><a class="heading-anchor" href="#how-it-works">3.1 How it works</a></h2>
+<p>If a <code>reload_signal</code> is configured, remco sends that signal to the child when templates change. If no <code>reload_signal</code> is set, remco kills the child process (with the configured <code>kill_signal</code>) and restarts it.</p>
+<p>The child process must remain in the foreground. If it forks into the background, remco will be unable to track it and will restart it endlessly.</p>
+<h2 id="child-process-failure-and-restart"><a class="heading-anchor" href="#child-process-failure-and-restart">3.2 Child process failure and restart</a></h2>
+<p>If the child process dies, the template resource is marked as failed. Remco automatically restarts it after a random delay of 0 to 30 seconds.</p>
+<p>This jitter helps prevent thundering-herd problems in large clusters where many instances might restart simultaneously.</p>
+<h2 id="signal-forwarding"><a class="heading-anchor" href="#signal-forwarding">3.3 Signal forwarding</a></h2>
+<p>Every signal that remco receives and does not handle itself (SIGINT, SIGTERM, SIGHUP, SIGCHLD) is forwarded to the child process. This means sending SIGUSR2 (or any custom signal) to the remco process will relay it to the child.</p>
+<p>See <a href="#doc-details-process-lifecycle">process lifecycle</a> for the full signal handling table.</p>
+<h2 id="configuration"><a class="heading-anchor" href="#configuration">3.4 Configuration</a></h2>
+<p>The exec configuration parameters can be found here: <a href="#exec-configuration-options">exec configuration</a>.</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-details-commands" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-commands">4. Commands</a></h1>
+<div class="section-meta"><span><code>details/commands.md</code> · 279 words</span></div>
+<p>Each template can have two optional commands:</p>
+<h2 id="check-command-checkcmd"><a class="heading-anchor" href="#check-command-checkcmd">4.1 Check command (<code>check_cmd</code>)</a></h2>
+<p>Executed <em>before</em> the rendered template is written to the destination path. The check command runs in a shell (<code>/bin/sh -c</code>).</p>
+<ul>
+<li>The rendered template is written to a temporary staging file first. You can reference this staging file with <code>{{ .src }}</code> in the check command.</li>
+<li>If the check command returns a non-zero exit code, the destination file is <strong>not</strong> overwritten. The old configuration is left in place.</li>
+<li>If no <code>check_cmd</code> is configured, the template is always written.</li>
+</ul>
+<p>Example:</p>
+<pre class="code-block code-block-example"><code class="language-toml"><span class="line">check_cmd = &quot;nginx -t -c {{ .src }}&quot;</span></code></pre>
+<h2 id="reload-command-reloadcmd"><a class="heading-anchor" href="#reload-command-reloadcmd">4.2 Reload command (<code>reload_cmd</code>)</a></h2>
+<p>Executed <em>after</em> the destination file has been updated. The reload command also runs in a shell.</p>
+<ul>
+<li>You can reference the destination path with <code>{{ .dst }}</code>.</li>
+<li>If the reload command returns a non-zero exit code, remco logs an error but the destination file remains updated.</li>
+</ul>
+<p>Example:</p>
+<pre class="code-block code-block-example"><code class="language-toml"><span class="line">reload_cmd = &quot;systemctl reload nginx&quot;</span></code></pre>
+<h2 id="resource-level-commands"><a class="heading-anchor" href="#resource-level-commands">4.3 Resource-level commands</a></h2>
+<p>A template resource also supports two higher-level commands:</p>
+<ul>
+<li><strong><code>start_cmd</code></strong> — runs once when all templates in the resource have been processed successfully for the first time.</li>
+<li><strong><code>reload_cmd</code></strong> (resource-level) — runs after any template in the resource is updated. This is distinct from the template-level <code>reload_cmd</code>.</li>
+</ul>
+<h2 id="interaction-with-watch-mode"><a class="heading-anchor" href="#interaction-with-watch-mode">4.4 Interaction with watch mode</a></h2>
+<p>When a backend is in watch mode and a change is detected:</p>
+<ol>
+<li>The template is re-rendered.</li>
+<li>If configured, <code>check_cmd</code> runs against the staging file.</li>
+<li>If the check passes, the staging file replaces the destination.</li>
+<li>If configured, the template-level <code>reload_cmd</code> runs.</li>
+<li>If configured, the resource-level <code>reload_cmd</code> runs.</li>
+</ol>
+<p>The template configuration parameters can be found here: <a href="#template-configuration-options">template configuration</a>.</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-details-process-lifecycle" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-process-lifecycle">5. Process lifecycle</a></h1>
+<div class="section-meta"><span><code>details/process-lifecycle.md</code> · 232 words</span></div>
+<p>Remco's lifecycle can be controlled with signals.</p>
+<h2 id="supported-signals"><a class="heading-anchor" href="#supported-signals">5.1 Supported signals</a></h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SIGINT / os.Interrupt</td>
+<td>Graceful shutdown. Remco stops all watchers and exits.</td>
+</tr>
+<tr>
+<td>SIGTERM</td>
+<td>Graceful shutdown. Same as SIGINT.</td>
+</tr>
+<tr>
+<td>SIGHUP</td>
+<td>Reload configuration. Remco re-reads the config file and restarts all resources.</td>
+</tr>
+<tr>
+<td>SIGCHLD</td>
+<td>Ignored. Remco handles child process reaping internally.</td>
+</tr>
+<tr>
+<td>SIGUSR1</td>
+<td>If an <code>inmem</code> telemetry sink is configured, dumps runtime metrics to stderr.</td>
+</tr>
+<tr>
+<td>Any other</td>
+<td>Forwarded to the child process (in exec mode).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="graceful-shutdown"><a class="heading-anchor" href="#graceful-shutdown">5.2 Graceful shutdown</a></h2>
+<p>On SIGINT or SIGTERM, remco:</p>
+<ol>
+<li>Stops all backend watchers/pollers.</li>
+<li>Sends the configured <code>kill_signal</code> (default: SIGTERM) to the child process if running in exec mode.</li>
+<li>Waits up to <code>kill_timeout</code> seconds for the child to exit.</li>
+<li>If the child has not exited, kills it (equivalent to SIGKILL).</li>
+<li>Exits with a code equal to the number of resources that had errors (capped at 125).</li>
+</ol>
+<h2 id="configuration-reload-sighup"><a class="heading-anchor" href="#configuration-reload-sighup">5.3 Configuration reload (SIGHUP)</a></h2>
+<p>When remco receives SIGHUP, it re-reads the configuration file from disk (including environment variable expansion). The new configuration replaces the old one — resources are stopped and restarted to match the new config.</p>
+<h2 id="exec-mode-signal-forwarding"><a class="heading-anchor" href="#exec-mode-signal-forwarding">5.4 Exec-mode signal forwarding</a></h2>
+<p>When running in exec mode, any signal not explicitly handled by remco is forwarded to the child process. This includes SIGUSR2 and any custom signals.</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-details-cli" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-cli">6. Command-line reference</a></h1>
+<div class="section-meta"><span><code>details/cli.md</code> · 203 words</span></div>
+<h2 id="flags"><a class="heading-anchor" href="#flags">6.1 Flags</a></h2>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-config</code></td>
+<td><code>/etc/remco/config</code></td>
+<td>Path to the configuration file.</td>
+</tr>
+<tr>
+<td><code>-onetime</code></td>
+<td><code>false</code></td>
+<td>Render all templates once and exit. Overrides the <code>onetime</code> setting on every backend to <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>-version</code></td>
+<td>—</td>
+<td>Print version information and exit.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="exit-codes"><a class="heading-anchor" href="#exit-codes">6.2 Exit codes</a></h2>
+<p>When remco exits after finishing its work, the exit code reflects the number of resources that encountered errors. This applies to <code>-onetime</code> runs and any other run where all resources complete on their own. The exit code is capped at 125 — if more than 125 resources fail, remco exits with 125.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>All resources completed successfully.</td>
+</tr>
+<tr>
+<td>1–125</td>
+<td>Number of resources that had errors.</td>
+</tr>
+<tr>
+<td>125+</td>
+<td>Clamped to 125.</td>
+</tr>
+</tbody>
+</table>
+<p>If remco receives <code>SIGINT</code> or <code>SIGTERM</code>, it performs a graceful shutdown and exits with code <code>0</code>.</p>
+<h2 id="version-output"><a class="heading-anchor" href="#version-output">6.3 Version output</a></h2>
+<p><code>remco -version</code> prints:</p>
+<pre class="code-block code-block-command"><code><span class="line">remco Version: &lt;version&gt;</span><span class="line">UTC Build Time: &lt;timestamp&gt;</span><span class="line">Git Commit Hash: &lt;hash&gt;</span><span class="line">Go Version: &lt;go version&gt;</span><span class="line">Go OS/Arch: &lt;os&gt;/&lt;arch&gt;</span></code></pre>
+<h2 id="configuration-reload"><a class="heading-anchor" href="#configuration-reload">6.4 Configuration reload</a></h2>
+<p><code>-onetime</code> is not the only way to control remco's lifecycle. See <a href="#doc-details-process-lifecycle">process lifecycle</a> for signal handling.</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-details-zombie-reaping" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-zombie-reaping">7. Zombie reaping</a></h1>
+<div class="section-meta"><span><code>details/zombie-reaping.md</code> · 32 words</span></div>
+<p>See: https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/</p>
+<p>If Remco detects that it runs as pid 1 (for example in a Docker container) it will automatically reap zombie processes.
+No additional init system is needed.</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-details-telemetry" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-telemetry">8. Telemetry</a></h1>
+<div class="section-meta"><span><code>details/telemetry.md</code> · 138 words</span></div>
+<p>Remco can expose different metrics about its state using <a href="https://github.com/armon/go-metrics">go-metrics</a>.
+You can configure any type of sink supported by go-metrics through the configuration file.
+All the configured sinks will be aggregated using FanoutSink.</p>
+<p>Currently supported sinks are:</p>
+<ul>
+<li><strong>inmem</strong></li>
+<li><strong>prometheus</strong></li>
+<li><strong>statsd</strong></li>
+<li><strong>statsite</strong></li>
+</ul>
+<p>The different configuration parameters can be found here: <a href="#telemetry-configuration-options">telemetry configuration</a>.</p>
+<p>Exposed metrics:</p>
+<ul>
+<li><strong>files.template_execution_duration</strong> — Duration of template execution</li>
+<li><strong>files.check_command_duration</strong> — Duration of check_command execution</li>
+<li><strong>files.reload_command_duration</strong> — Duration of reload_command execution</li>
+<li><strong>files.stage_errors_total</strong> — Total number of errors in file staging action</li>
+<li><strong>files.staged_total</strong> — Total number of successfully staged files</li>
+<li><strong>files.sync_errors_total</strong> — Total number of errors in file syncing action</li>
+<li><strong>files.synced_total</strong> — Total number of successfully synced files</li>
+<li><strong>backends.sync_errors_total</strong> — Total errors in backend sync action</li>
+<li><strong>backends.synced_total</strong> — Total number of successfully synced backends</li>
+</ul>
+
+</section>
+<hr class="section-divider">
+<div class="manual-group">
+<h2 class="manual-group-title">Configuration & Backends</h2>
+<p class="manual-group-summary">Backend capabilities, backend configuration, and integration points.</p>
+</div>
+<section id="doc-config-environment-variables" class="manual-section">
+<h1 class="section-header"><a href="#doc-config-environment-variables">9. Environment variables</a></h1>
+<div class="section-meta"><span><code>config/environment-variables.md</code> · 132 words</span></div>
+<p>Environment variable substitution is applied to the entire configuration file before TOML parsing. You can use <code>$VARIABLE_NAME</code> or <code>${VARIABLE_NAME}</code> and the text will be replaced with the value of the environment variable.</p>
+<pre class="code-block code-block-example"><code><span class="line">[resource]</span><span class="line">  [resource.backend.etcd]</span><span class="line">    nodes = [&quot;${ETCD_HOST}:2379&quot;]</span><span class="line">    username = &quot;$ETCD_USER&quot;</span><span class="line">    password = &quot;$ETCD_PASS&quot;</span></code></pre>
+<h2 id="how-it-works-1"><a class="heading-anchor" href="#how-it-works-1">9.1 How it works</a></h2>
+<p>Substitution is performed by Go's <code>os.ExpandEnv</code>, which means:</p>
+<ul>
+<li>Only simple <code>$VAR</code> and <code>${VAR}</code> forms are supported.</li>
+<li>Bash-style defaults like <code>${VAR:-default}</code> are <strong>not</strong> supported. Use a template function like <code>getv</code> with a default value inside templates instead.</li>
+<li>Undefined variables expand to an empty string.</li>
+</ul>
+<h2 id="quoting"><a class="heading-anchor" href="#quoting">9.2 Quoting</a></h2>
+<p>Because substitution happens before TOML parsing, values that may be empty or contain special characters should be quoted:</p>
+<pre class="code-block code-block-example"><code class="language-toml"><span class="line">password = &quot;${MY_PASSWORD}&quot;</span></code></pre>
+<p>Without quotes, an empty expansion could produce invalid TOML.</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-config-configuration-options" class="manual-section">
+<h1 class="section-header"><a href="#doc-config-configuration-options">10. Configuration options</a></h1>
+<div class="section-meta"><span><code>config/configuration-options.md</code> · 1376 words</span></div>
+<h2 id="global-configuration-options"><a class="heading-anchor" href="#global-configuration-options">10.1 Global configuration options</a></h2>
+<ul>
+<li><strong>log_level(string):</strong> Valid levels are panic, fatal, error, warn, info and debug. Default is info.</li>
+<li><strong>log_format(string):</strong> The format of the log messages. Valid formats are <em>text</em> and <em>json</em>.</li>
+<li><strong>include_dir(string):</strong> Specify an entire directory of resource configuration files to include. Data from files will be imported directly into <code>resource</code> array.</li>
+<li><strong>filter_dir(string):</strong> A folder with custom JavaScript template filters.</li>
+<li><strong>pid_file(string):</strong> A filename to write the process-id to.</li>
+</ul>
+<h2 id="resource-configuration-options"><a class="heading-anchor" href="#resource-configuration-options">10.2 Resource configuration options</a></h2>
+<ul>
+<li><strong>name(string, optional):</strong> You can give the resource a name which is added to the logs as field <em>resource</em>. Default is the name of the resource file.</li>
+<li><strong>start_cmd(string, optional)</strong> An optional command which is executed once all templates have been processed successfully.</li>
+<li><strong>reload_cmd(string, optional)</strong> An optional command which is executed as soon as a template belonging to the resource has been successfully recreated.</li>
+</ul>
+<h2 id="exec-configuration-options"><a class="heading-anchor" href="#exec-configuration-options">10.3 Exec configuration options</a></h2>
+<ul>
+<li><strong>command(string):</strong> This is the command to exec as a child process. Note that the child process must remain in the foreground.</li>
+<li><strong>kill_signal(string):</strong> This defines the signal sent to the child process when remco is gracefully shutting down. The application needs to exit before the <code>kill_timeout</code>, it will be terminated otherwise (like kill -9). The default value is &quot;SIGTERM&quot;.</li>
+<li><strong>kill_timeout(int):</strong> The maximum amount of time (seconds) to wait for the child process to gracefully terminate. Default is 10.</li>
+<li><strong>reload_signal(string):</strong> This defines the signal sent to the child process when some configuration data is changed. If no signal is specified the child process will be killed (gracefully) and started again.</li>
+<li><strong>splay(int):</strong> A random splay to wait before killing the command. May be useful in large clusters to prevent all child processes to reload at the same time when configuration changes occur. Default is 0.</li>
+</ul>
+<h2 id="template-configuration-options"><a class="heading-anchor" href="#template-configuration-options">10.4 Template configuration options</a></h2>
+<ul>
+<li><strong>src(string):</strong> The path of the template that will be used to render the application's configuration file.</li>
+<li><strong>dst(string):</strong> The location to place the rendered configuration file.</li>
+<li><strong>make_directories(bool, optional):</strong> Make parent directories for the dst path as needed. Default is false.</li>
+<li><strong>check_cmd(string, optional):</strong> An optional command to check the rendered source template before writing it to the destination. If this command returns non-zero, the destination will not be overwritten by the rendered source template. We can use <code>{{.src}}</code> here to reference the rendered source template.</li>
+<li><strong>reload_cmd(string, optional):</strong> An optional command to run after the destination is updated. We can use <code>{{.dst}}</code> here to reference the destination.</li>
+<li><strong>mode(string, optional):</strong> The permission mode of the file (e.g. &quot;0644&quot;). If empty and the destination file already exists, the existing file's mode is preserved. If the file does not exist, the default is &quot;0644&quot;.</li>
+<li><strong>UID(int, optional):</strong> The UID that should own the file. Defaults to the effective uid.</li>
+<li><strong>GID(int, optional):</strong> The GID that should own the file. Defaults to the effective gid.</li>
+</ul>
+<h2 id="backend-configuration-options"><a class="heading-anchor" href="#backend-configuration-options">10.5 Backend configuration options</a></h2>
+<p>The <code>default_backends</code> section lets you define backend values that apply to every resource. When remco loads a resource, it first deep-copies the <code>default_backends</code> into that resource, then overlays the resource's own <code>[backend]</code> settings on top. This means resource-level values override defaults, and any field left empty in the resource inherits the default.</p>
+<p>See the example configuration to see how global default values can be set for individual backends.</p>
+<h3 id="valid-in-every-backend"><a class="heading-anchor" href="#valid-in-every-backend">10.5.1 valid in every backend</a></h3>
+<ul>
+<li><strong>keys([]string):</strong> The backend keys that the template requires to be rendered correctly. The child keys are also loaded.</li>
+<li><strong>watch(bool, optional):</strong> Enable watch support. Default is false.</li>
+<li><strong>prefix(string, optional):</strong> Key path prefix. Default is &quot;&quot;.</li>
+<li><strong>watchKeys([]string, optional):</strong> Keys list to watch. Default is same as keys.</li>
+<li><strong>interval(int, optional):</strong> The backend polling interval in seconds. Can be used as a reconciliation loop for watch or standalone. If interval is 0 or unset, and neither <code>watch</code> nor <code>onetime</code> is true, the interval defaults to 60.</li>
+<li><strong>onetime(bool, optional):</strong> Render the config file and quit. Default is false.</li>
+</ul>
+<h3 id="etcd"><a class="heading-anchor" href="#etcd">10.5.2 etcd</a></h3>
+<ul>
+<li><strong>nodes([]string):</strong> List of backend nodes.</li>
+<li><strong>srv_record(string, optional):</strong> A DNS server record to discover the etcd nodes.</li>
+<li><strong>scheme(string, optional):</strong> The backend URI scheme (http or https). This is only used when the nodes are discovered via DNS srv records and the api level is 2. Default is http.</li>
+<li><strong>client_cert(string, optional):</strong> The client cert file.</li>
+<li><strong>client_key(string, optional):</strong> The client key file.</li>
+<li><strong>client_ca_keys(string, optional):</strong> The client CA key file.</li>
+<li><strong>username(string, optional):</strong> The username for the basic_auth authentication.</li>
+<li><strong>password(string, optional):</strong> The password for the basic_auth authentication.</li>
+<li><strong>version(uint, optional):</strong> The etcd api-level to use (2 or 3). Default is 2.</li>
+</ul>
+<h3 id="nats"><a class="heading-anchor" href="#nats">10.5.3 nats</a></h3>
+<ul>
+<li><strong>nodes([]string, optional):</strong> List of backend nodes. If none is provided the default URL <code>nats://localhost:4222</code> is used.</li>
+<li><strong>bucket(string):</strong> The nats kv bucket where your config keys are stored</li>
+<li><strong>username(string, optional):</strong> The username for the basic_auth authentication.</li>
+<li><strong>password(string, optional):</strong> The password for the basic_auth authentication.</li>
+<li><strong>token(string, optional):</strong> The authentication token for the nats server</li>
+<li><strong>creds(string, optional):</strong> The path to an NATS 2.0 and NATS NGS compatible user credentials file</li>
+</ul>
+<h3 id="consul"><a class="heading-anchor" href="#consul">10.5.4 consul</a></h3>
+<ul>
+<li><strong>nodes([]string):</strong> List of backend nodes.</li>
+<li><strong>srv_record(string, optional):</strong> A DNS server record to discover the consul nodes.</li>
+<li><strong>scheme(string, optional):</strong> The backend URI scheme (http or https).</li>
+<li><strong>client_cert(string, optional):</strong> The client cert file.</li>
+<li><strong>client_key(string, optional):</strong> The client key file.</li>
+<li><strong>client_ca_keys(string, optional):</strong> The client CA key file.</li>
+</ul>
+<h3 id="file"><a class="heading-anchor" href="#file">10.5.5 file</a></h3>
+<ul>
+<li><strong>filepath(string):</strong> The filepath to a yaml or json file containing the key-value pairs. This can be a local file or a remote http/https location.</li>
+<li><strong>httpheaders(map[string]string):</strong> Optional HTTP-headers to append to the request if the file path is a remote http/https location.</li>
+</ul>
+<h3 id="redis"><a class="heading-anchor" href="#redis">10.5.6 redis</a></h3>
+<ul>
+<li><strong>nodes([]string):</strong> List of backend nodes.</li>
+<li><strong>srv_record(string, optional):</strong> A DNS server record to discover the redis nodes.</li>
+<li><strong>password(string, optional):</strong> The redis password.</li>
+<li><strong>database(int, optional):</strong> The redis database.</li>
+</ul>
+<h3 id="vault"><a class="heading-anchor" href="#vault">10.5.7 vault</a></h3>
+<ul>
+<li><strong>node(string):</strong> The backend node.</li>
+<li><strong>auth_type(string):</strong> The vault authentication type. (token, approle, app-id, userpass, github, cert, kubernetes)</li>
+<li><strong>auth_token(string):</strong> The vault authentication token. Only used with auth_type=token or github.</li>
+<li><strong>role_id(string):</strong> The vault app role. Only used with auth_type=approle and kubernetes.</li>
+<li><strong>secret_id(string):</strong> The vault secret id. Only used with auth_type=approle.</li>
+<li><strong>app_id(string):</strong> The vault app ID. Only used with auth_type=app-id.</li>
+<li><strong>user_id(string):</strong> The vault user ID. Only used with auth_type=app-id.</li>
+<li><strong>username(string):</strong> The username for the userpass authentication.</li>
+<li><strong>password(string):</strong> The password for the userpass authentication.</li>
+<li><strong>client_cert(string, optional):</strong> The client cert file.</li>
+<li><strong>client_key(string, optional):</strong> The client key file.</li>
+<li><strong>client_ca_keys(string, optional):</strong> The client CA key file.</li>
+</ul>
+<h3 id="env"><a class="heading-anchor" href="#env">10.5.8 env</a></h3>
+<p>The environment backend has no configuration fields beyond the common backend options. It reads values directly from environment variables.</p>
+<h3 id="zookeeper"><a class="heading-anchor" href="#zookeeper">10.5.9 zookeeper</a></h3>
+<ul>
+<li><strong>nodes([]string):</strong> List of backend nodes.</li>
+<li><strong>srv_record(string, optional):</strong> A DNS server record to discover the zookeeper nodes.</li>
+</ul>
+<h3 id="plugin"><a class="heading-anchor" href="#plugin">10.5.10 plugin</a></h3>
+<ul>
+<li><strong>path(string):</strong> The path to the plugin binary or script.</li>
+<li><strong>config(map[string]interface{}):</strong> Arbitrary key-value configuration passed to the plugin. Values can be strings, numbers, booleans, or nested maps.</li>
+</ul>
+<p>See the <a href="#doc-plugins-env-plugin-example">env plugin example</a> and <a href="#doc-plugins-consul-plugin-example">consul plugin example</a> for full working plugins.</p>
+<h2 id="telemetry-configuration-options"><a class="heading-anchor" href="#telemetry-configuration-options">10.6 Telemetry configuration options</a></h2>
+<ul>
+<li><strong>enabled(bool):</strong> Flag to enable telemetry.</li>
+<li><strong>service_name(string):</strong> Service name to add to every metric name. &quot;remco&quot; by default</li>
+<li><strong>hostname(string):</strong> Hostname to use. If not provided and enable_hostname, it will be os.Hostname</li>
+<li><strong>enable_hostname(bool):</strong> Enable prefixing gauge values with hostname. <code>true</code> by default</li>
+<li><strong>enable_hostname_label(bool):</strong> Put hostname into label instead of metric name. <code>false</code> by default</li>
+<li><strong>enable_runtime_metrics(bool):</strong> Enables profiling of runtime metrics (GC, Goroutines, Memory). <code>true</code> by default</li>
+</ul>
+<h2 id="sink-configuration-options"><a class="heading-anchor" href="#sink-configuration-options">10.7 Sink configuration options</a></h2>
+<h3 id="inmem"><a class="heading-anchor" href="#inmem">10.7.1 inmem</a></h3>
+<ul>
+<li><strong>interval(int):</strong> How long is each aggregation interval (seconds).</li>
+<li><strong>retain(int):</strong> Retain controls how many metrics interval we keep.</li>
+</ul>
+<p>Sending <code>SIGUSR1</code> to remco while an inmem sink is active will dump the current metrics to stderr.</p>
+<h3 id="prometheus"><a class="heading-anchor" href="#prometheus">10.7.2 prometheus</a></h3>
+<ul>
+<li><strong>addr(string):</strong> Address to expose metrics on. Prometheus stats will be available at /metrics endpoint.</li>
+<li><strong>expiration(int):</strong> Expiration is the duration a metric is valid for, after which it will be untracked. If the value is zero, a metric is never expired.</li>
+</ul>
+<div class="admonition note">
+<p>If you are using only the prometheus sink you may want to disable runtime metrics with the <strong>enable_runtime_metrics</strong> option, because they will duplicate prometheus builtin runtime metrics reporting. Also, consider using <strong>enable_hostname_label</strong> to put hostname in gauge metrics to label instead of metric name.</p>
+</div>
+<h3 id="statsd"><a class="heading-anchor" href="#statsd">10.7.3 statsd</a></h3>
+<ul>
+<li><strong>addr(string):</strong> Statsd/Statsite server address</li>
+</ul>
+<h3 id="statsite"><a class="heading-anchor" href="#statsite">10.7.4 statsite</a></h3>
+<ul>
+<li><strong>addr(string):</strong> Statsd/Statsite server address</li>
+</ul>
+
+</section>
+<hr class="section-divider">
+<section id="doc-config-sample-config" class="manual-section">
+<h1 class="section-header"><a href="#doc-config-sample-config">11. Sample config file</a></h1>
+<div class="section-meta"><span><code>config/sample-config.md</code> · 219 words</span></div>
+<pre class="code-block code-block-command"><code class="language-toml"><span class="line">#remco.toml</span><span class="line">################################################################</span><span class="line"># Global configuration</span><span class="line">################################################################</span><span class="line">log_level   = &quot;debug&quot;</span><span class="line">log_format  = &quot;json&quot;</span><span class="line">include_dir = &quot;/etc/remco/resource.d/&quot;</span><span class="line">pid_file    = &quot;/var/run/remco/remco.pid&quot;</span><span class="line"></span><span class="line"># default backend configurations.</span><span class="line"># these settings can be overwritten in the individual resource backend settings.</span><span class="line">[default_backends]</span><span class="line">[default_backends.file]</span><span class="line">    onetime  = true</span><span class="line">    prefix   = &quot;/bla&quot;</span><span class="line"></span><span class="line">################################################################</span><span class="line"># Resource configuration</span><span class="line">################################################################</span><span class="line">[[resource]]</span><span class="line">  name = &quot;haproxy&quot;</span><span class="line">  start_cmd   = &quot;echo 1&quot;</span><span class="line">  reload_cmd  = &quot;echo 1&quot;</span><span class="line">  [[resource.template]]</span><span class="line">    src         = &quot;/etc/remco/templates/haproxy.cfg&quot;</span><span class="line">    dst         = &quot;/etc/haproxy/haproxy.cfg&quot;</span><span class="line">    check_cmd   = &quot;somecommand&quot;</span><span class="line">    reload_cmd  = &quot;somecommand&quot;</span><span class="line">    mode        = &quot;0644&quot;</span><span class="line"></span><span class="line">  [resource.backend]</span><span class="line">    # you can use as many backends as you like</span><span class="line">    # in this example vault and file</span><span class="line">    [resource.backend.vault]</span><span class="line">      node           = &quot;http://127.0.0.1:8200&quot;</span><span class="line">      ## Token based auth backend</span><span class="line">      auth_type      = &quot;token&quot;</span><span class="line">      auth_token     = &quot;vault_token&quot;</span><span class="line">      ## AppID based auth backend</span><span class="line">      # auth_type    = &quot;app-id&quot;</span><span class="line">      # app_id       = &quot;vault_app_id&quot;</span><span class="line">      # user_id      = &quot;vault_user_id&quot;</span><span class="line">      ## userpass based auth backend</span><span class="line">      # auth_type    = &quot;userpass&quot;</span><span class="line">      # username     = &quot;username&quot;</span><span class="line">      # password     = &quot;password&quot;</span><span class="line">      client_cert    = &quot;/path/to/client_cert&quot;</span><span class="line">      client_key     = &quot;/path/to/client_key&quot;</span><span class="line">      client_ca_keys = &quot;/path/to/client_ca_keys&quot;</span><span class="line"></span><span class="line">      # These values are valid in every backend</span><span class="line">      watch    = true</span><span class="line">      prefix   = &quot;/&quot;</span><span class="line">      onetime  = true</span><span class="line">      interval = 1</span><span class="line">      keys     = [&quot;/&quot;]</span><span class="line">      watchKeys = [&quot;/haproxy/reload&quot;]</span><span class="line"></span><span class="line">    [resource.backend.file]</span><span class="line">      httpheaders = { X-Test-Token = &quot;XXX&quot;, X-Test-Token2 = &quot;YYY&quot; }</span><span class="line">      filepath = &quot;/etc/remco/test.yml&quot;</span><span class="line">      watch    = true</span><span class="line">      keys     = [&quot;/prefix&quot;]</span><span class="line"></span><span class="line">################################################################</span><span class="line"># Telemetry configuration</span><span class="line">################################################################</span><span class="line">[telemetry]</span><span class="line">  enabled = true</span><span class="line">  [telemetry.sinks.prometheus]</span><span class="line">    addr = &quot;:2112&quot;</span><span class="line">    expiration = 600</span></code></pre>
+
+</section>
+<hr class="section-divider">
+<section id="doc-config-sample-resource" class="manual-section">
+<h1 class="section-header"><a href="#doc-config-sample-resource">12. Sample resource</a></h1>
+<div class="section-meta"><span><code>config/sample-resource.md</code> · 62 words</span></div>
+<pre class="code-block code-block-example"><code><span class="line">[exec]</span><span class="line">  command       = &quot;/path/to/program&quot;</span><span class="line">  kill_signal   = &quot;SIGTERM&quot;</span><span class="line">  reload_signal = &quot;SIGHUP&quot;</span><span class="line">  kill_timeout  = 10</span><span class="line">  splay         = 10</span><span class="line"></span><span class="line"></span><span class="line">[[template]]</span><span class="line">  src           = &quot;/etc/remco/templates/haproxy.cfg&quot;</span><span class="line">  dst           = &quot;/etc/haproxy/haproxy.cfg&quot;</span><span class="line">  reload_cmd    = &quot;haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&quot;</span><span class="line">  mode          = &quot;0644&quot;</span><span class="line"></span><span class="line">[backend]</span><span class="line">  [backend.etcd]</span><span class="line">    nodes    = [&quot;http://localhost:2379&quot;]</span><span class="line">    keys     = [&quot;/service-registry&quot;]</span><span class="line">    watchKeys = [&quot;/haproxy/reload&quot;]</span><span class="line">    watch    = true</span><span class="line">    interval = 60</span><span class="line">    version  = 3</span></code></pre>
+
+</section>
+<hr class="section-divider">
+<section id="doc-details-backends" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-backends">13. Backends</a></h1>
+<div class="section-meta"><span><code>details/backends.md</code> · 370 words</span></div>
+<p>Remco fetches configuration data from key-value stores via backends. Each backend can operate in two modes:</p>
+<ul>
+<li><strong>Watch mode</strong> — the backend watches for changes in real time and triggers template re-rendering immediately.</li>
+<li><strong>Interval mode</strong> — the backend polls at a fixed interval (in seconds). This is a reconciliation loop.</li>
+</ul>
+<p>These modes are not mutually exclusive. You can enable both <code>watch</code> and <code>interval</code> simultaneously, so that watch provides low-latency updates and interval provides a safety net.</p>
+<p>If neither <code>watch</code> nor <code>onetime</code> is set and <code>interval</code> is 0 or unset, the interval defaults to 60 seconds.</p>
+<p>Every backend implements the <a href="https://github.com/HeavyHorst/easykv">easykv</a> interface.</p>
+<h2 id="supported-backends"><a class="heading-anchor" href="#supported-backends">13.1 Supported backends</a></h2>
+<table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Watch</th>
+<th>Interval</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>etcd 2 &amp; 3</strong></td>
+<td>yes</td>
+<td>yes</td>
+<td>Use <code>version = 3</code> (default is 2) for etcd v3 API. The <code>scheme</code> setting only applies when nodes are discovered via DNS SRV records with etcd v2.</td>
+</tr>
+<tr>
+<td><strong>consul</strong></td>
+<td>yes</td>
+<td>yes</td>
+<td>Supports TLS client certificates.</td>
+</tr>
+<tr>
+<td><strong>nats kv</strong></td>
+<td>yes</td>
+<td>yes</td>
+<td>If no <code>nodes</code> are given, defaults to <code>nats://localhost:4222</code>.</td>
+</tr>
+<tr>
+<td><strong>zookeeper</strong></td>
+<td>yes</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>redis</strong></td>
+<td>no</td>
+<td>yes</td>
+<td>Polling only.</td>
+</tr>
+<tr>
+<td><strong>vault</strong></td>
+<td>no</td>
+<td>yes</td>
+<td>Supports multiple auth types: <code>token</code>, <code>approle</code>, <code>app-id</code>, <code>userpass</code>, <code>github</code>, <code>cert</code>, <code>kubernetes</code>. Polling only.</td>
+</tr>
+<tr>
+<td><strong>env</strong></td>
+<td>no</td>
+<td>yes</td>
+<td>Reads from environment variables. No config fields beyond the common backend options.</td>
+</tr>
+<tr>
+<td><strong>file</strong></td>
+<td>yes</td>
+<td>yes</td>
+<td>YAML or JSON files. Can be a local path or a remote HTTP/HTTPS URL. Use <code>httpheaders</code> to add custom headers to remote requests.</td>
+</tr>
+<tr>
+<td><strong>mock</strong></td>
+<td>no</td>
+<td>yes</td>
+<td>Intended for testing. Accepts an <code>error</code> field to simulate backend failures.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="backend-configuration"><a class="heading-anchor" href="#backend-configuration">13.2 Backend configuration</a></h2>
+<p>The different configuration parameters can be found here: <a href="#backend-configuration-options">backend configuration</a>.</p>
+<h2 id="default-backends"><a class="heading-anchor" href="#default-backends">13.3 Default backends</a></h2>
+<p>You can define shared backend defaults in a <code>[default_backends]</code> section. These values are deep-copied into every resource as a starting point. Resource-level backend settings then override the defaults.</p>
+<pre class="code-block code-block-example"><code class="language-toml"><span class="line">[default_backends.etcd]</span><span class="line">  nodes = [&quot;http://etcd1:2379&quot;]</span><span class="line"></span><span class="line">[[resource]]</span><span class="line">  [resource.backend.etcd]</span><span class="line">    nodes = [&quot;http://etcd2:2379&quot;]   # overrides the default</span><span class="line">    keys = [&quot;/myapp&quot;]</span></code></pre>
+<h2 id="plugin-backends"><a class="heading-anchor" href="#plugin-backends">13.4 Plugin backends</a></h2>
+<p>Remco also supports backends as plugins via JSON-RPC. See <a href="#doc-details-plugins">plugins</a> for details.</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-details-plugins" class="manual-section">
+<h1 class="section-header"><a href="#doc-details-plugins">14. Plugins</a></h1>
+<div class="section-meta"><span><code>details/plugins.md</code> · 30 words</span></div>
+<p>Remco supports backends as plugins.
+There is no requirement that plugins be written in Go.
+Every language that can provide a JSON-RPC API is ok.</p>
+<p>Example: <a href="#doc-plugins-env-plugin-example">env plugin</a>.</p>
+
+</section>
+<hr class="section-divider">
+<div class="manual-group">
+<h2 class="manual-group-title">Template Authoring</h2>
+<p class="manual-group-summary">Template syntax, built-in functions, and filters used while rendering files.</p>
+</div>
+<section id="doc-template-template-engine" class="manual-section">
+<h1 class="section-header"><a href="#doc-template-template-engine">15. Template engine</a></h1>
+<div class="section-meta"><span><code>template/template-engine.md</code> · 225 words</span></div>
+<p>Remco uses <a href="https://github.com/flosch/pongo2">pongo2</a>, a Django-syntax template engine for Go. This is different from confd's Go <code>text/template</code> syntax. If you are migrating from confd, templates must be rewritten.</p>
+<h2 id="syntax-overview"><a class="heading-anchor" href="#syntax-overview">15.1 Syntax overview</a></h2>
+<p>Pongo2 uses <code>{% %}</code> for tags and <code>{{ }}</code> for variable output:</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for key in gets(&quot;/config/*&quot;) %}</span><span class="line">{{ key }} = {{ getv(key) }}</span><span class="line">{% endfor %}</span></code></pre>
+<p>Auto-escaping is disabled, so HTML entities are not inserted.</p>
+<h2 id="whitespace-handling"><a class="heading-anchor" href="#whitespace-handling">15.2 Whitespace handling</a></h2>
+<p>Remco enables pongo2's <code>TrimBlocks</code> and <code>LStripBlocks</code> options:</p>
+<ul>
+<li><strong>TrimBlocks</strong> — the first newline after a block tag (<code>{% if %}</code>, <code>{% for %}</code>, <code>{% endfor %}</code>, etc.) is stripped.</li>
+<li><strong>LStripBlocks</strong> — leading whitespace (including tabs) before a block tag on the same line is stripped.</li>
+</ul>
+<p>These match the behavior of Jinja2's similarly-named options. Without them, templates that mix tags and literal content often produce unwanted blank lines.</p>
+<p>Example with both options enabled:</p>
+<pre class="code-block code-block-example"><code><span class="line">{% if true %}</span><span class="line">hello</span><span class="line">{% endif %}</span></code></pre>
+<p>Produces <code>\nhello\n</code> (not <code>\n\nhello\n\n</code>).</p>
+<h2 id="available-functions-and-filters"><a class="heading-anchor" href="#available-functions-and-filters">15.3 Available functions and filters</a></h2>
+<ul>
+<li><a href="#doc-template-template-functions">Template functions</a> — <code>getv</code>, <code>getvs</code>, <code>ls</code>, <code>fileExists</code>, etc.</li>
+<li><a href="#doc-template-template-filters">Template filters</a> — <code>parseInt</code>, <code>toYAML</code>, <code>base64</code>, etc.</li>
+</ul>
+<h2 id="memkv-store-functions"><a class="heading-anchor" href="#memkv-store-functions">15.4 memkv store functions</a></h2>
+<p>The functions <code>exists</code>, <code>get</code>, <code>gets</code>, <code>getv</code>, <code>getvs</code>, <code>ls</code>, and <code>lsdir</code> come from the <a href="https://github.com/HeavyHorst/memkv">memkv</a> library, which remco uses as an in-memory cache of the backend key-value data. They are available in every template without any additional configuration.</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-template-template-functions" class="manual-section">
+<h1 class="section-header"><a href="#doc-template-template-functions">16. Template functions</a></h1>
+<div class="section-meta"><span><code>template/template-functions.md</code> · 793 words</span></div>
+<h3 id="exists"><a class="heading-anchor" href="#exists">16.1 exists</a></h3>
+<p>Checks if the key exists. Returns <code>false</code> if the key is not found.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% if exists(&quot;/key&quot;) %}</span><span class="line">    value: {{ getv(&quot;/key&quot;) }}</span><span class="line">{% endif %}</span></code></pre>
+<h3 id="get"><a class="heading-anchor" href="#get">16.2 get</a></h3>
+<p>Returns the KVPair where key matches its argument.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% with get(&quot;/key&quot;) as dat %}</span><span class="line">    key: {{dat.Key}}</span><span class="line">    value: {{dat.Value}}</span><span class="line">{% endwith %}</span></code></pre>
+<h3 id="gets"><a class="heading-anchor" href="#gets">16.3 gets</a></h3>
+<p>Returns all KVPair, []KVPair, where key matches its argument.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for i in gets(&quot;/*&quot;) %}</span><span class="line">    key: {{i.Key}}</span><span class="line">    value: {{i.Value}}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="getv"><a class="heading-anchor" href="#getv">16.4 getv</a></h3>
+<p>Returns the value as a string where key matches its argument, or an optional default value.</p>
+<pre class="code-block code-block-example"><code><span class="line">value: {{ getv(&quot;/key&quot;) }}</span></code></pre>
+<p>With a default value:</p>
+<pre class="code-block code-block-example"><code><span class="line">value: {{ getv(&quot;/key&quot;, &quot;default_value&quot;) }}</span></code></pre>
+<h3 id="getvs"><a class="heading-anchor" href="#getvs">16.5 getvs</a></h3>
+<p>Returns all values, []string, where key matches its argument.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for value in getvs(&quot;/*&quot;) %}</span><span class="line">    value: {{value}}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="getenv"><a class="heading-anchor" href="#getenv">16.6 getenv</a></h3>
+<p>Retrieves the value of the environment variable named by the key. It returns the value, which will be empty if the variable is not present. Optionally, you can give a default value that will be returned if the key is not present.</p>
+<pre class="code-block code-block-command"><code><span class="line">export HOSTNAME=`hostname`</span></code></pre>
+<pre class="code-block code-block-example"><code><span class="line">hostname: {{getenv(&quot;HOSTNAME&quot;)}}</span></code></pre>
+<p>With a default value:</p>
+<pre class="code-block code-block-example"><code><span class="line">ipaddr: {{ getenv(&quot;HOST_IP&quot;, &quot;127.0.0.1&quot;) }}</span></code></pre>
+<h3 id="ls"><a class="heading-anchor" href="#ls">16.7 ls</a></h3>
+<p>Returns all subkeys, []string, where path matches its argument. Returns an empty list if path is not found.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for i in ls(&quot;/deis/services&quot;) %}</span><span class="line">   value: {{i}}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="lsdir"><a class="heading-anchor" href="#lsdir">16.8 lsdir</a></h3>
+<p>Returns all subkeys, []string, where path matches its argument. It only returns subkeys that also have subkeys. Returns an empty list if path is not found.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for dir in lsdir(&quot;/deis/services&quot;) %}</span><span class="line">   value: {{dir}}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="replace"><a class="heading-anchor" href="#replace">16.9 replace</a></h3>
+<p>Alias for the <a href="https://golang.org/pkg/strings/#Replace">strings.Replace</a> function.</p>
+<pre class="code-block code-block-example"><code><span class="line">backend = {{ replace(getv(&quot;/services/backend/nginx&quot;), &quot;-&quot;, &quot;_&quot;, -1) }}</span></code></pre>
+<h3 id="contains"><a class="heading-anchor" href="#contains">16.10 contains</a></h3>
+<p>Alias for the <a href="https://golang.org/pkg/strings/#Contains">strings.Contains</a> function.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% if contains(getv(&quot;/services/backend/nginx&quot;), &quot;something&quot;) %}</span><span class="line">something</span><span class="line">{% endif %}</span></code></pre>
+<h3 id="printf"><a class="heading-anchor" href="#printf">16.11 printf</a></h3>
+<p>Alias for the <a href="https://golang.org/pkg/fmt/#Sprintf">fmt.Sprintf</a> function.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ getv (printf (&quot;/config/%s/host_port&quot;, dir)) }}</span></code></pre>
+<h3 id="unixts"><a class="heading-anchor" href="#unixts">16.12 unixTS</a></h3>
+<p>Wrapper for <a href="https://golang.org/pkg/time/#Unix">time.Now().Unix()</a>.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ unixTS }}</span></code></pre>
+<h3 id="daterfc3339"><a class="heading-anchor" href="#daterfc3339">16.13 dateRFC3339</a></h3>
+<p>Wrapper for <a href="https://golang.org/pkg/time/">time.Now().Format(time.RFC3339)</a>.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ dateRFC3339 }}</span></code></pre>
+<h3 id="fileexists"><a class="heading-anchor" href="#fileexists">16.14 fileExists</a></h3>
+<p>Checks whether a file exists at the given path. Returns <code>true</code> if the file exists, <code>false</code> otherwise.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% if fileExists(&quot;/etc/myapp/config.yaml&quot;) %}</span><span class="line">key: {{ getv(&quot;/myapp/key&quot;) }}</span><span class="line">{% else %}</span><span class="line">key: default_value</span><span class="line">{% endif %}</span></code></pre>
+<h3 id="lookupip"><a class="heading-anchor" href="#lookupip">16.15 lookupIP</a></h3>
+<p>Wrapper for the <a href="https://golang.org/pkg/net/#LookupIP">net.LookupIP</a> function. The wrapper returns the IP addresses in alphabetical order.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for ip in lookupIP(&quot;kube-master&quot;) %}</span><span class="line"> {{ ip }}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="lookupsrv"><a class="heading-anchor" href="#lookupsrv">16.16 lookupSRV</a></h3>
+<p>Wrapper for the <a href="https://golang.org/pkg/net/#LookupSRV">net.LookupSRV</a> function. The wrapper returns the SRV records in alphabetical order.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for srv in lookupSRV(&quot;xmpp-server&quot;, &quot;tcp&quot;, &quot;google.com&quot;) %}</span><span class="line">  target: {{ srv.Target }}</span><span class="line">  port: {{ srv.Port }}</span><span class="line">  priority: {{ srv.Priority }}</span><span class="line">  weight: {{ srv.Weight }}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="createmap"><a class="heading-anchor" href="#createmap">16.17 createMap</a></h3>
+<p>Creates a hashMap to store values at runtime. This can be useful if you want to generate json/yaml files.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% set map = createMap() %}</span><span class="line">{{ map.Set(&quot;Moin&quot;, &quot;Hallo2&quot;) }}</span><span class="line">{{ map.Set(&quot;Test&quot;, 105) }}</span><span class="line">{{ map | toYAML }}</span><span class="line"></span><span class="line">{% set map2 = createMap() %}</span><span class="line">{{ map2.Set(&quot;Moin&quot;, &quot;Hallo&quot;) }}</span><span class="line">{{ map2.Set(&quot;Test&quot;, 300) }}</span><span class="line">{{ map2.Set(&quot;anotherMap&quot;, map) }}</span><span class="line">{{ map2 | toYAML }}</span></code></pre>
+<p>The hashmap supports the following methods:</p>
+<ul>
+<li><code>m.Set(&quot;key&quot;, value)</code> adds a new value of arbitrary type referenced by &quot;key&quot; to the map</li>
+<li><code>m.Get(&quot;key&quot;)</code> get the value for the given &quot;key&quot;</li>
+<li><code>m.Remove(&quot;key&quot;)</code> removes the key and value from the map</li>
+</ul>
+<h3 id="createset"><a class="heading-anchor" href="#createset">16.18 createSet</a></h3>
+<p>Creates a set to store values at runtime. This can be useful if you want to generate json/yaml files.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% set s = createSet() %}</span><span class="line">{{ s.Append(&quot;Moin&quot;) }}</span><span class="line">{{ s.Append(&quot;Moin&quot;) }}</span><span class="line">{{ s.Append(&quot;Hallo&quot;) }}</span><span class="line">{{ s.Append(1) }}</span><span class="line">{{ s.Remove(&quot;Hallo&quot;) }}</span><span class="line">{{ s | toYAML }}</span></code></pre>
+<p>The set supports the following methods:</p>
+<ul>
+<li><code>s.Append(&quot;string&quot;)</code> adds a new string to the set. Attention - the set is not sorted or the order of appended elements guaranteed.</li>
+<li><code>s.Remove(&quot;string&quot;)</code> removes the given element from the set.</li>
+<li><code>s.Contains(&quot;string&quot;)</code> check if the given string is part of the set, returns true or false otherwise</li>
+<li><code>s.SortedSet()</code> returns a new list where all elements are sorted in increasing order. This method should be used inside the template with a for-in loop to generate a stable output file not changing order of elements on every run.</li>
+</ul>
+<pre class="code-block code-block-example"><code><span class="line">{% set s = createSet() %}</span><span class="line">{% s.Append(&quot;Moin&quot;) %}</span><span class="line">{% s.Append(&quot;Hi&quot;) %}</span><span class="line">{% s.Append(&quot;Hallo&quot;) %}</span><span class="line"></span><span class="line">{% for greeting in s %}</span><span class="line">{{ greeting }}</span><span class="line">{% endfor %}</span><span class="line"></span><span class="line">{% for greeting in s.SortedSet() %}</span><span class="line">{{ greeting }}</span><span class="line">{% endfor %}</span></code></pre>
+<p>The output of the first loop is not defined, it can be in every order (like <code>Moin Hallo Hi</code> or <code>Hi Hallo Moin</code> and so on). The second loop returns every time <code>Hallo Hi Moin</code> (items sorted as string in increasing order).</p>
+
+</section>
+<hr class="section-divider">
+<section id="doc-template-template-filters" class="manual-section">
+<h1 class="section-header"><a href="#doc-template-template-filters">17. Template filters</a></h1>
+<div class="section-meta"><span><code>template/template-filters.md</code> · 783 words</span></div>
+<h2 id="builtin-filters"><a class="heading-anchor" href="#builtin-filters">17.1 Builtin filters</a></h2>
+<h3 id="parseint"><a class="heading-anchor" href="#parseint">17.1.1 parseInt</a></h3>
+<p>Takes the given string and parses it as a base-10 integer (64bit).</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ &quot;12000&quot; | parseInt }}</span></code></pre>
+<h3 id="parsefloat"><a class="heading-anchor" href="#parsefloat">17.1.2 parseFloat</a></h3>
+<p>Takes the given string and parses it as a float64.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ &quot;12000.45&quot; | parseFloat }}</span></code></pre>
+<h3 id="base64"><a class="heading-anchor" href="#base64">17.1.3 base64</a></h3>
+<p>Encodes a string as base64.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ &quot;somestring&quot; | base64 }}</span></code></pre>
+<h3 id="base64decode"><a class="heading-anchor" href="#base64decode">17.1.4 base64decode</a></h3>
+<p>Decodes a base64-encoded string.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ &quot;c29tZXN0cmluZw==&quot; | base64decode }}</span></code></pre>
+<h3 id="base"><a class="heading-anchor" href="#base">17.1.5 base</a></h3>
+<p>Alias for the <a href="https://golang.org/pkg/path/#Base">path.Base</a> function.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ &quot;/home/user/test&quot; | base }}</span></code></pre>
+<h3 id="dir"><a class="heading-anchor" href="#dir">17.1.6 dir</a></h3>
+<p>Alias for the <a href="https://golang.org/pkg/path/#Dir">path.Dir</a> function.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ &quot;/home/user/test&quot; | dir }}</span></code></pre>
+<h3 id="split"><a class="heading-anchor" href="#split">17.1.7 split</a></h3>
+<p>Alias for the <a href="https://golang.org/pkg/strings/#Split">strings.Split</a> function.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for i in (&quot;/home/user/test&quot; | split:&quot;/&quot;) %}</span><span class="line">{{i}}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="mapvalue"><a class="heading-anchor" href="#mapvalue">17.1.8 mapValue</a></h3>
+<p>Returns a map element by key.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ getv(&quot;/some_yaml_config&quot;) | parseYAML | mapValue:&quot;key&quot; }}</span></code></pre>
+<h3 id="index"><a class="heading-anchor" href="#index">17.1.9 index</a></h3>
+<p>Returns an array element by index.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ &quot;/home/user/test&quot; | split:&quot;/&quot; | index:&quot;1&quot; }}</span></code></pre>
+<h3 id="parseyaml"><a class="heading-anchor" href="#parseyaml">17.1.10 parseYAML</a></h3>
+<p>Returns an interface{} of the yaml value.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for value in getvs(&quot;/cache1/domains/*&quot;) %}</span><span class="line">{% set data = value | parseYAML %}</span><span class="line">{{ data.type }} {{ data.name }} {{ data.addr }}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="parsejson"><a class="heading-anchor" href="#parsejson">17.1.11 parseJSON</a></h3>
+<p>Returns an interface{} of the json value. (<code>parseYAMLArray</code> is a deprecated alias.)</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for value in getvs(&quot;/cache1/domains/*&quot;) %}</span><span class="line">{% set data = value | parseJSON %}</span><span class="line">{{ data.type }} {{ data.name }} {{ data.addr }}</span><span class="line">{% endfor %}</span></code></pre>
+<h3 id="tojson"><a class="heading-anchor" href="#tojson">17.1.12 toJSON</a></h3>
+<p>Converts data, for example the result of gets or lsdir, into a JSON object.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ gets(&quot;/myapp/database/*&quot;) | toJson}}</span></code></pre>
+<h3 id="toprettyjson"><a class="heading-anchor" href="#toprettyjson">17.1.13 toPrettyJSON</a></h3>
+<p>Converts data, for example the result of gets or lsdir, into a pretty-printed JSON object, indented by four spaces.</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ gets(&quot;/myapp/database/*&quot;) | toPrettyJson}}</span></code></pre>
+<h3 id="toyaml"><a class="heading-anchor" href="#toyaml">17.1.14 toYAML</a></h3>
+<p>Converts data, for example the result of gets or lsdir, into a YAML string. Accepts an optional parameter to control indentation (e.g. <code>indent=4</code>).</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ gets(&quot;/myapp/database/*&quot;) | toYAML }}</span></code></pre>
+<p>With custom indentation:</p>
+<pre class="code-block code-block-example"><code><span class="line">{{ gets(&quot;/myapp/database/*&quot;) | toYAML:&quot;indent=4&quot; }}</span></code></pre>
+<h3 id="sortbylength"><a class="heading-anchor" href="#sortbylength">17.1.15 sortByLength</a></h3>
+<p>Returns the sorted array. Works with []string and []KVPair.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for dir in lsdir(&quot;/config&quot;) | sortByLength %}</span><span class="line">{{dir}}</span><span class="line">{% endfor %}</span></code></pre>
+<h2 id="custom-filters"><a class="heading-anchor" href="#custom-filters">17.2 Custom filters</a></h2>
+<p>It is possible to create custom filters in JavaScript.
+If you want to create a <code>toEnv</code> filter, which transforms file system paths to environment variables, you must create the file <code>toEnv.js</code> in the configurable filter directory.</p>
+<p>The filter code could look like:</p>
+<pre class="code-block code-block-example"><code class="language-javascript"><span class="line">In.split(&quot;/&quot;).join(&quot;_&quot;).substr(1).toUpperCase();</span></code></pre>
+<p>There are two predefined variables:</p>
+<ul>
+<li><strong>In:</strong> the filter input (string)</li>
+<li><strong>Param:</strong> the optional filter parameter (string)</li>
+</ul>
+<p>As the parameter one string is possible only, the parameter string is added with a double-colon to the filter name (<code>&quot;yadda&quot; | filter:&quot;paramstr&quot;</code>).
+When the filter function needs multiple parameter all of them must be put into this one string and parsed inside the filter to extract all parameter from this string (example &quot;replace&quot; filter below).</p>
+<p>Remark:</p>
+<ul>
+<li><code>console</code> object for logging does not exist, therefore no output (for debugging and similar) possible.</li>
+<li>variable declaration must use <code>var</code> as other keywords like <code>const</code> or <code>let</code> are not defined</li>
+<li>the main script must not use <code>return</code> keyword, last output is the filter result.</li>
+</ul>
+<h3 id="examples"><a class="heading-anchor" href="#examples">17.2.1 Examples</a></h3>
+<p><strong>reverse filter</strong></p>
+<p>Put file <code>reverse.js</code> into the configured &quot;filter_dir&quot; with following content:</p>
+<pre class="code-block code-block-example"><code class="language-javascript"><span class="line">function reverse(s) {</span><span class="line">     var o = &quot;&quot;;</span><span class="line">     for (var i = s.length - 1; i &gt;= 0; i--)</span><span class="line">        o += s[i];</span><span class="line">     return o;</span><span class="line">}</span><span class="line"></span><span class="line">reverse(In);</span></code></pre>
+<p>Call this filter inside your template (e.g. <code>my-reverse-template.tmpl</code>) with:</p>
+<pre class="code-block code-block-example"><code><span class="line">{% set myString = &quot;hip-hip-hooray&quot; %}</span><span class="line">myString is {{ myString }}</span><span class="line">reversed myString is {{ myString | reverse }}</span></code></pre>
+<p>Output is:</p>
+<pre class="code-block code-block-example"><code><span class="line">myString is hip-hip-hooray</span><span class="line">reversed myString is yarooh-pih-pih</span></code></pre>
+<p><strong>replace filter</strong></p>
+<p>Put file <code>replace.js</code> into the configured &quot;filter_dir&quot; with following content:</p>
+<pre class="code-block code-block-command"><code class="language-javascript"><span class="line">function replace(str, p) {</span><span class="line">    var params = [' ','_'];  // default: replace all spaces with underscore</span><span class="line">    if (p) {</span><span class="line">        params = p.split(',');  // split all params given at comma</span><span class="line">    }</span><span class="line">  // if third param is a &quot;g&quot; like &quot;global&quot; change search string to regexp</span><span class="line">    if (params.length &gt; 2 &amp;&amp; params[2] == 'g') {</span><span class="line">        params[0] = new RegExp(params[0], params[2]);</span><span class="line">    }</span><span class="line">    // javascript string.replace replaces first occurence only if search param is a string</span><span class="line">    // need regexp object to replace all occurences</span><span class="line">    return str.replace(params[0], params[1]);</span><span class="line">}</span><span class="line">replace(In, Param)</span></code></pre>
+<p>Use this inside the template as:</p>
+<pre class="code-block code-block-example"><code><span class="line">{% set myString = &quot;hip-hip-hooray&quot; %}</span><span class="line">myString is {{ myString }}</span><span class="line">replace with default params (spaces): {{ myString | replace }}</span><span class="line">only replace first &quot;-&quot; with underscore is {{ myString | replace:&quot;-,_&quot; }}</span><span class="line">replace all &quot;-&quot; with underscore is {{ myString | replace:&quot;-,_,g&quot; }}</span></code></pre>
+<p>Output is:</p>
+<pre class="code-block code-block-example"><code><span class="line">myString is hip-hip-hooray</span><span class="line">replace with default params (spaces): hip-hip-hooray</span><span class="line">only replace first &quot;-&quot; with underscore is hip_hip-hooray</span><span class="line">replace all &quot;-&quot; with underscore is hip_hip_hooray</span></code></pre>
+
+</section>
+<hr class="section-divider">
+<div class="manual-group">
+<h2 class="manual-group-title">Extensions & Examples</h2>
+<p class="manual-group-summary">Plugin examples and end-to-end tutorials for adapting remco to real systems.</p>
+</div>
+<section id="doc-plugins-env-plugin-example" class="manual-section">
+<h1 class="section-header"><a href="#doc-plugins-env-plugin-example">18. Env plugin example</a></h1>
+<div class="section-meta"><span><code>plugins/env-plugin-example.md</code> · 233 words</span></div>
+<p>This is the env backend as a plugin.
+If you want to try it yourself, then just compile it and move the executable to <code>/etc/remco/plugins</code>.</p>
+<pre class="code-block code-block-command"><code class="language-go"><span class="line">package main</span><span class="line"></span><span class="line">import (</span><span class="line">	&quot;context&quot;</span><span class="line">	&quot;log&quot;</span><span class="line">	&quot;net/rpc/jsonrpc&quot;</span><span class="line"></span><span class="line">	easykv &quot;github.com/HeavyHorst/easykv&quot;</span><span class="line">	&quot;github.com/HeavyHorst/easykv/env&quot;</span><span class="line">	&quot;github.com/HeavyHorst/remco/pkg/backends/plugin&quot;</span><span class="line">	&quot;github.com/natefinch/pie&quot;</span><span class="line">)</span><span class="line"></span><span class="line">func main() {</span><span class="line">	p := pie.NewProvider()</span><span class="line">	if err := p.RegisterName(&quot;Plugin&quot;, &amp;EnvRPCServer{}); err != nil {</span><span class="line">		log.Fatalf(&quot;failed to register Plugin: %s&quot;, err)</span><span class="line">	}</span><span class="line">	p.ServeCodec(jsonrpc.NewServerCodec)</span><span class="line">}</span><span class="line"></span><span class="line">type EnvRPCServer struct {</span><span class="line">	// This is the real implementation</span><span class="line">	Impl easykv.ReadWatcher</span><span class="line">}</span><span class="line"></span><span class="line">func (e *EnvRPCServer) Init(args map[string]interface{}, resp *bool) error {</span><span class="line">	// use the data in args to create the ReadWatcher</span><span class="line">	// env var doesn't need any data</span><span class="line"></span><span class="line">	var err error</span><span class="line">	e.Impl, err = env.New()</span><span class="line">	return err</span><span class="line">}</span><span class="line"></span><span class="line">func (e *EnvRPCServer) GetValues(args []string, resp *map[string]string) error {</span><span class="line">	erg, err := e.Impl.GetValues(args)</span><span class="line">	if err != nil {</span><span class="line">		return err</span><span class="line">	}</span><span class="line">	*resp = erg</span><span class="line">	return nil</span><span class="line">}</span><span class="line"></span><span class="line">func (e *EnvRPCServer) Close(args interface{}, resp *interface{}) error {</span><span class="line">	e.Impl.Close()</span><span class="line">	return nil</span><span class="line">}</span><span class="line"></span><span class="line">func (e EnvRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {</span><span class="line">	var err error</span><span class="line">	*resp, err = e.Impl.WatchPrefix(context.Background(), args.Prefix, easykv.WithKeys(args.Opts.Keys), easykv.WithWaitIndex(args.Opts.WaitIndex))</span><span class="line">	return err</span><span class="line">}</span></code></pre>
+<p>Then create a config file with this backend section.</p>
+<pre class="code-block code-block-command"><code class="language-toml"><span class="line">[backend]</span><span class="line">  [[backend.plugin]]</span><span class="line">    path = &quot;/etc/remco/plugins/env&quot;</span><span class="line">    keys = [&quot;/&quot;]</span><span class="line">    interval = 60</span><span class="line">    watch = false</span><span class="line">    [backend.plugin.config]</span><span class="line">     # these parameters are not used in the env backend plugin</span><span class="line">     # but other plugins may need some data (password, prefix ...)</span><span class="line">     a = &quot;hallo&quot;</span><span class="line">     b = &quot;moin&quot;</span></code></pre>
+
+</section>
+<hr class="section-divider">
+<section id="doc-plugins-consul-plugin-example" class="manual-section">
+<h1 class="section-header"><a href="#doc-plugins-consul-plugin-example">19. Consul plugin example</a></h1>
+<div class="section-meta"><span><code>plugins/consul-plugin-example.md</code> · 296 words</span></div>
+<p>Here is another simple example plugin that speaks to the consul service endpoint instead of the consul kv-store like the built in consul backend.</p>
+<pre class="code-block code-block-command"><code class="language-go"><span class="line">package main</span><span class="line"></span><span class="line">import (</span><span class="line">	&quot;encoding/json&quot;</span><span class="line">	&quot;fmt&quot;</span><span class="line">	&quot;log&quot;</span><span class="line">	&quot;net/rpc/jsonrpc&quot;</span><span class="line">	&quot;path&quot;</span><span class="line">	&quot;strconv&quot;</span><span class="line"></span><span class="line">	easykv &quot;github.com/HeavyHorst/easykv&quot;</span><span class="line">	&quot;github.com/HeavyHorst/remco/pkg/backends/plugin&quot;</span><span class="line">	consul &quot;github.com/hashicorp/consul/api&quot;</span><span class="line">	&quot;github.com/natefinch/pie&quot;</span><span class="line">)</span><span class="line"></span><span class="line">func NewConsulClient(addr string) (*consul.Client, error) {</span><span class="line">	config := consul.DefaultConfig()</span><span class="line">	config.Address = addr</span><span class="line">	c, err := consul.NewClient(config)</span><span class="line">	if err != nil {</span><span class="line">		return nil, err</span><span class="line">	}</span><span class="line">	return c, nil</span><span class="line">}</span><span class="line"></span><span class="line">type ConsulRPCServer struct {</span><span class="line">	client *consul.Client</span><span class="line">}</span><span class="line"></span><span class="line">func main() {</span><span class="line">	p := pie.NewProvider()</span><span class="line">	if err := p.RegisterName(&quot;Plugin&quot;, &amp;ConsulRPCServer{}); err != nil {</span><span class="line">		log.Fatalf(&quot;failed to register Plugin: %s&quot;, err)</span><span class="line">	}</span><span class="line">	p.ServeCodec(jsonrpc.NewServerCodec)</span><span class="line">}</span><span class="line"></span><span class="line">func (c *ConsulRPCServer) Init(args map[string]string, resp *bool) error {</span><span class="line">	var err error</span><span class="line">	if addr, ok := args[&quot;addr&quot;]; ok {</span><span class="line">		c.client, err = NewConsulClient(addr)</span><span class="line">		if err != nil {</span><span class="line">			return err</span><span class="line">		}</span><span class="line">		*resp = true</span><span class="line">		return nil</span><span class="line">	}</span><span class="line">	return fmt.Errorf(&quot;I need an Address !&quot;)</span><span class="line">}</span><span class="line"></span><span class="line">func (c *ConsulRPCServer) GetValues(args []string, resp *map[string]string) error {</span><span class="line">	r := make(map[string]string)</span><span class="line">	passingOnly := true</span><span class="line">	for _, v := range args {</span><span class="line">		addrs, _, err := c.client.Health().Service(v, &quot;&quot;, passingOnly, nil)</span><span class="line">		if len(addrs) == 0 &amp;&amp; err == nil {</span><span class="line">			log.Printf(&quot;service ( %s ) was not found&quot;, v)</span><span class="line">		}</span><span class="line">		if err != nil {</span><span class="line">			return err</span><span class="line">		}</span><span class="line"></span><span class="line">		for idx, addr := range addrs {</span><span class="line">			key := path.Join(&quot;/&quot;, &quot;_consul&quot;, &quot;service&quot;, addr.Service.Service, strconv.Itoa(idx))</span><span class="line">			service_json, _ := json.Marshal(addr)</span><span class="line">			r[key] = string(service_json)</span><span class="line">		}</span><span class="line">	}</span><span class="line">	*resp = r</span><span class="line">	return nil</span><span class="line">}</span><span class="line"></span><span class="line">func (c *ConsulRPCServer) Close(args interface{}, resp *interface{}) error {</span><span class="line">	// consul client doesn't need to be closed</span><span class="line">	return nil</span><span class="line">}</span><span class="line"></span><span class="line">func (c *ConsulRPCServer) WatchPrefix(args plugin.WatchConfig, resp *uint64) error {</span><span class="line">	return easykv.ErrWatchNotSupported</span><span class="line">}</span></code></pre>
+<p>The config backend section could look like this:</p>
+<pre class="code-block code-block-example"><code><span class="line">[backend]</span><span class="line">  [[backend.plugin]]</span><span class="line">    path = &quot;/etc/remco/plugins/consul-service&quot;</span><span class="line">    keys = [&quot;consul&quot;]</span><span class="line">    interval = 60</span><span class="line">    onetime = false</span><span class="line">    [backend.plugin.config]</span><span class="line">     addr = &quot;localhost:8500&quot;</span></code></pre>
+
+</section>
+<hr class="section-divider">
+<section id="doc-examples-haproxy" class="manual-section">
+<h1 class="section-header"><a href="#doc-examples-haproxy">20. Dynamic haproxy configuration with Docker, registrator and etcd</a></h1>
+<div class="section-meta"><span><code>examples/haproxy.md</code> · 839 words</span></div>
+<h2 id="the-haproxy-template"><a class="heading-anchor" href="#the-haproxy-template">20.1 The haproxy template</a></h2>
+<p>We expect <a href="http://gliderlabs.github.io/registrator/latest/">registrator</a> to write the service data in this format to etcd:</p>
+<pre class="code-block code-block-command"><code><span class="line">/services/&lt;service-name&gt;/&lt;service-id&gt; = &lt;ip&gt;:&lt;port&gt;</span></code></pre>
+<p>The scheme (tcp, http) and the host_port of the service is configurable over the following keys:</p>
+<pre class="code-block code-block-command"><code><span class="line">/config/&lt;service-name&gt;/scheme</span><span class="line">/config/&lt;service-name&gt;/host_port</span></code></pre>
+<p>We create the template for the haproxy configuration file first.
+Create the file <strong>haproxy.tmpl</strong> and add the following config blocks:</p>
+<p>Some default configuration parameters:</p>
+<pre class="code-block code-block-example"><code><span class="line">global</span><span class="line">    daemon</span><span class="line">    maxconn 2048</span><span class="line"></span><span class="line">defaults</span><span class="line">    timeout connect 5000ms</span><span class="line">    timeout client 500000ms</span><span class="line">    timeout server 500000ms</span><span class="line">    log global</span><span class="line"></span><span class="line">frontend name_resolver_http</span><span class="line">    bind *:80</span><span class="line">    mode http</span></code></pre>
+<hr>
+<p>This block creates the <em>http</em> acl's.
+We iterate over all directories under /config (the services) and create a <strong>url_beg</strong> and a <strong>hdr_beg(host)</strong> acl if the service has a scheme configured.
+Note that we sort the services by length and iterate in reversed order (longest services first). That way we can have services with the same prefix, for example redis_test, and redis.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for dir in lsdir(&quot;/config&quot;) | sortByLength reversed %}</span><span class="line">  {% if exists(printf(&quot;/config/%s/scheme&quot;, dir)) %}</span><span class="line">    {% if getv(printf(&quot;/config/%s/scheme&quot;, dir)) == &quot;http&quot; %}</span><span class="line">      {% if ls(printf(&quot;/services/%s&quot;, dir)) %}</span><span class="line">        acl is_{{ dir }} url_beg /{{ dir }}</span><span class="line">        acl is_{{ dir }} hdr_beg(host) {{ dir }}</span><span class="line">        use_backend {{ dir }}_servers if is_{{ dir }}</span><span class="line">      {% endif %}</span><span class="line">    {% endif %}</span><span class="line">  {% endif %}</span><span class="line">{% endfor %}</span></code></pre>
+<p>If we had one service named redis we would get:</p>
+<pre class="code-block code-block-example"><code><span class="line">acl is_redis url_beg /redis </span><span class="line">acl is_redis hdr_beg(host) redis</span><span class="line">use_backend redis_servers if is_redis</span></code></pre>
+<hr>
+<p>Optional template block to expose a service on a host port:
+We iterate over all services under /config, test if the scheme and host_port is configured and create the host port configuration.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for dir in lsdir(&quot;/config&quot;) %}</span><span class="line">  {% if exists (printf (&quot;/config/%s/scheme&quot;, dir )) %}</span><span class="line">    {% if exists (printf(&quot;/config/%s/host_port&quot;, dir )) %}</span><span class="line">      {% if ls(printf(&quot;/services/%s&quot;, dir)) %}</span><span class="line">                frontend {{ dir }}_port</span><span class="line">                mode {{ getv (printf(&quot;/config/%s/scheme&quot;, dir)) }}</span><span class="line">                bind *:{{ getv (printf (&quot;/config/%s/host_port&quot;, dir)) }}</span><span class="line">                default_backend {{ dir }}_servers</span><span class="line">      {% endif %}</span><span class="line">    {% endif %}</span><span class="line">  {% endif %}</span><span class="line">{% endfor %}</span></code></pre>
+<p>If we had one service named redis with scheme=tcp and host_port=6379 we would get:</p>
+<pre class="code-block code-block-example"><code><span class="line">frontend redis_port</span><span class="line">mode tcp</span><span class="line">bind *:6379 </span><span class="line">default_backend redis_servers</span></code></pre>
+<hr>
+<p>The last block creates the haproxy backends.
+We iterate over all services and, if a scheme is set, create the backend <em>{service_name}_servers</em>.</p>
+<pre class="code-block code-block-example"><code><span class="line">{% for dir in lsdir(&quot;/services&quot;) %}</span><span class="line">  {% if exists(printf(&quot;/config/%s/scheme&quot;, dir)) %}</span><span class="line">backend {{ dir }}_servers</span><span class="line">        mode {{ getv (printf (&quot;/config/%s/scheme&quot;, dir)) }}</span><span class="line">        {% for i in gets (printf(&quot;/services/%s/*&quot;, dir)) %}</span><span class="line">            server server_{{ dir }}_{{ base (i.Key) }} {{ i.Value }}</span><span class="line">        {% endfor %}</span><span class="line">    {% endif %}</span><span class="line">{% endfor %}</span></code></pre>
+<p>If we had one service named redis with scheme=tcp we could get for example:</p>
+<pre class="code-block code-block-example"><code><span class="line">backend redis_servers   </span><span class="line">  mode tcp</span><span class="line">    server server_redis_1 192.168.0.10:32012</span><span class="line">    server server_redis_2 192.168.0.10:35013</span></code></pre>
+<hr>
+<h2 id="the-remco-configuration-file"><a class="heading-anchor" href="#the-remco-configuration-file">20.2 The remco configuration file</a></h2>
+<p>We also need to create the remco configuration file.
+Create a file named <strong>config</strong> and insert the following toml configuration.</p>
+<pre class="code-block code-block-command"><code class="language-toml"><span class="line">################################################################</span><span class="line"># Global configuration</span><span class="line">################################################################</span><span class="line">log_level = &quot;debug&quot;</span><span class="line">log_format = &quot;text&quot;</span><span class="line"></span><span class="line">[[resource]]</span><span class="line">name = &quot;haproxy&quot;</span><span class="line"></span><span class="line">[[resource.template]]</span><span class="line">  src = &quot;/etc/remco/templates/haproxy.tmpl&quot;</span><span class="line">  dst = &quot;/etc/haproxy/haproxy.cfg&quot;</span><span class="line">  reload_cmd 	  = &quot;haproxy -f {{.dst}} -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid`&quot;</span><span class="line"></span><span class="line">  [resource.backend]</span><span class="line">    [resource.backend.etcd]</span><span class="line">      nodes = [&quot;${ETCD_NODE}&quot;]</span><span class="line">      keys = [&quot;/services&quot;, &quot;/config&quot;]</span><span class="line">      watchKeys = [&quot;/haproxy/reload&quot;]</span><span class="line">      watch = true</span><span class="line">      interval = 60</span></code></pre>
+<h2 id="the-dockerfile"><a class="heading-anchor" href="#the-dockerfile">20.3 The Dockerfile</a></h2>
+<pre class="code-block code-block-command"><code><span class="line">FROM alpine:3.4</span><span class="line"></span><span class="line">ENV REMCO_VER 0.8.0</span><span class="line"></span><span class="line">RUN apk --update add --no-cache haproxy bash ca-certificates</span><span class="line">RUN wget https://github.com/HeavyHorst/remco/releases/download/v${REMCO_VER}/remco_${REMCO_VER}_linux_amd64.zip &amp;&amp; \</span><span class="line">    unzip remco_${REMCO_VER}_linux_amd64.zip &amp;&amp; rm remco_${REMCO_VER}_linux_amd64.zip &amp;&amp; \</span><span class="line">    mv remco_linux /bin/remco</span><span class="line"></span><span class="line">COPY config /etc/remco/config</span><span class="line">COPY haproxy.tmpl /etc/remco/templates/haproxy.tmpl</span><span class="line"></span><span class="line">ENTRYPOINT [&quot;remco&quot;]</span></code></pre>
+<h2 id="build-and-run-the-container"><a class="heading-anchor" href="#build-and-run-the-container">20.4 Build and run the container</a></h2>
+<p>You should have three files at this point:</p>
+<pre class="code-block code-block-example"><code><span class="line">.</span><span class="line">├── config</span><span class="line">├── Dockerfile</span><span class="line">└── haproxy.tmpl</span></code></pre>
+<h3 id="build-the-docker-container"><a class="heading-anchor" href="#build-the-docker-container">20.4.1 Build the docker container</a></h3>
+<pre class="code-block code-block-command"><code class="language-bash"><span class="line">sudo docker build -t remcohaproxy .</span></code></pre>
+<h3 id="optionally-test-the-container"><a class="heading-anchor" href="#optionally-test-the-container">20.4.2 Optionally test the container</a></h3>
+<h4 id="put-some-data-into-etcd"><a class="heading-anchor" href="#put-some-data-into-etcd">20.4.2.1 Put some data into etcd</a></h4>
+<pre class="code-block code-block-command"><code class="language-bash"><span class="line">etcdctl set /services/exampleService/1 someip:port</span><span class="line">etcdctl set /config/exampleService/scheme http</span><span class="line">etcdctl set /config/exampleService/host_port 1234</span></code></pre>
+<p>In this example we connect to a local etcd cluster.</p>
+<pre class="code-block code-block-command"><code class="language-bash"><span class="line">sudo docker run --rm -ti --net=host -e ETCD_NODE=http://localhost:2379 remcohaproxy</span></code></pre>
+<p>You should see something like this:</p>
+<pre class="code-block code-block-example"><code><span class="line">[Dec 16 18:26:20]  INFO remco[1]: Target config out of sync config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66</span><span class="line">[Dec 16 18:26:20] DEBUG remco[1]: Overwriting target config config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66</span><span class="line">[Dec 16 18:26:20] DEBUG remco[1]: Running haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -D -sf `cat /var/run/haproxy.pid` resource=haproxy source=resource.go:66</span><span class="line">[Dec 16 18:26:20] DEBUG remco[1]: &quot;&quot; resource=haproxy source=resource.go:66</span><span class="line">[Dec 16 18:26:20]  INFO remco[1]: Target config has been updated config=/etc/haproxy/haproxy.cfg resource=hapco source=resource.go:66</span><span class="line">[Dec 16 18:26:20] DEBUG remco[1]: [Reaped child process 60] source=main.go:87</span><span class="line">[Dec 16 18:26:24] DEBUG remco[1]: Retrieving keys backend=etcd key_prefix= resource=haproxy source=resource.go:66</span><span class="line">[Dec 16 18:26:24] DEBUG remco[1]: Compiling source template resource=haproxy source=resource.go:66 template=/etc/remco/templates/haproxy.tmpl</span><span class="line">[Dec 16 18:26:24] DEBUG remco[1]: Comparing staged and dest config files dest=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66 staged=.haproxy.cfg389124299</span><span class="line">[Dec 16 18:26:24] DEBUG remco[1]: Target config in sync config=/etc/haproxy/haproxy.cfg resource=haproxy source=resource.go:66</span></code></pre>
+<h3 id="run-registrator"><a class="heading-anchor" href="#run-registrator">20.4.3 Run registrator</a></h3>
+<pre class="code-block code-block-command"><code><span class="line">sudo docker run -d \</span><span class="line">    --name=registrator \</span><span class="line">    --net=host \</span><span class="line">    --volume=/var/run/docker.sock:/tmp/docker.sock \</span><span class="line">    gliderlabs/registrator:latest \</span><span class="line">      etcd://localhost:2379/services</span></code></pre>
+<p>Now every container gets automatically registered under /services.
+You can then configure the scheme and optionally the host_port of each service that you want to expose.</p>
+
+</section>
+<footer>
+<div>Sections: 20 · Headings: 96 · Words: 6721</div>
+<div><a href="#manual-top">Back to top</a></div>
+<div>MIT License · Copyright (c) 2026 HeavyHorst</div>
+</footer>
+</main>
+</div>
+<script>
+(function () {
+  const toc = document.getElementById('manual-toc');
+  if (!toc) {
+    return;
+  }
+
+  const links = Array.from(toc.querySelectorAll('a[href^="#"]'));
+  const linksByID = new Map();
+  const targets = [];
+
+  for (const link of links) {
+    const href = link.getAttribute('href');
+    if (!href || href === '#') {
+      continue;
+    }
+    const id = decodeURIComponent(href.slice(1));
+    const target = document.getElementById(id);
+    if (!target) {
+      continue;
+    }
+    if (!linksByID.has(id)) {
+      linksByID.set(id, []);
+      targets.push(target);
+    }
+    linksByID.get(id).push(link);
+  }
+
+  if (targets.length === 0) {
+    return;
+  }
+
+  let activeID = '';
+
+  function activationOffset() {
+    if (!window.matchMedia('(max-width: 980px)').matches) {
+      return 32;
+    }
+    const stickyHeader = document.querySelector('.section-header');
+    if (!stickyHeader) {
+      return 96;
+    }
+    return stickyHeader.getBoundingClientRect().height + 24;
+  }
+
+  function setActive(id) {
+    if (id === activeID) {
+      return;
+    }
+    activeID = id;
+    for (const link of links) {
+      link.classList.remove('active');
+      link.removeAttribute('aria-current');
+    }
+    if (!id) {
+      return;
+    }
+    const activeLinks = linksByID.get(id) || [];
+    for (const link of activeLinks) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'location');
+    }
+    if (activeLinks.length > 0) {
+      keepLinkVisible(activeLinks[0]);
+    }
+  }
+
+  function keepLinkVisible(link) {
+    if (!toc || window.getComputedStyle(toc).display === 'none') {
+      return;
+    }
+    const tocRect = toc.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    const padding = 16;
+
+    if (linkRect.top < tocRect.top + padding) {
+      toc.scrollTop += linkRect.top - tocRect.top - padding;
+      return;
+    }
+    if (linkRect.bottom > tocRect.bottom - padding) {
+      toc.scrollTop += linkRect.bottom - tocRect.bottom + padding;
+    }
+  }
+
+  function pickActiveID() {
+    const offset = activationOffset();
+    let current = '';
+    for (const target of targets) {
+      if (target.getBoundingClientRect().top <= offset) {
+        current = target.id;
+        continue;
+      }
+      break;
+    }
+    if (current) {
+      return current;
+    }
+    if (window.location.hash.length > 1) {
+      return decodeURIComponent(window.location.hash.slice(1));
+    }
+    return targets[0].id;
+  }
+
+  function updateActiveLink() {
+    setActive(pickActiveID());
+  }
+
+  function scheduleUpdate() {
+    updateActiveLink();
+  }
+
+  window.addEventListener('scroll', scheduleUpdate, { passive: true });
+  window.addEventListener('resize', scheduleUpdate);
+  window.addEventListener('hashchange', scheduleUpdate);
+  updateActiveLink();
+})();
+</script>
+</body>
+</html>

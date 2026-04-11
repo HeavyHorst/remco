@@ -28,6 +28,8 @@ require (
 	sigs.k8s.io/yaml v1.2.0
 )
 
+require github.com/yuin/goldmark v1.8.2
+
 require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

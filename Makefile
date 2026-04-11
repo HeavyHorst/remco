@@ -1,4 +1,4 @@
-.PHONY: build clean test help default tag fmt vendor vet install release
+.PHONY: build clean test help default tag fmt vendor vet install release manual pages-build
 
 BIN_NAME := bin/remco
 
@@ -104,3 +104,11 @@ $(OUT_RELEASE_ZIP): $(GO_SRC)
 	     $(MAKE) build \
 	     BIN_NAME=$(subst ${VERSION}_,,$(subst _$(GOARCH).zip,,$@))
 	cd bin && zip -r $(shell basename $@) $(shell basename $(subst ${VERSION}_,,$(subst _$(GOARCH).zip,,$@)))
+
+manual:
+	go run ./cmd/remco-manual docs manual.html
+
+pages-build:
+	mkdir -p dist
+	go run ./cmd/remco-manual docs dist/index.html
+	touch dist/.nojekyll
