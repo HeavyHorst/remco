@@ -261,3 +261,15 @@ func TestExecutorLogging(t *testing.T) {
 		t.Errorf("Log output did not match out expectations. Was '%s'", s)
 	}
 }
+
+
+func TestSpawnChildEmptyCommand(t *testing.T) {
+	for _, command := range []string{"   ", "	", " 	 "} {
+		logger := hclog.New(&hclog.LoggerOptions{Output: ioutil.Discard})
+		exec := NewExecutor(command, "", "", 0, 0, logger)
+		err := exec.SpawnChild()
+		if err == nil {
+			t.Errorf("SpawnChild with command %q should return an error, got nil", command)
+		}
+	}
+}
