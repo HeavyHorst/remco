@@ -134,6 +134,10 @@ func (e *Executor) SpawnChild() error {
 			return err
 		}
 
+		if len(args) == 0 {
+			return fmt.Errorf("exec_command %q parsed to no tokens", e.execCommand)
+		}
+
 		c, err = child.New(&child.NewInput{
 			Stdin:        os.Stdin,
 			Stdout:       os.Stdout,
