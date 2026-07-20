@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -22,6 +23,9 @@ import (
 	"github.com/HeavyHorst/remco/pkg/template"
 	"github.com/pkg/errors"
 )
+
+// bracedEnvRegex matches the ${VAR} form of environment variable references.
+var bracedEnvRegex = regexp.MustCompile(`\$\{([A-Za-z_][A-Za-z0-9_]*)\}`)
 
 // BackendConfigs holds every individually backend config.
 // The values are filled with data from the configuration file.
@@ -129,13 +133,24 @@ type Resource struct {
 	Name string
 }
 
+// expandEnvBraced expands only the ${VAR} form of environment variables.
+// Unlike os.ExpandEnv it leaves a bare "$" untouched, so literal dollar signs
+// in configuration values (for example a password like "secret$Q$") are
+// preserved instead of being stripped.
+func expandEnvBraced(s string) string {
+	return bracedEnvRegex.ReplaceAllStringFunc(s, func(match string) string {
+		name := match[2 : len(match)-1]
+		return os.Getenv(name)
+	})
+}
+
 func readFileAndExpandEnv(path string) ([]byte, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return buf, errors.Wrap(err, "read file failed")
 	}
-	// expand the environment variables
-	buf = []byte(os.ExpandEnv(string(buf)))
+	// expand only ${VAR} style environment variables
+	buf = []byte(expandEnvBraced(string(buf)))
 	return buf, nil
 }
 
